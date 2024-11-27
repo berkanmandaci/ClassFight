@@ -13,7 +13,7 @@ namespace _Project.Runtime.Core.Extensions.Singleton
           return _instance;
         }
 
-        if (FindObjectsOfType(typeof(T)) is T[] managers && managers.Length != 0)
+        if (FindObjectsByType<T>(FindObjectsSortMode.None) is T[] managers && managers.Length != 0)
         {
           if (managers.Length == 1)
           {
