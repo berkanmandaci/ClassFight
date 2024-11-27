@@ -15,9 +15,7 @@ namespace _Project.Runtime.Core.Extensions.Dictionary
                 dictionary.Add(key, value);
             }
         }
-        public static void Update<TKey, TCollection, TValue>(this IDictionary<TKey, TCollection> dictionary,
-                                                             TKey key,
-                                                             TValue value)
+        public static void Update<TKey, TCollection, TValue>(this IDictionary<TKey, TCollection> dictionary, TKey key, TValue value)
             where TCollection : ICollection<TValue>, new()
         {
             if (!dictionary.ContainsKey(key))
