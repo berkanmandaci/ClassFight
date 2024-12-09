@@ -8313,7 +8313,7 @@ PrefabInstance:
     - target: {fileID: 1441259490102284308, guid: d0cf637dcf53a764f94f39824c06cc92, type: 3}
       propertyPath: m_camTransform
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 780027982}
     - target: {fileID: 1441259490102284309, guid: d0cf637dcf53a764f94f39824c06cc92, type: 3}
       propertyPath: m_Name
       value: Robot Kyle_MOCAP_Balanced
