@@ -82,16 +82,16 @@ public abstract class BaseCharacterController : NetworkBehaviour
         }
 
         // Pozisyon ve rotasyonu networked değerlerle senkronize et
-        if (HasStateAuthority)
-        {
-            NetworkedPosition = transform.position;
-            NetworkedRotation = transform.rotation;
-        }
-        else
-        {
-            transform.position = NetworkedPosition;
-            transform.rotation = NetworkedRotation;
-        }
+        // if (HasStateAuthority)
+        // {
+        //     NetworkedPosition = transform.position;
+        //     NetworkedRotation = transform.rotation;
+        // }
+        // else
+        // {
+        //     transform.position = NetworkedPosition;
+        //     transform.rotation = NetworkedRotation;
+        // }
     }
 
     protected void UpdateRotation(Vector2 mousePosition)

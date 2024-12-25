@@ -246,6 +246,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5862735302072542867}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3012302445248222305}
   m_SourcePrefab: {fileID: 100100000, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
 --- !u!1 &2399255931290959617 stripped
 GameObject:
@@ -270,6 +273,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4805018316036459958}
+  - {fileID: 3012302445248222305}
 --- !u!114 &4805018316036459958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,6 +373,22 @@ CapsuleCollider:
   m_Height: 1.9
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &3012302445248222305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2399255931290959617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!4 &3026434490385360315 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
