@@ -9,9 +9,9 @@ public class ArcherController : BaseCharacterController
     [SerializeField] private float attackCooldown = 1f;
     [SerializeField] private float dodgeDuration = 0.5f;
     [SerializeField] private float dodgeCooldown = 1f;
-    [SerializeField] private float maxChargeTime = 2f; 
-    [SerializeField] private float minArrowSpeed = 15f; 
-    [SerializeField] private float maxArrowSpeed = 30f; 
+    [SerializeField] private float maxChargeTime = 2f;
+    [SerializeField] private float minArrowSpeed = 15f;
+    [SerializeField] private float maxArrowSpeed = 30f;
 
     private float lastAttackTime;
     private float lastDodgeTime;
@@ -54,7 +54,7 @@ public class ArcherController : BaseCharacterController
 
         Vector3 spawnPosition = transform.position + transform.forward + Vector3.up;
         NetworkObject arrowObj = Runner.Spawn(arrowPrefab, spawnPosition, transform.rotation, Object.InputAuthority);
-            
+
         if (arrowObj.TryGetComponent<Arrow>(out var arrow))
         {
             arrow.Initialize(transform.forward, Object.InputAuthority, arrowSpeed);
@@ -73,7 +73,6 @@ public class ArcherController : BaseCharacterController
     public override void FixedUpdateNetwork()
     {
         base.FixedUpdateNetwork();
-
         if (GetInput(out NetworkInputData input))
         {
             if (!input.AttackPressed && isCharging)
@@ -86,7 +85,7 @@ public class ArcherController : BaseCharacterController
     protected override void Dodge()
     {
         if (!HasStateAuthority) return;
-        
+
         if (Time.time >= lastDodgeTime + dodgeCooldown)
         {
             if (isCharging)
@@ -99,11 +98,11 @@ public class ArcherController : BaseCharacterController
             }
 
             if (animator != null) animator.SetTrigger(DodgeHash);
-            
+
             canMove = false;
-            
+
             Observable.Timer(TimeSpan.FromSeconds(dodgeDuration))
-                .Subscribe(_ => 
+                .Subscribe(_ =>
                 {
                     canMove = true;
                 })

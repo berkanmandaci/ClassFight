@@ -45,11 +45,14 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+      
         if (IsDead || !canMove) return;
         
+     
         if (GetInput(out NetworkInputData input))
         {
             // Mouse'a bakış - Her zaman fareyi takip et
+            
             if (HasStateAuthority)
             {
                 UpdateRotation(input.RotationInput);
