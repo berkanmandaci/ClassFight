@@ -104,10 +104,7 @@ PrefabInstance:
       addedObject: {fileID: 1142513605896520249}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 9078988434172166440}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1557681914057954945}
+      addedObject: {fileID: 5862735302072542867}
   m_SourcePrefab: {fileID: 100100000, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}
 --- !u!1 &2399255931290959617 stripped
 GameObject:
@@ -132,7 +129,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4805018316036459958}
-  - {fileID: 1557681914057954945}
 --- !u!114 &4805018316036459958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,8 +205,8 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!143 &9078988434172166440
-CharacterController:
+--- !u!136 &5862735302072542867
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -224,34 +220,14 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
+  serializedVersion: 2
   m_Radius: 0.3
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_Height: 1.9
+  m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!114 &1557681914057954945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2399255931290959617}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 378411a89480da345945c2f888327a2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gravity: -20
-  jumpImpulse: 8
-  acceleration: 10
-  braking: 10
-  maxSpeed: 2
-  rotationSpeed: 15
 --- !u!4 &6349319471690035583 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -749876600356752593, guid: 883c138e4a941304b889dcd9ffc15064, type: 3}

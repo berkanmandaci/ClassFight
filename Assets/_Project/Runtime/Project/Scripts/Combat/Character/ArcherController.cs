@@ -19,6 +19,8 @@ public class ArcherController : BaseCharacterController
     private bool isCharging;
     private readonly int aimingHash = Animator.StringToHash("IsAiming");
 
+    public int CurrentDashStacks => currentDashStacks;
+
     protected override void Attack()
     {
         if (!HasStateAuthority) return;
@@ -114,5 +116,25 @@ public class ArcherController : BaseCharacterController
     public void OnAttackPoint()
     {
         Debug.Log("Attack point reached in animation");
+    }
+
+    // Cooldown getters for UI
+    public float GetDashCooldownPercent()
+    {
+        if (currentDashStacks >= maxDashStacks) return 0f;
+        float timeSinceLastDash = Time.time - lastDashTime;
+        return 1f - Mathf.Clamp01(timeSinceLastDash / dashCooldown);
+    }
+
+    public float GetDodgeCooldownPercent()
+    {
+        float timeSinceLastDodge = Time.time - lastDodgeTime;
+        return 1f - Mathf.Clamp01(timeSinceLastDodge / dodgeCooldown);
+    }
+
+    public float GetAttackCooldownPercent()
+    {
+        float timeSinceLastAttack = Time.time - lastAttackTime;
+        return 1f - Mathf.Clamp01(timeSinceLastAttack / attackCooldown);
     }
 }
