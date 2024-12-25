@@ -7,6 +7,7 @@ public class Archer : NetworkBehaviour
     [SerializeField] private NetworkPrefabRef _arrowPrefab;
     [SerializeField] private Transform _arrowSpawnPoint;
     [SerializeField] private float _attackCooldown = 0.5f;
+    [SerializeField] private float _arrowSpeed = 15f;
 
     private float _lastAttackTime;
     private NetworkCharacterController _characterController;
@@ -47,7 +48,7 @@ public class Archer : NetworkBehaviour
         // Initialize the arrow
         if (arrow.TryGetComponent<Arrow>(out var arrowComponent))
         {
-            arrowComponent.Initialize(shootDirection, Object.InputAuthority);
+            arrowComponent.Initialize(shootDirection, Object.InputAuthority, _arrowSpeed);
         }
     }
 }
