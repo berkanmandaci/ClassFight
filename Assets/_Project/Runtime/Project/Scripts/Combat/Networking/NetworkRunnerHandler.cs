@@ -79,7 +79,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             try
             {
                 // Spawn player character
-                Vector3 spawnPosition = new Vector3(0, 1, 0);
+                Vector3 spawnPosition = new Vector3(0, 0, 0);
                 Debug.Log($"Attempting to spawn player at position: {spawnPosition}");
                 
                 var playerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);

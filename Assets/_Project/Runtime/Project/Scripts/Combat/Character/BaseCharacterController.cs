@@ -11,16 +11,18 @@ public abstract class BaseCharacterController : NetworkBehaviour
     [SerializeField] protected int maxDashStacks = 2;
     [SerializeField] protected float rotationSpeed = 15f;
     
-    protected NetworkCharacterController characterController;
     protected Animator animator;
     protected Camera mainCamera;
     protected int currentDashStacks;
     protected float lastDashTime;
     protected bool canMove = true;
-    
+
+    [Networked] protected NetworkButtons ButtonsPrevious { get; set; }
     [Networked] public float Health { get; set; } = 100f;
     [Networked] public bool IsDead { get; set; }
     [Networked] public PlayerRef Owner { get; set; }
+    [Networked] protected Vector3 NetworkedPosition { get; set; }
+    [Networked] protected Quaternion NetworkedRotation { get; set; }
 
     // Animator hash IDs
     protected readonly int MovementXHash = Animator.StringToHash("MovementX");
@@ -30,10 +32,15 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
     protected virtual void Awake()
     {
-        characterController = GetComponent<NetworkCharacterController>();
         animator = GetComponent<Animator>();
         mainCamera = Camera.main;
         currentDashStacks = maxDashStacks;
+    }
+
+    public override void Spawned()
+    {
+        NetworkedPosition = transform.position;
+        NetworkedRotation = transform.rotation;
     }
 
     public override void FixedUpdateNetwork()
@@ -42,10 +49,13 @@ public abstract class BaseCharacterController : NetworkBehaviour
         
         if (GetInput(out NetworkInputData input))
         {
-            // Mouse'a göre dönüş - Her zaman mouse'u takip et
-            UpdateRotation(input.RotationInput);
+            // Mouse'a bakış - Her zaman fareyi takip et
+            if (HasStateAuthority)
+            {
+                UpdateRotation(input.RotationInput);
+            }
 
-            // Hareket - Karakterin baktığı yöne göre relative
+            // Hareket - Dünya koordinatlarında sabit yönler
             UpdateMovement(input.MovementInput);
 
             // Dash
@@ -67,35 +77,59 @@ public abstract class BaseCharacterController : NetworkBehaviour
                 Dodge();
             }
         }
+
+        // Pozisyon ve rotasyonu networked değerlerle senkronize et
+        if (HasStateAuthority)
+        {
+            NetworkedPosition = transform.position;
+            NetworkedRotation = transform.rotation;
+        }
+        else
+        {
+            transform.position = NetworkedPosition;
+            transform.rotation = NetworkedRotation;
+        }
     }
 
     protected void UpdateRotation(Vector2 mousePosition)
     {
+        if (mainCamera == null) return;
+
+        // Mouse pozisyonunu world space'e çevir
         Vector3 mouseWorldPosition = GetMouseWorldPosition(mousePosition);
+        
+        // Karakterden mouse'a doğru yön vektörü
         Vector3 lookDirection = (mouseWorldPosition - transform.position).normalized;
         lookDirection.y = 0;
 
         if (lookDirection != Vector3.zero)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
+            // Karakteri direkt olarak mouse'a döndür
+            NetworkedRotation = Quaternion.Lerp(
+                NetworkedRotation,
+                Quaternion.LookRotation(lookDirection),
+                rotationSpeed * Runner.DeltaTime
+            );
+            transform.rotation = NetworkedRotation;
         }
     }
 
     protected void UpdateMovement(Vector2 input)
     {
-        // Dünya koordinatlarında hareket yönünü hesapla
-        Vector3 moveDirection = new Vector3(input.x, 0, input.y);
-        
-        if (moveDirection != Vector3.zero)
+        // Dünya koordinatlarında hareket yönü (W = Z+, S = Z-, A = X-, D = X+)
+        Vector3 worldMoveDirection = new Vector3(input.x, 0, input.y);
+
+        if (worldMoveDirection != Vector3.zero && HasStateAuthority)
         {
-            // Dünya koordinatlarında hareketi uygula
-            characterController.Move(moveDirection * moveSpeed * Runner.DeltaTime);
+            // Dünya koordinatlarında hareket et
+            Vector3 movement = worldMoveDirection * moveSpeed * Runner.DeltaTime;
+            NetworkedPosition += movement;
+            transform.position = NetworkedPosition;
 
-            // Hareket yönünü karakterin local space'ine çevir (animasyon için)
-            Vector3 localMoveDirection = transform.InverseTransformDirection(moveDirection);
+            // Hareket yönünü karakterin local space'ine çevir (sadece animasyon için)
+            Vector3 localMoveDirection = transform.InverseTransformDirection(worldMoveDirection);
 
-            // Animator parametrelerini güncelle
+            // Animator parametrelerini local space'e göre güncelle
             if (animator != null)
             {
                 animator.SetFloat(MovementXHash, localMoveDirection.x);
@@ -132,7 +166,8 @@ public abstract class BaseCharacterController : NetworkBehaviour
     {
         if (!HasStateAuthority) return;
 
-        characterController.Move(direction * dashForce);
+        NetworkedPosition += direction * dashForce;
+        transform.position = NetworkedPosition;
         currentDashStacks--;
         lastDashTime = Time.time;
 
