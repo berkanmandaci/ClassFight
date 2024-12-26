@@ -34,6 +34,11 @@ public class ArcherController : BaseCharacterController
         }
     }
 
+    public override void Spawned()
+    {
+        base.Spawned();
+        
+    }
     private void StartCharging()
     {
         isCharging = true;
@@ -69,6 +74,7 @@ public class ArcherController : BaseCharacterController
 
         lastAttackTime = Time.time;
     }
+
 
     public override void FixedUpdateNetwork()
     {

@@ -41,6 +41,11 @@ public abstract class BaseCharacterController : NetworkBehaviour
     {
         NetworkedPosition = transform.position;
         NetworkedRotation = transform.rotation;
+
+        if (Object.HasInputAuthority)
+        {
+            ArenaManager.Instance.SetupLocalPlayerCamera(Object);
+        }
     }
 
     public override void FixedUpdateNetwork()
