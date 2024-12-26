@@ -68,22 +68,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }
-
-    public void OnClickHost()
-    {
-        if (_runner == null)
-        {
-            StartGame(GameMode.Host);
-        }
-    }
-
-    public void OnClickClient()
-    {
-        if (_runner == null)
-        {
-            StartGame(GameMode.Client);
-        }
-    }
+    
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
