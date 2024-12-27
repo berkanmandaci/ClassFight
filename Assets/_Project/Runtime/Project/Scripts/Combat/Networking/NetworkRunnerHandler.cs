@@ -121,6 +121,13 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
                     Debug.Log($"Spawning pending player {player}");
                     Vector3 spawnPosition = new Vector3((player.RawEncoded % _maxPlayers) * 3, 0, 0);
                     NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+
+                    // TeamId'yi oyuncu sırasına göre ata (0, 1, 2, 3...)
+                    if (networkPlayerObject.TryGetComponent<BaseCharacterController>(out var character))
+                    {
+                        character.TeamId = _spawnedCharacters.Count;
+                    }
+                    
                     _spawnedCharacters.Add(player, networkPlayerObject);
                     Debug.Log($"Spawned player object: {networkPlayerObject.Id} for player {player}");
                 }

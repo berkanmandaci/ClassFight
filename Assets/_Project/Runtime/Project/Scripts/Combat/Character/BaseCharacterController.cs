@@ -10,12 +10,14 @@ public abstract class BaseCharacterController : NetworkBehaviour
     [SerializeField] protected float dashCooldown = 2f;
     [SerializeField] protected int maxDashStacks = 2;
     [SerializeField] protected float rotationSpeed = 15f;
-    
+
     protected Animator animator;
     protected Camera mainCamera;
     protected int currentDashStacks;
     protected float lastDashTime;
     protected bool canMove = true;
+
+    public int TeamId { get; set; }
 
     [Networked] protected NetworkButtons ButtonsPrevious { get; set; }
     [Networked] public float Health { get; set; } = 100f;
@@ -50,14 +52,14 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-      
+
         if (IsDead || !canMove) return;
-        
-     
+
+
         if (GetInput(out NetworkInputData input))
         {
             // Mouse'a bakış - Her zaman fareyi takip et
-            
+
             if (HasStateAuthority)
             {
                 UpdateRotation(input.RotationInput);
@@ -105,7 +107,7 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
         // Mouse pozisyonunu world space'e çevir
         Vector3 mouseWorldPosition = GetMouseWorldPosition(mousePosition);
-        
+
         // Karakterden mouse'a doğru yön vektörü
         Vector3 lookDirection = (mouseWorldPosition - transform.position).normalized;
         lookDirection.y = 0;
@@ -161,12 +163,12 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
         Ray ray = mainCamera.ScreenPointToRay(new Vector3(mousePosition.x, mousePosition.y, 0));
         Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-        
+
         if (groundPlane.Raycast(ray, out float distance))
         {
             return ray.GetPoint(distance);
         }
-        
+
         return transform.position + transform.forward;
     }
 
@@ -181,7 +183,7 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
         // Reset dash stack after cooldown
         Observable.Timer(TimeSpan.FromSeconds(dashCooldown))
-            .Subscribe(_ => 
+            .Subscribe(_ =>
             {
                 if (currentDashStacks < maxDashStacks)
                     currentDashStacks++;
@@ -195,7 +197,7 @@ public abstract class BaseCharacterController : NetworkBehaviour
     public virtual void TakeDamage(float damage)
     {
         if (!HasStateAuthority) return;
-        
+
         Health -= damage;
         if (Health <= 0)
         {

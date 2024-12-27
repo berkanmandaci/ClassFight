@@ -83,21 +83,21 @@ public class ArcherController : BaseCharacterController
             NetworkObject arrowObj = Runner.Spawn(arrowPrefab, spawnPosition, rotation);
             if (arrowObj.TryGetComponent<Arrow>(out var arrow))
             {
-                arrow.Initialize(direction, Object.InputAuthority, speed);
+                arrow.Initialize(direction, Object.InputAuthority, speed, TeamId);
                 
                 // Ok spawn olduğunda tüm clientlara bildir
-                Rpc_OnArrowSpawned(arrowObj, direction, speed);
+                Rpc_OnArrowSpawned(arrowObj, direction, speed, TeamId);
             }
         }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void Rpc_OnArrowSpawned(NetworkObject arrowObj, Vector3 direction, float speed)
+    private void Rpc_OnArrowSpawned(NetworkObject arrowObj, Vector3 direction, float speed, int teamId)
     {
         if (arrowObj.TryGetComponent<Arrow>(out var arrow))
         {
             // Tüm clientlarda ok yönünü ve hızını ayarla
-            arrow.Initialize(direction, Object.InputAuthority, speed);
+            arrow.Initialize(direction, Object.InputAuthority, speed, teamId);
         }
     }
 
