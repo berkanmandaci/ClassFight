@@ -15,17 +15,17 @@ public class ArcherController : BaseCharacterController
 
     private float lastAttackTime;
     private float lastDodgeTime;
-    private float chargeStartTime;
-    private bool isCharging;
+    [Networked] private float chargeStartTime { get; set; }
+    [Networked] private NetworkBool isCharging { get; set; }
     private readonly int aimingHash = Animator.StringToHash("IsAiming");
 
     public int CurrentDashStacks => currentDashStacks;
 
     protected override void Attack()
     {
-        if (!HasStateAuthority) return;
+        if (!Object.HasInputAuthority) return;
 
-        if (Time.time >= lastAttackTime + attackCooldown)
+        if (Runner.SimulationTime >= lastAttackTime + attackCooldown)
         {
             if (!isCharging)
             {
@@ -39,10 +39,11 @@ public class ArcherController : BaseCharacterController
         base.Spawned();
         
     }
+
     private void StartCharging()
     {
         isCharging = true;
-        chargeStartTime = Time.time;
+        chargeStartTime = (float)Runner.SimulationTime;
         if (animator != null)
         {
             animator.SetBool(aimingHash, true);
@@ -53,16 +54,14 @@ public class ArcherController : BaseCharacterController
     {
         if (!isCharging) return;
 
-        float chargeTime = Mathf.Min(Time.time - chargeStartTime, maxChargeTime);
+        float chargeTime = Mathf.Min((float)(Runner.SimulationTime - chargeStartTime), maxChargeTime);
         float chargePercent = chargeTime / maxChargeTime;
         float arrowSpeed = Mathf.Lerp(minArrowSpeed, maxArrowSpeed, chargePercent);
 
-        Vector3 spawnPosition = transform.position + transform.forward + Vector3.up;
-        NetworkObject arrowObj = Runner.Spawn(arrowPrefab, spawnPosition, transform.rotation, Object.InputAuthority);
-
-        if (arrowObj.TryGetComponent<Arrow>(out var arrow))
+        // Input Authority olan RPC çağırır
+        if (Object.HasInputAuthority)
         {
-            arrow.Initialize(transform.forward, Object.InputAuthority, arrowSpeed);
+            Rpc_RequestSpawnArrow(transform.position + transform.forward + Vector3.up, transform.rotation, transform.forward, arrowSpeed);
         }
 
         isCharging = false;
@@ -72,27 +71,63 @@ public class ArcherController : BaseCharacterController
             animator.SetTrigger(AttackHash);
         }
 
-        lastAttackTime = Time.time;
+        lastAttackTime = (float)Runner.SimulationTime;
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_RequestSpawnArrow(Vector3 spawnPosition, Quaternion rotation, Vector3 direction, float speed)
+    {
+        if (Object.HasStateAuthority)
+        {
+            // Host tarafında ok spawn et
+            NetworkObject arrowObj = Runner.Spawn(arrowPrefab, spawnPosition, rotation);
+            if (arrowObj.TryGetComponent<Arrow>(out var arrow))
+            {
+                arrow.Initialize(direction, Object.InputAuthority, speed);
+                
+                // Ok spawn olduğunda tüm clientlara bildir
+                Rpc_OnArrowSpawned(arrowObj, direction, speed);
+            }
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void Rpc_OnArrowSpawned(NetworkObject arrowObj, Vector3 direction, float speed)
+    {
+        if (arrowObj.TryGetComponent<Arrow>(out var arrow))
+        {
+            // Tüm clientlarda ok yönünü ve hızını ayarla
+            arrow.Initialize(direction, Object.InputAuthority, speed);
+        }
+    }
 
     public override void FixedUpdateNetwork()
     {
         base.FixedUpdateNetwork();
+
         if (GetInput(out NetworkInputData input))
         {
-            if (!input.AttackPressed && isCharging)
+            if (Object.HasInputAuthority)
             {
-                ReleaseArrow();
+                if (!input.AttackPressed && isCharging)
+                {
+                    ReleaseArrow();
+                }
             }
+        }
+
+        // Animasyon senkronizasyonu için charging durumunu güncelle
+        if (animator != null)
+        {
+            animator.SetBool(aimingHash, isCharging);
         }
     }
 
     protected override void Dodge()
     {
-        if (!HasStateAuthority) return;
+        if (!Object.HasInputAuthority) return;
 
-        if (Time.time >= lastDodgeTime + dodgeCooldown)
+        if (Runner.SimulationTime >= lastDodgeTime + dodgeCooldown)
         {
             if (isCharging)
             {
@@ -103,18 +138,17 @@ public class ArcherController : BaseCharacterController
                 }
             }
 
-            if (animator != null) animator.SetTrigger(DodgeHash);
+            if (animator != null)
+            {
+                animator.SetTrigger(DodgeHash);
+            }
 
             canMove = false;
+            lastDodgeTime = (float)Runner.SimulationTime;
 
             Observable.Timer(TimeSpan.FromSeconds(dodgeDuration))
-                .Subscribe(_ =>
-                {
-                    canMove = true;
-                })
+                .Subscribe(_ => canMove = true)
                 .AddTo(this);
-
-            lastDodgeTime = Time.time;
         }
     }
 
