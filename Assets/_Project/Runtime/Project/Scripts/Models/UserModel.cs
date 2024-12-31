@@ -14,4 +14,10 @@ public class UserModel : SingletonBehaviour<UserModel>
 
     public int Elo { get; set; }
 
+
+    public void Init()
+    {
+        
+    }
+
 }
