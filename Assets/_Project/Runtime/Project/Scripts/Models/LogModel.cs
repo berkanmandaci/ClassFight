@@ -18,11 +18,12 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
         }
         public void Log(string message, string ff4500)
         {
-            throw new System.NotImplementedException();
+            Debug.Log("<color=#" + ff4500 + ">" + message + "</color>");
         }
         public void Log(string message)
         {
-            throw new System.NotImplementedException();
+            Debug.Log(message);
         }
+
     }
 }

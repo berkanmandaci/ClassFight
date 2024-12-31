@@ -19,6 +19,9 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private Image dodgeCooldownFill;
     [SerializeField] private Image attackCooldownFill;
 
+    [Header("UserInfo")]
+    [SerializeField] private TextMeshProUGUI nicknameText;
+
     private float maxHealth = 100f;
 
     private void Start()
@@ -30,6 +33,12 @@ public class CharacterUI : MonoBehaviour
             character = GetComponentInParent<BaseCharacterController>();
 
         // Initialize max health
+
+        Init();
+    }
+    public void Init()
+    {
+        nicknameText.text = UserModel.Instance.UserVo.DisplayName;
         maxHealth = character.Health;
     }
 
@@ -50,7 +59,7 @@ public class CharacterUI : MonoBehaviour
         {
             // Dash stacks
             dashStacksText.text = archer.CurrentDashStacks.ToString();
-            
+
             // Cooldown fills
             float dashCooldownPercent = archer.GetDashCooldownPercent();
             dashCooldownFill.fillAmount = dashCooldownPercent;

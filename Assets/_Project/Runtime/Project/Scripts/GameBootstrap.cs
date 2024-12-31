@@ -13,7 +13,10 @@ public class GameBootstrap : MonoBehaviour
             var success = await AuthenticationModel.Instance.TryAutoLogin();
             if (success)
             {
+
+                UserModel.Instance.Init();
                 LogModel.Instance.Log("Open Main Scene");
+                LogModel.Instance.Log("DisplayName: " + UserModel.Instance.UserVo.DisplayName);
             }
             else
             {

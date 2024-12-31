@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using _Project.Runtime.Core.Extensions.Singleton;
 using _Project.Runtime.Project.Service.Scripts.Model;
@@ -47,12 +48,13 @@ public class AuthenticationModel : Singleton<AuthenticationModel>
         {
             var authToken = PlayerPrefs.GetString(AuthenticationKeys.AuthTokenKey);
             var refreshToken = PlayerPrefs.GetString(AuthenticationKeys.RefreshTokenKey);
-          
+
             success = await LoginWithAuthToken(authToken, refreshToken);
             if (!success)
                 await LoginWithDeviceIdAsync(false);
-            
-        }else
+
+        }
+        else
         {
             await LoginWithDeviceIdAsync();
             success = true;
@@ -99,10 +101,8 @@ public class AuthenticationModel : Singleton<AuthenticationModel>
         string deviceId = SystemInfo.deviceUniqueIdentifier;
         deviceId += Application.platform.ToString();
 
-        #if UNITY_EDITOR
-        deviceId += CurrentPlayer.ReadOnlyTags();
-  #endif
-       
+        deviceId += CurrentPlayer.ReadOnlyTags().First();
+        LogModel.Instance.Log("DeviceId: " + deviceId);
         Dictionary<string, string> vars = GetLanguage();
         // SetLanguagePlayerPref(vars["Language"]);
         try
@@ -310,8 +310,8 @@ public class AuthenticationModel : Singleton<AuthenticationModel>
     //     PlayerPrefs.SetInt(PlayerPrefHashes.Language, langInt);
     // }
 
-    
-   
+
+
 
     private void OnHideUnity(bool isGameShown)
     {
@@ -325,5 +325,5 @@ public class AuthenticationModel : Singleton<AuthenticationModel>
         }
     }
 
-    
+
 }
