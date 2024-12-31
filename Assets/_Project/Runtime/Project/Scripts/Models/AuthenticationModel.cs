@@ -6,6 +6,7 @@ using _Project.Runtime.Core.Extensions.Singleton;
 using _Project.Runtime.Project.Service.Scripts.Model;
 using Cysharp.Threading.Tasks;
 using Nakama;
+using Unity.Multiplayer.Playmode;
 using UnityEngine;
 public class AuthenticationKeys
 {
@@ -97,9 +98,13 @@ public class AuthenticationModel : Singleton<AuthenticationModel>
     {
         string deviceId = SystemInfo.deviceUniqueIdentifier;
         deviceId += Application.platform.ToString();
+
+        #if UNITY_EDITOR
+        deviceId += CurrentPlayer.ReadOnlyTags();
+  #endif
+       
         Dictionary<string, string> vars = GetLanguage();
         // SetLanguagePlayerPref(vars["Language"]);
-
         try
         {
             ActiveSession = await _client.AuthenticateDeviceAsync(deviceId, null, register, vars);
@@ -181,6 +186,7 @@ public class AuthenticationModel : Singleton<AuthenticationModel>
             }
             catch (Exception e)
             {
+                LogModel.Instance.Error(e);
                 return false;
             }
 
