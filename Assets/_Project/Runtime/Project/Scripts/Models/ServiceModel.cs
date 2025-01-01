@@ -20,18 +20,18 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
     {
     }
 
-
     public class ServiceModel : Singleton<ServiceModel>
     {
         private CancellationTokenSource _reconnectCancel;
         public IClient Client { get; set; }
-        private ISession Session => AuthenticationModel.Instance.ActiveSession;
+        private ISession _session;
+        public ISession Session => _session ?? AuthenticationModel.Instance.ActiveSession;
+        public bool IsSessionValid => Session != null && !Session.IsExpired;
 
         public ISocket Socket { get; private set; }
 
         public void Init()
         {
-
             Client = new Client("http", "13.61.21.22", 7350, "defaultkey");
             // Signals.Get<SocketConnected>().AddListener(GetNotifications);
         }
@@ -61,7 +61,6 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
             }
         }
 
-    
         public async UniTask<T> RpcRequest<T>(string serviceKey, object data)
         {
             var payload = JsonConvert.SerializeObject(data);
@@ -252,15 +251,12 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
             }
         }
 
-
         private async void ReceiveMessagesAsync(IApiChannelMessage message)
         {
             await UniTask.SwitchToMainThread();
             Signals.Get<ReceivedMessageSignal>().Dispatch(message);
             LogRequest(message.ToString());
         }
-
-      
 
         public async UniTask FollowUsersAsync(IEnumerable<string> userIDs, IEnumerable<string> usernames = null)
         {
@@ -272,11 +268,8 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
             await Socket.UnfollowUsersAsync(userIDs);
         }
 
-
-    
         public void OnDestroy()
         {
-
             if (Socket != null)
             {
                 _reconnectCancel?.Cancel();
@@ -366,6 +359,19 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
                 throw;
             }
         }
+        public async UniTask<IApiUsers> GetUser(string[] userNames)
+        {
+            try
+            {
+                var result = await Client.GetUsersAsync(Session, null, userNames);
+                return result;
+            }
+            catch (Exception e)
+            {
+                OnError(e);
+                throw;
+            }
+        }
 
         public async UniTask<IApiUsers> GetUserWithId(string id)
         {
@@ -421,6 +427,16 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
         public async void DeleteOfflineNotifications(IApiNotification notification)
         {
             await Client.DeleteNotificationsAsync(Session, new[] { notification.Id });
+        }
+
+        public void SetSession(ISession session)
+        {
+            _session = session;
+        }
+
+        public void ClearSession()
+        {
+            _session = null;
         }
     }
 

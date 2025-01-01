@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using _Project.Runtime.Project.Scripts.Combat.Networking;
+using _Project.Runtime.Project.Service.Scripts.Model;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private GameObject _loadingPanel;
     [SerializeField] private TextMeshProUGUI _statusText;
     [SerializeField] private TextMeshProUGUI _playerCountText;
+    [SerializeField] private MatchmakingHandler matchmakingHandler;
 
     private void Start()
     {
@@ -20,14 +23,41 @@ public class MainMenuManager : MonoBehaviour
         NetworkRunnerHandler.Instance.OnMatchmakingStateChanged += UpdateMatchmakingState;
     }
 
-    private void OnJoinMatchClicked()
+    private async void OnJoinMatchClicked()
     {
-        _joinMatchButton.interactable = false;
-        _loadingPanel.SetActive(true);
-        _statusText.text = "Matchmaking başlatılıyor...";
-        _playerCountText.text = "";
-        
-        NetworkRunnerHandler.Instance.StartMatchmaking();
+        try
+        {
+            _joinMatchButton.interactable = false;
+            _loadingPanel.SetActive(true);
+            _statusText.text = "Matchmaking başlatılıyor...";
+            _playerCountText.text = "";
+            
+            // Session kontrolü
+            if (!ServiceModel.Instance.IsSessionValid)
+            {
+                UpdateMatchmakingState("Geçerli bir oturum bulunamadı!");
+                return;
+            }
+
+            // PvpArenaModel kontrolü
+            if (PvpArenaModel.Instance == null)
+            {
+                UpdateMatchmakingState("PvpArenaModel bulunamadı!");
+                return;
+            }
+
+            // Matchmaking'i başlat
+            await matchmakingHandler.StartMatchmaking(ServiceModel.Instance.Session);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Matchmaking başlatılamadı: {e.Message}");
+            UpdateMatchmakingState($"Hata: {e.Message}");
+        }
+        finally
+        {
+            _joinMatchButton.interactable = true;
+        }
     }
 
     private void UpdatePlayerCount(int currentPlayers, int maxPlayers)

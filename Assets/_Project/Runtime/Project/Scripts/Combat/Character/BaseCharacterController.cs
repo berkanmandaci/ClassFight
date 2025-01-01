@@ -19,6 +19,8 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
     public string TeamId { get; set; }
 
+    [Networked] public string UserId { get; set; }
+
     [Networked] protected NetworkButtons ButtonsPrevious { get; set; }
     [Networked] public float Health { get; set; } = 100f;
     [Networked] public bool IsDead { get; set; }

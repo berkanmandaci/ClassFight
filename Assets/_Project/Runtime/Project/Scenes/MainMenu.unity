@@ -422,6 +422,7 @@ GameObject:
   m_Component:
   - component: {fileID: 375227683}
   - component: {fileID: 375227684}
+  - component: {fileID: 375227685}
   m_Layer: 0
   m_Name: 'NetworkRunnerHandler '
   m_TagString: Untagged
@@ -460,7 +461,20 @@ MonoBehaviour:
     RawGuidValue: 9c775390f315371458966542bbf0d7f1
   _maxPlayers: 2
   _arenaSceneIndex: 1
-  _lobbyName: DefaultLobby
+--- !u!114 &375227685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375227682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b285099129df4434c8ebedfcfc8ab2a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkRunnerHandler: {fileID: 375227684}
+  maxPlayers: 2
 --- !u!1 &533563175
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,6 +671,7 @@ MonoBehaviour:
   _loadingPanel: {fileID: 352342636}
   _statusText: {fileID: 1560775895}
   _playerCountText: {fileID: 1625358089}
+  matchmakingHandler: {fileID: 375227685}
 --- !u!1 &1525050527
 GameObject:
   m_ObjectHideFlags: 0
@@ -816,11 +831,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8313128632512068546, guid: b6c05d3523727344c95a302685a8b7b6, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 639.99994
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8313128632512068546, guid: b6c05d3523727344c95a302685a8b7b6, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 419.99997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8313128632512068546, guid: b6c05d3523727344c95a302685a8b7b6, type: 3}
       propertyPath: m_LocalPosition.x
