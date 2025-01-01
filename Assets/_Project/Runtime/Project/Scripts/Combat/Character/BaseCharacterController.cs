@@ -17,7 +17,7 @@ public abstract class BaseCharacterController : NetworkBehaviour
     protected float lastDashTime;
     protected bool canMove = true;
 
-    public int TeamId { get; set; }
+    public string TeamId { get; set; }
 
     [Networked] protected NetworkButtons ButtonsPrevious { get; set; }
     [Networked] public float Health { get; set; } = 100f;

@@ -1,3 +1,5 @@
+using _Project.Runtime.Project.Service.Scripts.Model;
+using _Project.Scripts.Vo;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -21,7 +23,9 @@ public class CharacterUI : MonoBehaviour
 
     [Header("UserInfo")]
     [SerializeField] private TextMeshProUGUI nicknameText;
+    private string userId;
 
+    private PvpUserVo userVo => PvpArenaModel.Instance.PvpArenaVo.GetUser(userId);
     private float maxHealth = 100f;
 
     private void Start()
@@ -34,11 +38,11 @@ public class CharacterUI : MonoBehaviour
 
         // Initialize max health
 
-        Init();
     }
-    public void Init()
+    public void Init(string userId)
     {
-        nicknameText.text = UserModel.Instance.UserVo.DisplayName;
+        this.userId = userId;
+        nicknameText.text = userVo.DisplayName;
         maxHealth = character.Health;
     }
 

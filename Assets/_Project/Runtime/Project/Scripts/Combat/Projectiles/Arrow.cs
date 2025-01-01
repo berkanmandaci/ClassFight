@@ -11,10 +11,10 @@ public class Arrow : NetworkBehaviour
     private Vector3 direction;
     [Networked] private PlayerRef ownerRef { get; set; }
     [Networked] private float currentSpeed { get; set; }
-    [Networked] private int teamId { get; set; }
+    [Networked] private string teamId { get; set; }
     private float spawnTime;
 
-    public void Initialize(Vector3 direction, PlayerRef owner, float speed, int teamId)
+    public void Initialize(Vector3 direction, PlayerRef owner, float speed, string teamId)
     {
         this.direction = direction;
         this.ownerRef = owner;

@@ -125,7 +125,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
                     // TeamId'yi oyuncu sırasına göre ata (0, 1, 2, 3...)
                     if (networkPlayerObject.TryGetComponent<BaseCharacterController>(out var character))
                     {
-                        character.TeamId = _spawnedCharacters.Count;
+                        character.TeamId = _spawnedCharacters.Count.ToString();
                     }
                     
                     _spawnedCharacters.Add(player, networkPlayerObject);

@@ -92,7 +92,7 @@ public class ArcherController : BaseCharacterController
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void Rpc_OnArrowSpawned(NetworkObject arrowObj, Vector3 direction, float speed, int teamId)
+    private void Rpc_OnArrowSpawned(NetworkObject arrowObj, Vector3 direction, float speed, string teamId)
     {
         if (arrowObj.TryGetComponent<Arrow>(out var arrow))
         {
