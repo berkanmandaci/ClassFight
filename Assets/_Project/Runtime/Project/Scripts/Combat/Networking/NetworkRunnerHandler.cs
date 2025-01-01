@@ -5,6 +5,8 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using _Project.Runtime.Project.Service.Scripts.Model;
+using _Project.Scripts.Vo;
 
 public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -22,6 +24,8 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     private NetworkRunner _runner;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
     private List<PlayerRef> _pendingSpawns = new List<PlayerRef>();
+    private Dictionary<string, List<PlayerRef>> _teams = new Dictionary<string, List<PlayerRef>>();
+    private const int MAX_TEAM_DIFFERENCE = 1;
 
     private void Awake()
     {
@@ -29,10 +33,50 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeTeams();
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void InitializeTeams()
+    {
+        _teams.Clear();
+        _teams["Team1"] = new List<PlayerRef>();
+        _teams["Team2"] = new List<PlayerRef>();
+    }
+
+    private string GetBalancedTeam()
+    {
+        int team1Count = _teams["Team1"].Count;
+        int team2Count = _teams["Team2"].Count;
+
+        // Takımlar eşitse veya fark 1'den azsa, rastgele takım seç
+        if (Math.Abs(team1Count - team2Count) < MAX_TEAM_DIFFERENCE)
+        {
+            return UnityEngine.Random.value > 0.5f ? "Team1" : "Team2";
+        }
+
+        // Daha az oyuncusu olan takımı seç
+        return team1Count < team2Count ? "Team1" : "Team2";
+    }
+
+    private void AssignPlayerToTeam(PlayerRef player)
+    {
+        string teamId = GetBalancedTeam();
+        _teams[teamId].Add(player);
+        
+        // PvpUserVo'ya takım ataması
+        var pvpArenaModel = PvpArenaModel.Instance;
+        if (pvpArenaModel != null && pvpArenaModel.PvpArenaVo != null)
+        {
+            var userVo = pvpArenaModel.PvpArenaVo.GetUser(player.ToString());
+            if (userVo != null)
+            {
+                ((PvpUserVo)userVo).TeamId = teamId;
+            }
         }
     }
 
@@ -69,21 +113,13 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"Player {player} joined, total players: {runner.ActivePlayers.Count()}");
-
-        // Oyuncuyu spawn edilecekler listesine ekle
-        if (!_pendingSpawns.Contains(player))
-        {
-            _pendingSpawns.Add(player);
-            Debug.Log($"Added player {player} to pending spawns");
-        }
-
-        // Player count'u güncelle
-        int currentPlayers = runner.ActivePlayers.Count();
+        AssignPlayerToTeam(player);
+        _pendingSpawns.Add(player);
+        
+        int currentPlayers = _spawnedCharacters.Count + _pendingSpawns.Count;
         OnPlayerCountChanged?.Invoke(currentPlayers, _maxPlayers);
 
-        // Yeterli oyuncu varsa arena sahnesine geç
-        if (runner.IsServer && currentPlayers >= _maxPlayers)
+        if (currentPlayers == _maxPlayers)
         {
             Debug.Log("Required player count reached, loading arena...");
             OnMatchmakingStateChanged?.Invoke("Oyun başlatılıyor...");
@@ -139,6 +175,12 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        // Oyuncuyu takımdan çıkar
+        foreach (var team in _teams.Values)
+        {
+            team.Remove(player);
+        }
+
         Debug.Log($"Player {player} left");
         if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
         {
