@@ -5,28 +5,33 @@ using System;
 
 public abstract class BaseCharacterController : NetworkBehaviour
 {
+    [Header("Movement Settings")]
     [SerializeField] protected float moveSpeed = 5f;
+    [SerializeField] protected float rotationSpeed = 15f;
+
+    [Header("Dash Settings")]
     [SerializeField] protected float dashForce = 10f;
     [SerializeField] protected float dashCooldown = 2f;
     [SerializeField] protected int maxDashStacks = 2;
-    [SerializeField] protected float rotationSpeed = 15f;
 
     protected Animator animator;
     protected Camera mainCamera;
-    protected int currentDashStacks;
-    protected float lastDashTime;
     protected bool canMove = true;
 
-    public string TeamId { get; set; }
+    // Cooldown değişkenleri
+    [Networked] protected TickTimer dashCooldownTimer { get; set; }
+    [Networked] protected int currentDashStacks { get; set; }
 
+    // Networked değişkenler
     [Networked] public string UserId { get; set; }
-
     [Networked] protected NetworkButtons ButtonsPrevious { get; set; }
     [Networked] public float Health { get; set; } = 100f;
     [Networked] public bool IsDead { get; set; }
     [Networked] public PlayerRef Owner { get; set; }
     [Networked] protected Vector3 NetworkedPosition { get; set; }
     [Networked] protected Quaternion NetworkedRotation { get; set; }
+
+    public string TeamId { get; set; }
 
     // Animator hash IDs
     protected readonly int MovementXHash = Animator.StringToHash("MovementX");
@@ -38,13 +43,13 @@ public abstract class BaseCharacterController : NetworkBehaviour
     {
         animator = GetComponent<Animator>();
         mainCamera = Camera.main;
-        currentDashStacks = maxDashStacks;
     }
 
     public override void Spawned()
     {
         NetworkedPosition = transform.position;
         NetworkedRotation = transform.rotation;
+        currentDashStacks = maxDashStacks;
 
         if (Object.HasInputAuthority)
         {
@@ -54,94 +59,123 @@ public abstract class BaseCharacterController : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-
         if (IsDead || !canMove) return;
-
 
         if (GetInput(out NetworkInputData input))
         {
-            // Mouse'a bakış - Her zaman fareyi takip et
-
-            if (HasStateAuthority)
+            if (Object.HasInputAuthority)
             {
-                UpdateRotation(input.RotationInput);
-            }
+                // Hareket ve rotasyon
+                UpdateMovement(input.movementInput);
+                UpdateRotation(input.rotationInput);
 
-            // Hareket - Dünya koordinatlarında sabit yönler
-            UpdateMovement(input.MovementInput);
+                // Dash
+                if (input.IsDashPressed && CanDash())
+                {
+                    Vector3 moveDirection = new Vector3(input.movementInput.x, 0, input.movementInput.y);
+                    Dash(moveDirection != Vector3.zero ? moveDirection : transform.forward);
+                }
 
-            // Dash
-            if (input.DashPressed && currentDashStacks > 0 && Time.time >= lastDashTime + dashCooldown)
-            {
-                Vector3 moveDirection = new Vector3(input.MovementInput.x, 0, input.MovementInput.y);
-                Dash(moveDirection != Vector3.zero ? moveDirection : transform.forward);
-            }
+                // Attack
+                if (input.IsAttackPressed)
+                {
+                    Attack();
+                }
 
-            // Attack
-            if (input.AttackPressed)
-            {
-                Attack();
-            }
-
-            // Dodge
-            if (input.DodgePressed)
-            {
-                Dodge();
+                // Dodge
+                if (input.IsDodgePressed)
+                {
+                    Dodge();
+                }
             }
         }
 
-        // Pozisyon ve rotasyonu networked değerlerle senkronize et
-        // if (HasStateAuthority)
-        // {
-        //     NetworkedPosition = transform.position;
-        //     NetworkedRotation = transform.rotation;
-        // }
-        // else
-        // {
-        //     transform.position = NetworkedPosition;
-        //     transform.rotation = NetworkedRotation;
-        // }
+        // Pozisyon ve rotasyon senkronizasyonu
+        if (Object.HasStateAuthority)
+        {
+            NetworkedPosition = transform.position;
+            NetworkedRotation = transform.rotation;
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, NetworkedPosition, Runner.DeltaTime * 10f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, NetworkedRotation, Runner.DeltaTime * 10f);
+        }
+
+        // Dash stack yenileme kontrolü
+        if (Object.HasStateAuthority && currentDashStacks < maxDashStacks && dashCooldownTimer.ExpiredOrNotRunning(Runner))
+        {
+            currentDashStacks++;
+            if (currentDashStacks < maxDashStacks)
+            {
+                dashCooldownTimer = TickTimer.CreateFromSeconds(Runner, dashCooldown);
+            }
+        }
+    }
+
+    protected bool CanDash()
+    {
+        return currentDashStacks > 0;
+    }
+
+    protected virtual void Dash(Vector3 direction)
+    {
+        NetworkedPosition += direction * dashForce;
+        transform.position = NetworkedPosition;
+        currentDashStacks--;
+        
+        if (currentDashStacks < maxDashStacks)
+        {
+            dashCooldownTimer = TickTimer.CreateFromSeconds(Runner, dashCooldown);
+        }
+    }
+
+    // Cooldown durumlarını UI için public metodlar
+    public float GetDashCooldownProgress()
+    {
+        if (dashCooldownTimer.ExpiredOrNotRunning(Runner)) return 1f;
+        return 1f - dashCooldownTimer.RemainingTime(Runner).Value / dashCooldown;
+    }
+
+    public int GetCurrentDashStacks()
+    {
+        return currentDashStacks;
+    }
+
+    public int GetMaxDashStacks()
+    {
+        return maxDashStacks;
     }
 
     protected void UpdateRotation(Vector2 mousePosition)
     {
         if (mainCamera == null) return;
 
-        // Mouse pozisyonunu world space'e çevir
         Vector3 mouseWorldPosition = GetMouseWorldPosition(mousePosition);
-
-        // Karakterden mouse'a doğru yön vektörü
         Vector3 lookDirection = (mouseWorldPosition - transform.position).normalized;
         lookDirection.y = 0;
 
         if (lookDirection != Vector3.zero)
         {
-            // Karakteri direkt olarak mouse'a döndür
-            NetworkedRotation = Quaternion.Lerp(
-                NetworkedRotation,
+            transform.rotation = Quaternion.Lerp(
+                transform.rotation,
                 Quaternion.LookRotation(lookDirection),
                 rotationSpeed * Runner.DeltaTime
             );
-            transform.rotation = NetworkedRotation;
         }
     }
 
     protected void UpdateMovement(Vector2 input)
     {
-        // Dünya koordinatlarında hareket yönü (W = Z+, S = Z-, A = X-, D = X+)
         Vector3 worldMoveDirection = new Vector3(input.x, 0, input.y);
 
-        if (worldMoveDirection != Vector3.zero && HasStateAuthority)
+        if (worldMoveDirection != Vector3.zero)
         {
-            // Dünya koordinatlarında hareket et
             Vector3 movement = worldMoveDirection * moveSpeed * Runner.DeltaTime;
-            NetworkedPosition += movement;
-            transform.position = NetworkedPosition;
+            transform.position += movement;
 
-            // Hareket yönünü karakterin local space'ine çevir (sadece animasyon için)
             Vector3 localMoveDirection = transform.InverseTransformDirection(worldMoveDirection);
 
-            // Animator parametrelerini local space'e göre güncelle
             if (animator != null)
             {
                 animator.SetFloat(MovementXHash, localMoveDirection.x);
@@ -150,7 +184,6 @@ public abstract class BaseCharacterController : NetworkBehaviour
         }
         else
         {
-            // Hareket yoksa animator parametrelerini sıfırla
             if (animator != null)
             {
                 animator.SetFloat(MovementXHash, 0);
@@ -172,25 +205,6 @@ public abstract class BaseCharacterController : NetworkBehaviour
         }
 
         return transform.position + transform.forward;
-    }
-
-    protected virtual void Dash(Vector3 direction)
-    {
-        if (!HasStateAuthority) return;
-
-        NetworkedPosition += direction * dashForce;
-        transform.position = NetworkedPosition;
-        currentDashStacks--;
-        lastDashTime = Time.time;
-
-        // Reset dash stack after cooldown
-        Observable.Timer(TimeSpan.FromSeconds(dashCooldown))
-            .Subscribe(_ =>
-            {
-                if (currentDashStacks < maxDashStacks)
-                    currentDashStacks++;
-            })
-            .AddTo(this);
     }
 
     protected abstract void Attack();

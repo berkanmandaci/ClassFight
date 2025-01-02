@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using _Project.Runtime.Core.Extensions.Signal;
 using _Project.Runtime.Core.Extensions.Singleton;
+using _Project.Runtime.Project.Scripts.Models;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Nakama;
@@ -30,10 +31,11 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
 
         public ISocket Socket { get; private set; }
 
-        public void Init()
+        public async void Init()
         {
             Client = new Client("http", "13.61.21.22", 7350, "defaultkey");
-            // Signals.Get<SocketConnected>().AddListener(GetNotifications);
+
+      
         }
 
         public async Task ConnectSocketAsync(ISession session)
@@ -47,6 +49,7 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
             Debug.Log("Socket Connected! " + Socket.IsConnected);
             AuthenticationModel.Instance.SetStatusOnline(true).Forget();
             Signals.Get<SocketConnected>().Dispatch();
+            MatchmakingModel.Instance.Init();
         }
 
         public async UniTask OnApplicationPause(bool pauseStatus)

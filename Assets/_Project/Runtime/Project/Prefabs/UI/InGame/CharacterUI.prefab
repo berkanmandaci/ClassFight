@@ -149,16 +149,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60dc01f821d6332478c736dc47bd9e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  character: {fileID: 0}
-  worldSpaceCanvas: {fileID: 8514658992829040846}
-  mainCamera: {fileID: 0}
   healthBarFill: {fileID: 6825362201063861000}
   healthText: {fileID: 6062184029059943152}
-  dashCooldownFill: {fileID: 6668340804929568910}
-  dashStacksText: {fileID: 586618715298136890}
-  dodgeCooldownFill: {fileID: 3639632586464095065}
-  attackCooldownFill: {fileID: 6597314420365165640}
-  nicknameText: {fileID: 936293252337487338}
+  worldSpaceCanvas: {fileID: 8514658992829040846}
+  dashCooldownImage: {fileID: 6668340804929568910}
+  attackCooldownImage: {fileID: 6597314420365165640}
+  dodgeCooldownImage: {fileID: 3639632586464095065}
+  dashStackText: {fileID: 586618715298136890}
 --- !u!1 &9166471674735562510
 GameObject:
   m_ObjectHideFlags: 0
@@ -595,17 +592,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8313128632512068546, guid: b6c05d3523727344c95a302685a8b7b6, type: 3}
   m_PrefabInstance: {fileID: 8083880846521164309}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &936293252337487338 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8994206377917394943, guid: b6c05d3523727344c95a302685a8b7b6, type: 3}
-  m_PrefabInstance: {fileID: 8083880846521164309}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &8269263368924895623
 PrefabInstance:
   m_ObjectHideFlags: 0

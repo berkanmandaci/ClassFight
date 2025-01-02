@@ -1,78 +1,97 @@
-using _Project.Runtime.Project.Service.Scripts.Model;
-using _Project.Scripts.Vo;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 public class CharacterUI : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private BaseCharacterController character;
-    [SerializeField] private Canvas worldSpaceCanvas;
-    [SerializeField] private Camera mainCamera;
-
-    [Header("Health Bar")]
+    [Header("Health UI")]
     [SerializeField] private Image healthBarFill;
     [SerializeField] private TextMeshProUGUI healthText;
+    [SerializeField] private Canvas worldSpaceCanvas;
 
-    [Header("Cooldowns")]
-    [SerializeField] private Image dashCooldownFill;
-    [SerializeField] private TextMeshProUGUI dashStacksText;
-    [SerializeField] private Image dodgeCooldownFill;
-    [SerializeField] private Image attackCooldownFill;
+    [Header("Cooldown UI")]
+    [SerializeField] private Image dashCooldownImage;
+    [SerializeField] private Image attackCooldownImage;
+    [SerializeField] private Image dodgeCooldownImage;
+    [SerializeField] private TextMeshProUGUI dashStackText;
 
-    [Header("UserInfo")]
-    [SerializeField] private TextMeshProUGUI nicknameText;
-    private string userId;
-
-    private PvpUserVo userVo => PvpArenaModel.Instance.PvpArenaVo.GetUser(userId);
+    private BaseCharacterController characterController;
+    private ArcherController archerController;
+    private Camera mainCamera;
     private float maxHealth = 100f;
 
     private void Start()
     {
-        if (mainCamera == null)
-            mainCamera = Camera.main;
+        // Karakter kontrolcüsünü bul
+        characterController = GetComponentInParent<BaseCharacterController>();
+        archerController = characterController as ArcherController;
+        mainCamera = Camera.main;
 
-        if (character == null)
-            character = GetComponentInParent<BaseCharacterController>();
+        if (characterController == null)
+        {
+            Debug.LogError("CharacterUI: BaseCharacterController bulunamadı!");
+            enabled = false;
+            return;
+        }
 
-        // Initialize max health
-
-    }
-    public void Init(string userId)
-    {
-        this.userId = userId;
-        nicknameText.text = userVo.DisplayName;
-        maxHealth = character.Health;
+        // Başlangıç can değerini kaydet
+        maxHealth = characterController.Health;
     }
 
     private void LateUpdate()
     {
-        if (character == null || mainCamera == null) return;
+        if (characterController == null || mainCamera == null) return;
 
-        // Update health bar
-        float healthPercent = character.Health / maxHealth;
-        healthBarFill.fillAmount = healthPercent;
-        healthText.text = $"{Mathf.CeilToInt(character.Health)}/{maxHealth}";
-
-        // Make UI face camera
-        worldSpaceCanvas.transform.forward = mainCamera.transform.forward;
-
-        // Update cooldowns if character is Archer
-        if (character is ArcherController archer)
+        // UI'ı kameraya döndür
+        if (worldSpaceCanvas != null)
         {
-            // Dash stacks
-            dashStacksText.text = archer.CurrentDashStacks.ToString();
+            worldSpaceCanvas.transform.forward = mainCamera.transform.forward;
+        }
 
-            // Cooldown fills
-            float dashCooldownPercent = archer.GetDashCooldownPercent();
-            dashCooldownFill.fillAmount = dashCooldownPercent;
+        UpdateHealth();
+        UpdateCooldowns();
+    }
 
-            float dodgeCooldownPercent = archer.GetDodgeCooldownPercent();
-            dodgeCooldownFill.fillAmount = dodgeCooldownPercent;
+    private void UpdateHealth()
+    {
+        if (healthBarFill != null)
+        {
+            float healthPercent = characterController.Health / maxHealth;
+            healthBarFill.fillAmount = healthPercent;
+        }
 
-            float attackCooldownPercent = archer.GetAttackCooldownPercent();
-            attackCooldownFill.fillAmount = attackCooldownPercent;
+        if (healthText != null)
+        {
+            healthText.text = $"{Mathf.CeilToInt(characterController.Health)}/{maxHealth}";
+        }
+    }
+
+    private void UpdateCooldowns()
+    {
+        if (characterController == null) return;
+
+        // Dash cooldown ve stack
+        if (dashCooldownImage != null)
+        {
+            dashCooldownImage.fillAmount = 1f - characterController.GetDashCooldownProgress();
+        }
+
+        if (dashStackText != null)
+        {
+            dashStackText.text = $"{characterController.GetCurrentDashStacks()}/{characterController.GetMaxDashStacks()}";
+        }
+
+        // Attack cooldown (sadece Archer için)
+        if (attackCooldownImage != null && archerController != null)
+        {
+            attackCooldownImage.fillAmount = 1f - archerController.GetAttackCooldownProgress();
+        }
+
+        // Dodge cooldown (eğer implement edilmişse)
+        if (dodgeCooldownImage != null && archerController != null)
+        {
+            // Şimdilik dodge cooldown'u devre dışı
+            dodgeCooldownImage.fillAmount = 0f;
         }
     }
 }

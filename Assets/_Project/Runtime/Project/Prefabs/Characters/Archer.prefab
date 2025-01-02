@@ -273,7 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 558771213
   ObjectInterest: 1
-  Flags: 786433
+  Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4805018316036459958}
@@ -295,6 +295,7 @@ MonoBehaviour:
   dashCooldown: 2
   maxDashStacks: 2
   rotationSpeed: 15
+  _UserId: 
   _Health: 100
   _IsDead: 0
   arrowPrefab:

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using _Project.Runtime.Project.Scripts.Combat.Networking;
 using _Project.Runtime.Project.Service.Scripts.Model;
 
 public class MainMenuManager : MonoBehaviour
@@ -11,16 +10,12 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private GameObject _loadingPanel;
     [SerializeField] private TextMeshProUGUI _statusText;
     [SerializeField] private TextMeshProUGUI _playerCountText;
-    [SerializeField] private MatchmakingHandler matchmakingHandler;
 
     private void Start()
     {
         _joinMatchButton.onClick.AddListener(OnJoinMatchClicked);
         _loadingPanel.SetActive(false);
         
-        // NetworkRunnerHandler event'lerine subscribe ol
-        NetworkRunnerHandler.Instance.OnPlayerCountChanged += UpdatePlayerCount;
-        NetworkRunnerHandler.Instance.OnMatchmakingStateChanged += UpdateMatchmakingState;
     }
 
     private async void OnJoinMatchClicked()
@@ -47,7 +42,6 @@ public class MainMenuManager : MonoBehaviour
             }
 
             // Matchmaking'i başlat
-            await matchmakingHandler.StartMatchmaking(ServiceModel.Instance.Session);
         }
         catch (System.Exception e)
         {
@@ -74,12 +68,5 @@ public class MainMenuManager : MonoBehaviour
     {
         if (_joinMatchButton != null)
             _joinMatchButton.onClick.RemoveListener(OnJoinMatchClicked);
-
-        // Event'lerden unsubscribe ol
-        if (NetworkRunnerHandler.Instance != null)
-        {
-            NetworkRunnerHandler.Instance.OnPlayerCountChanged -= UpdatePlayerCount;
-            NetworkRunnerHandler.Instance.OnMatchmakingStateChanged -= UpdateMatchmakingState;
-        }
     }
 }
