@@ -1,7 +1,6 @@
 using UnityEngine;
 using Fusion;
-using UniRx;
-using System;
+using _Project.Runtime.Project.Service.Scripts.Model;
 
 public abstract class BaseCharacterController : NetworkBehaviour
 {
@@ -13,6 +12,7 @@ public abstract class BaseCharacterController : NetworkBehaviour
     [SerializeField] protected float dashForce = 10f;
     [SerializeField] protected float dashCooldown = 2f;
     [SerializeField] protected int maxDashStacks = 2;
+    [SerializeField] private CharacterUI characterUI;
 
     protected Animator animator;
     protected Camera mainCamera;
@@ -23,7 +23,6 @@ public abstract class BaseCharacterController : NetworkBehaviour
     [Networked] protected int currentDashStacks { get; set; }
 
     // Networked değişkenler
-    [Networked] public string UserId { get; set; }
     [Networked] protected NetworkButtons ButtonsPrevious { get; set; }
     [Networked] public float Health { get; set; } = 100f;
     [Networked] public bool IsDead { get; set; }
@@ -31,7 +30,14 @@ public abstract class BaseCharacterController : NetworkBehaviour
     [Networked] protected Vector3 NetworkedPosition { get; set; }
     [Networked] protected Quaternion NetworkedRotation { get; set; }
 
-    public string TeamId { get; set; }
+    private string _userId;
+    public string UserId
+    {
+        get => _userId;
+        private set => _userId = value;
+    }
+
+    [Networked] public string TeamId { get; set; }
 
     // Animator hash IDs
     protected readonly int MovementXHash = Animator.StringToHash("MovementX");
@@ -54,7 +60,16 @@ public abstract class BaseCharacterController : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             ArenaManager.Instance.SetupLocalPlayerCamera(Object);
+
+            // Kendi bilgilerini tüm clientlara gönder
+            var user = PvpArenaModel.Instance.PvpArenaVo.GetUser(ServiceModel.Instance.Session.UserId);
+            RPC_SetUserId(user.Id);
         }
+    }
+    public void Init(string userId)
+    {
+        UserId = userId;
+        characterUI.Init(UserId);
     }
 
     public override void FixedUpdateNetwork()
@@ -123,7 +138,7 @@ public abstract class BaseCharacterController : NetworkBehaviour
         NetworkedPosition += direction * dashForce;
         transform.position = NetworkedPosition;
         currentDashStacks--;
-        
+
         if (currentDashStacks < maxDashStacks)
         {
             dashCooldownTimer = TickTimer.CreateFromSeconds(Runner, dashCooldown);
@@ -225,5 +240,27 @@ public abstract class BaseCharacterController : NetworkBehaviour
     protected virtual void Die()
     {
         gameObject.SetActive(false);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_RequestUserInfo()
+    {
+        if (Object.HasInputAuthority)
+        {
+            var user = PvpArenaModel.Instance.PvpArenaVo.GetUser(ServiceModel.Instance.Session.UserId);
+            RPC_SetUserId(user.Id);
+            Debug.Log($"Responding to user info request - UserId: {user.Id}");
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_SetUserId(string userId)
+    {
+        UserId = userId;
+        if (characterUI != null)
+        {
+            characterUI.Init(userId);
+        }
+        Debug.Log($"Set UserId: {userId} for object {Object.Id}");
     }
 }

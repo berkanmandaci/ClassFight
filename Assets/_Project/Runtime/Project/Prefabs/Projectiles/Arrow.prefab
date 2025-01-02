@@ -155,9 +155,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseDamage: 15
-  lifetime: 5
   minDamageMultiplier: 1
   maxDamageMultiplier: 2.5
+  minSpeed: 15
+  maxSpeed: 30
 --- !u!114 &1661844358054255324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,9 +194,9 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 2
-  m_Height: 2
-  m_Direction: 1
+  m_Radius: 0.08
+  m_Height: 1
+  m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1683166834838214969
 Rigidbody:

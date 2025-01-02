@@ -16,19 +16,19 @@ namespace _Project.Runtime.Project.Scripts.Models
     {
         [SerializeField] private NetworkRunner _networkRunnerPrefab;
         [SerializeField] private string _gameSceneName = "GameScene";
-        
+
         private NetworkRunner _runner;
         private ISocket Socket => ServiceModel.Instance.Socket;
         private IMatch _currentMatch;
-        
+
         // Test için değerler
         private const int MinPlayers = 2; // Test için 2 oyuncu
         private const int MaxPlayers = 2; // Test için 2 oyuncu
-        
+
         // Normal değerler (daha sonra kullanılacak)
         private const int DefaultMinPlayers = 6;
         private const int DefaultMaxPlayers = 6;
-        
+
         private const int MinTeamPlayers = 3; // 3v3 için
         private const int MaxTeamPlayers = 3;
 
@@ -90,7 +90,7 @@ namespace _Project.Runtime.Project.Scripts.Models
                 };
 
                 var result = await _runner.StartGame(args);
-                
+
                 if (result.Ok)
                 {
                     Debug.Log("Successfully connected to Fusion room: " + roomName);
@@ -184,16 +184,17 @@ namespace _Project.Runtime.Project.Scripts.Models
                 _currentMatch = await Socket.JoinMatchAsync(matched);
                 OnMatchJoined?.Invoke(_currentMatch);
 
-                var userIds = new List<string>();
+                var userNames = new List<string>();
                 foreach (var matchedUser in matched.Users)
                 {
-                    userIds.Add(matchedUser.Presence.UserId);
+                    userNames.Add(matchedUser.Presence.Username);
                 }
-                var apiUsers = await ServiceModel.Instance.GetUser(userIds.ToArray());
+                var apiUsers = await ServiceModel.Instance.GetUser(userNames.ToArray());
 
                 // PvpArenaModel'i başlat
-                var teams = CreateTeams(matched);
                 var users = CreateUsers(apiUsers);
+                var teams = CreateTeams(matched,users);
+            
                 var pvpArenaVo = new PvpArenaVo(
                     teams,
                     users,
@@ -212,7 +213,7 @@ namespace _Project.Runtime.Project.Scripts.Models
             }
         }
 
-        private List<TeamVo> CreateTeams(IMatchmakerMatched matched)
+        private List<TeamVo> CreateTeams(IMatchmakerMatched matched, List<PvpUserVo> users)
         {
             var teams = new List<TeamVo>();
             if (matched.Self.StringProperties["mode"] == GameMode.TeamVsTeam.ToString())
@@ -224,9 +225,13 @@ namespace _Project.Runtime.Project.Scripts.Models
             else
             {
                 // FFA için her oyuncu kendi takımında
-                foreach (var user in matched.Users)
+                var teamIndex = 1;
+                foreach (var user in users)
                 {
-                    teams.Add(new TeamVo($"team_{user.Presence.UserId}", $"Player {user.Presence.Username}"));
+                    var teamId = $"team{teamIndex}";
+                    teams.Add(new TeamVo(teamId, $"Player {user.DisplayName}"));
+                    user.TeamId = teamId;
+                    teamIndex++;
                 }
             }
             return teams;

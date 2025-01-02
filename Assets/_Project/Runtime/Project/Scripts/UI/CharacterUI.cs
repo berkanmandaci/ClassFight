@@ -1,3 +1,5 @@
+using _Project.Runtime.Project.Service.Scripts.Model;
+using _Project.Scripts.Vo;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -14,12 +16,24 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private Image attackCooldownImage;
     [SerializeField] private Image dodgeCooldownImage;
     [SerializeField] private TextMeshProUGUI dashStackText;
+    [Header("Cooldown UI")]
+    [SerializeField] private TextMeshProUGUI displayNameText;
 
+    private string _userId;
+
+    private PvpUserVo _userVo => PvpArenaModel.Instance.PvpArenaVo.GetUser(_userId);
     private BaseCharacterController characterController;
     private ArcherController archerController;
     private Camera mainCamera;
     private float maxHealth = 100f;
 
+
+    public void Init(string userId)
+    {
+        _userId = userId.ToString();
+
+        displayNameText.text = _userVo.DisplayName;
+    }
     private void Start()
     {
         // Karakter kontrolcüsünü bul

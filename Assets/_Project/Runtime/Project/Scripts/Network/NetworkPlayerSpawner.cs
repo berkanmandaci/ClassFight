@@ -3,6 +3,7 @@ using Fusion;
 using System.Collections.Generic;
 using Fusion.Sockets;
 using System;
+using _Project.Runtime.Project.Service.Scripts.Model;
 
 public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -30,8 +31,16 @@ public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
                     if (networkPlayerObject.TryGetComponent<BaseCharacterController>(out var controller))
                     {
                         controller.Owner = player;
+
+                        // PvpArenaModel'den user bilgilerini al
+                        var pvpArenaVo = PvpArenaModel.Instance.PvpArenaVo;
+                        var user = pvpArenaVo.GetUser(ServiceModel.Instance.Session.UserId);
+                        
+                        controller.TeamId = user.TeamId;
+                        controller.RPC_SetUserId(user.Id);
+                        Debug.Log($"Set user info - UserId: {user.Id}, TeamId: {controller.TeamId}");
                     }
-                    
+
                     _spawnedCharacters.Add(player, networkPlayerObject);
                     Debug.Log($"Player {player} spawned own character - Object ID: {networkPlayerObject.Id}, State Authority: {networkPlayerObject.StateAuthority}, Input Authority: {networkPlayerObject.InputAuthority}, Has Input Authority: {networkPlayerObject.HasInputAuthority}");
                 }
@@ -43,6 +52,19 @@ public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             else
             {
                 Debug.Log($"Player {player} already has a spawned character");
+            }
+        }
+
+        // Eğer yeni oyuncu isek, tüm mevcut oyunculardan bilgilerini göndermelerini iste
+        if (player == runner.LocalPlayer)
+        {
+            foreach (var spawnedCharacter in _spawnedCharacters.Values)
+            {
+                if (spawnedCharacter.TryGetComponent<BaseCharacterController>(out var controller))
+                {
+                    controller.RPC_RequestUserInfo();
+                    Debug.Log($"Requesting user info from existing player - Object ID: {spawnedCharacter.Id}");
+                }
             }
         }
     }
@@ -79,8 +101,8 @@ public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             data.rotationInput = Input.mousePosition;
 
             // Action buttons
-            data.buttons.Set(NetworkInputData.ATTACK, Input.GetMouseButton(0));  // Sol tık
-            data.buttons.Set(NetworkInputData.DASH, Input.GetMouseButton(1));    // Sağ tık
+            data.buttons.Set(NetworkInputData.ATTACK, Input.GetMouseButton(0)); // Sol tık
+            data.buttons.Set(NetworkInputData.DASH, Input.GetMouseButton(1)); // Sağ tık
             data.buttons.Set(NetworkInputData.DODGE, Input.GetKey(KeyCode.Space)); // Space
             data.buttons.Set(NetworkInputData.NEXT_CHAR, Input.GetKey(KeyCode.Q)); // Q
             data.buttons.Set(NetworkInputData.PREV_CHAR, Input.GetKey(KeyCode.E)); // E
@@ -109,4 +131,4 @@ public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-} 
+}

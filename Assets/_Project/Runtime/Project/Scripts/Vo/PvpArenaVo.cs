@@ -35,11 +35,9 @@ namespace _Project.Scripts.Vo
             CurrentRound = 0;
         }
 
-        public PvpUserVo GetUser(string userId) => 
-            _users.TryGetValue(userId, out var user) ? user : null;
+        public PvpUserVo GetUser(string userId) => _users[userId];
 
-        public TeamVo GetTeam(string teamId) => 
-            _teams.TryGetValue(teamId, out var team) ? team : null;
+        public TeamVo GetTeam(string teamId) => _teams[teamId];
 
         public void StartNewRound()
         {

@@ -169,6 +169,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6078367648116862261, guid: 08b2ac78844360144a6a02b2fc2b3b32, type: 3}
   m_PrefabInstance: {fileID: 913254875279236939}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6843468653652530966 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5932483170708703325, guid: 08b2ac78844360144a6a02b2fc2b3b32, type: 3}
+  m_PrefabInstance: {fileID: 913254875279236939}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60dc01f821d6332478c736dc47bd9e40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3281636897710244432
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -291,21 +302,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  rotationSpeed: 15
   dashForce: 10
   dashCooldown: 2
   maxDashStacks: 2
-  rotationSpeed: 15
+  characterUI: {fileID: 6843468653652530966}
   _UserId: 
   _Health: 100
   _IsDead: 0
   arrowPrefab:
     RawGuidValue: 40c190ac9bd77134295f66c9bd744773
+  arrowSpeed: 20
+  arrowDamage: 20
+  arrowSpawnPoint: {fileID: 0}
   attackCooldown: 1
-  dodgeDuration: 0.5
-  dodgeCooldown: 1
-  maxChargeTime: 2
-  minArrowSpeed: 15
-  maxArrowSpeed: 30
 --- !u!54 &2769918281374069189
 Rigidbody:
   m_ObjectHideFlags: 0
