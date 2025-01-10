@@ -22,7 +22,7 @@ namespace _Project.Runtime.Project.Scripts.Models
         [Header("Development Settings")]
         [SerializeField] private bool _isDevelopmentBuild = true;
         [SerializeField] private string _developmentIP = "127.0.0.1";
-        [SerializeField] private ushort _developmentPort = 27016;
+        [SerializeField] private ushort _developmentPort = 27017;
 
         private NetworkRunner _runner;
         private ISocket Socket => ServiceModel.Instance.Socket;
@@ -71,31 +71,43 @@ namespace _Project.Runtime.Project.Scripts.Models
             }
         }
 
-        private async UniTask StartFusionGame(string roomName)
+        public async UniTask StartFusionGame(string roomName)
         {
             try
             {
+                // Eğer önceki runner varsa temizle
+                if (_runner != null)
+                {
+                    _runner.Shutdown();
+                    Destroy(_runner.gameObject);
+                    _runner = null;
+                }
+
+                // NetworkRunner'ı oluştur
+                _runner = Instantiate(_networkRunnerPrefab);
                 if (_runner == null)
                 {
-                    _runner = Instantiate(_networkRunnerPrefab);
-                    DontDestroyOnLoad(_runner.gameObject);
+                    throw new Exception("NetworkRunner prefab oluşturulamadı!");
                 }
+                DontDestroyOnLoad(_runner.gameObject);
 
                 Debug.Log($"Dedicated Server'a bağlanılıyor...");
 
-                SceneManager.LoadScene(_gameSceneName);
-                await UniTask.WaitForEndOfFrame();
-
+                // NetworkRunner'ı yapılandır
+                _runner.ProvideInput = true; // Input sağlayacağımızı belirt
+                
                 var args = new StartGameArgs()
                 {
                     GameMode = Fusion.GameMode.Client,
                     SessionName = "DedicatedServer",
                     CustomLobbyName = "MainLobby",
                     SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                    ConnectionToken = System.Text.Encoding.UTF8.GetBytes(ServiceModel.Instance.Session.AuthToken),
                     SessionProperties = new Dictionary<string, SessionProperty>()
                     {
                         { "GameType", "Dedicated" }
-                    }
+                    },
+                    DisableNATPunchthrough = true // NAT Punchthrough'yu devre dışı bırak
                 };
 
                 // Development build için özel ayarlar
@@ -106,23 +118,48 @@ namespace _Project.Runtime.Project.Scripts.Models
                 }
 
                 Debug.Log($"Bağlantı deneniyor... SessionName: {args.SessionName}, Lobby: {args.CustomLobbyName}");
-                var result = await _runner.StartGame(args);
-
+                
+                // Önce bağlantıyı kur
+                StartGameResult result = await _runner.StartGame(args);
+                
                 if (result.Ok)
                 {
                     Debug.Log($"Dedicated Server'a başarıyla bağlanıldı! SessionID: {_runner.SessionInfo.Name}");
                     Debug.Log($"Lobby: {_runner.LobbyInfo?.Name}");
+                    
+                    // Bağlantı başarılı olduktan sonra sahneyi yükle
+                    await UniTask.SwitchToMainThread();
+                    SceneManager.LoadScene(_gameSceneName);
                 }
                 else
                 {
-                    Debug.LogError($"Dedicated Server'a bağlanılamadı: {result.ShutdownReason} - {result.ErrorMessage}");
-                    OnMatchError?.Invoke(new Exception($"Fusion connection failed: {result.ShutdownReason} - {result.ErrorMessage}"));
+                    var error = $"Dedicated Server'a bağlanılamadı: {result.ShutdownReason} - {result.ErrorMessage}";
+                    Debug.LogError(error);
+                    
+                    // Runner'ı temizle
+                    if (_runner != null)
+                    {
+                        _runner.Shutdown();
+                        Destroy(_runner.gameObject);
+                        _runner = null;
+                    }
+                    
+                    OnMatchError?.Invoke(new Exception(error));
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError($"Bağlantı hatası: {e.Message}");
                 Debug.LogError($"Stack Trace: {e.StackTrace}");
+                
+                // Hata durumunda runner'ı temizle
+                if (_runner != null)
+                {
+                    _runner.Shutdown();
+                    Destroy(_runner.gameObject);
+                    _runner = null;
+                }
+                
                 OnMatchError?.Invoke(e);
             }
         }
@@ -306,6 +343,14 @@ namespace _Project.Runtime.Project.Scripts.Models
             {
                 Socket.ReceivedMatchmakerMatched -= OnMatchmakerMatched;
                 Socket.ReceivedMatchPresence -= OnMatchPresence;
+            }
+
+            // Runner'ı temizle
+            if (_runner != null)
+            {
+                _runner.Shutdown();
+                Destroy(_runner.gameObject);
+                _runner = null;
             }
         }
     }

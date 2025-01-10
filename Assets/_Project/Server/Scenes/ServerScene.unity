@@ -163,6 +163,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d582e9f2fe2b4cf49990f1875dcb9dd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _networkRunnerPrefab: {fileID: 5950981557836738416, guid: 12b52d4d77b5baf4db6dd8f8d54c247d, type: 3}
+  _gameSceneName: Arena
+  _isDevelopmentBuild: 1
+  _developmentIP: 127.0.0.1
+  _developmentPort: 27016
 --- !u!1 &617644877
 GameObject:
   m_ObjectHideFlags: 0
@@ -194,52 +199,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 867219222}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &839876298
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 839876299}
-  - component: {fileID: 839876300}
-  m_Layer: 0
-  m_Name: ServerGameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &839876299
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 839876298}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &839876300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 839876298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6bf94d47fa055442a243f14b758222b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerPrefab:
-    RawGuidValue: 9c775390f315371458966542bbf0d7f1
 --- !u!1 &848103874
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,10 +243,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6273c42d4000aea42be27a9b33a6518f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoints:
-  - {fileID: 617644878}
-  - {fileID: 887913025}
-  - {fileID: 1884672524}
 --- !u!1 &867219221
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,6 +437,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 1373058838}
   - {fileID: 404189110}
-  - {fileID: 839876299}
   - {fileID: 848103875}
   - {fileID: 867219222}

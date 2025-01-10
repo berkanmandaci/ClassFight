@@ -10,20 +10,65 @@ namespace _Project.Server.Scripts.Core
 {
     public class ServerGameManager : MonoBehaviour, INetworkRunnerCallbacks
     {
+        [Header("Network Settings")]
         [SerializeField] private NetworkPrefabRef _playerPrefab;
+        [SerializeField] private ServerPlayerManager _playerManager;
         private NetworkRunner _runner;
-        private ServerPlayerManager _playerManager;
-        private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
-        private ServerMatchState _currentMatchState = ServerMatchState.WaitingForPlayers;
+        private ServerMatchState _currentMatchState;
 
-        public NetworkPrefabRef PlayerPrefab => _playerPrefab;
-        public ServerMatchState CurrentMatchState => _currentMatchState;
+        private void Awake()
+        {
+            Application.targetFrameRate = 60;
+            _currentMatchState = ServerMatchState.WaitingForPlayers;
+        }
 
         public void Initialize(NetworkRunner runner)
         {
             _runner = runner;
-            _runner.AddCallbacks(this);
-            _playerManager = GetComponent<ServerPlayerManager>();
+            
+            // PlayerManager'ı bul veya oluştur
+            _playerManager = FindObjectOfType<ServerPlayerManager>();
+            if (_playerManager == null)
+            {
+                var playerManagerObj = new GameObject("ServerPlayerManager");
+                _playerManager = playerManagerObj.AddComponent<ServerPlayerManager>();
+            }
+            
+            // Player prefab kontrolü
+            if (!_playerPrefab.IsValid)
+            {
+                Debug.LogError("Player prefab is not valid in ServerGameManager! Please assign it in the inspector.");
+                return;
+            }
+            
+            // PlayerManager'ı başlat
+            _playerManager.SetPlayerPrefab(_playerPrefab);
+            _playerManager.Init(_runner);
+            
+            Debug.Log($"ServerGameManager initialized successfully! Player Prefab: {_playerPrefab}");
+        }
+
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+            Debug.Log($"Oyuncu katıldı: {player}");
+            
+            if (_playerManager != null && runner.IsServer)
+            {
+                _playerManager.SpawnPlayer(player);
+            }
+            else
+            {
+                Debug.LogError($"PlayerManager is not initialized or not running on server! IsServer: {runner.IsServer}");
+            }
+        }
+
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+            Debug.Log($"Oyuncu ayrıldı: {player}");
+            if (_playerManager != null && runner.IsServer)
+            {
+                _playerManager.DespawnPlayer(player);
+            }
         }
 
         public void UpdateMatchState(ServerMatchState newState)
@@ -40,18 +85,6 @@ namespace _Project.Server.Scripts.Core
         {
             throw new NotImplementedException();
         }
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
-            Debug.Log($"Oyuncu katıldı: {player}");
-            _playerManager.SpawnPlayer(player);
-        }
-
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-        {
-            Debug.Log($"Oyuncu ayrıldı: {player}");
-            _playerManager.DespawnPlayer(player);
-        }
-
         public void OnInput(NetworkRunner runner, NetworkInput input) { }
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }

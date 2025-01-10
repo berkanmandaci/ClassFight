@@ -599,8 +599,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ab6955f3beffaa44840c56e5f17f77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _networkRunnerPrefab: {fileID: 1017396116505675798, guid: 79b5d027350b0264f90d2376485a76e0, type: 3}
+  _networkRunnerPrefab: {fileID: 353512771487351869, guid: 79b5d027350b0264f90d2376485a76e0, type: 3}
   _gameSceneName: Arena
+  _isDevelopmentBuild: 1
+  _developmentIP: 127.0.0.1
+  _developmentPort: 27017
 --- !u!1001 &379137105
 PrefabInstance:
   m_ObjectHideFlags: 0
