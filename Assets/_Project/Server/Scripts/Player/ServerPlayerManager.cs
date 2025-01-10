@@ -2,221 +2,203 @@ using System;
 using UnityEngine;
 using Fusion;
 using System.Collections.Generic;
-using System.Linq;
+using _Project.Server.Scripts.Core;
+using _Project.Shared.Scripts.Enums;
 using Fusion.Sockets;
 
 namespace _Project.Server.Scripts.Player
 {
     public class ServerPlayerManager : MonoBehaviour, INetworkRunnerCallbacks
     {
+        [SerializeField] private Transform _spawnPointsParent;
         private NetworkPrefabRef _playerPrefab;
         private NetworkRunner _runner;
-        private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+        private Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
+        private List<Transform> _spawnPoints = new List<Transform>();
+        private int _currentSpawnIndex = 0;
 
-        public void SetPlayerPrefab(NetworkPrefabRef prefab)
+        private void Awake()
         {
-            if (!prefab.IsValid)
+            if (_spawnPointsParent != null)
             {
-                Debug.LogError("Attempting to set invalid player prefab in ServerPlayerManager!");
-                return;
+                foreach (Transform child in _spawnPointsParent)
+                {
+                    _spawnPoints.Add(child);
+                }
             }
-            
-            _playerPrefab = prefab;
-            Debug.Log($"Player prefab set successfully in ServerPlayerManager: {prefab}");
         }
 
         public void Init(NetworkRunner runner)
         {
-            if (runner == null)
-            {
-                Debug.LogError("NetworkRunner is null in ServerPlayerManager.Init!");
-                return;
-            }
-            
             _runner = runner;
             _runner.AddCallbacks(this);
-            
+
+            // ServerGameManager'dan player prefab'ı al
+            var serverGameManager = FindObjectOfType<ServerGameManager>();
+            if (serverGameManager != null)
+            {
+                var prefabRef = serverGameManager.GetPlayerPrefab();
+                if (prefabRef.IsValid)
+                {
+                    _playerPrefab = prefabRef;
+                    Debug.Log($"[ServerPlayerManager] Player prefab set successfully");
+                }
+                else
+                {
+                    Debug.LogError("[ServerPlayerManager] Player prefab from ServerGameManager is not valid!");
+                }
+            }
+            else
+            {
+                Debug.LogError("[ServerPlayerManager] ServerGameManager not found!");
+            }
+        }
+
+        public void SetPlayerPrefab(NetworkPrefabRef prefab)
+        {
+            _playerPrefab = prefab;
+        }
+
+        private Vector3 GetNextSpawnPosition()
+        {
+            if (_spawnPoints.Count == 0)
+            {
+                Debug.LogWarning("No spawn points found! Using default position.");
+                return Vector3.zero;
+            }
+
+            Vector3 position = _spawnPoints[_currentSpawnIndex].position;
+            _currentSpawnIndex = (_currentSpawnIndex + 1) % _spawnPoints.Count;
+            return position;
+        }
+
+        public NetworkObject SpawnPlayer(NetworkRunner runner, PlayerRef player)
+        {
             if (!_playerPrefab.IsValid)
             {
-                Debug.LogError("Player prefab is not set in ServerPlayerManager! Make sure it's assigned before initialization.");
-                return;
+                Debug.LogError("Player prefab is not valid!");
+                return null;
             }
+
+            // Oyuncu zaten spawn edilmiş mi kontrol et
+            if (_spawnedPlayers.TryGetValue(player, out NetworkObject existingPlayer))
+            {
+                Debug.Log($"Player {player} already spawned!");
+                return existingPlayer;
+            }
+
+            Vector3 spawnPosition = GetNextSpawnPosition();
+            NetworkObject playerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
             
-            Debug.Log($"ServerPlayerManager initialized with runner {runner.name} and player prefab {_playerPrefab}");
+            if (playerObject != null)
+            {
+                _spawnedPlayers[player] = playerObject;
+                Debug.Log($"Spawned player {player} at position {spawnPosition}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to spawn player {player}!");
+            }
+
+            return playerObject;
         }
 
-        public void Initialize(NetworkRunner runner)
+        public void DespawnPlayer(NetworkRunner runner, PlayerRef player)
         {
-            Init(runner);
-        }
-
-        public void SpawnPlayer(PlayerRef player)
-        {
-            if (!_runner.IsServer)
+            if (_spawnedPlayers.TryGetValue(player, out NetworkObject playerObject))
             {
-                Debug.LogError("Trying to spawn player on non-server instance!");
-                return;
-            }
-
-            // Prefab kontrolü
-            if (!_playerPrefab.IsValid)
-            {
-                Debug.LogError($"Player prefab is not valid! Please check NetworkPrefabRef in ServerPlayerManager.");
-                return;
-            }
-
-            try
-            {
-                // Spawn pozisyonu
-                var spawnPosition = Vector3.zero;
-                var spawnRotation = Quaternion.identity;
-
-                Debug.Log($"Attempting to spawn player {player} at position {spawnPosition}");
-                
-                NetworkObject networkPlayerObject = _runner.Spawn(_playerPrefab, spawnPosition, spawnRotation, player);
-                
-                if (networkPlayerObject == null)
-                {
-                    Debug.LogError($"Failed to spawn player object for player {player}");
-                    return;
-                }
-
-                // Player'ı kaydet
-                _spawnedCharacters[player] = networkPlayerObject;
-                Debug.Log($"Successfully spawned player {player} with NetworkObject ID: {networkPlayerObject.Id}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Error spawning player: {e.Message}\nStack trace: {e.StackTrace}");
+                runner.Despawn(playerObject);
+                _spawnedPlayers.Remove(player);
+                Debug.Log($"Despawned player {player}");
             }
         }
 
-        public void DespawnPlayer(PlayerRef player)
+        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
         {
-            if (!_runner.IsServer)
+            throw new NotImplementedException();
+        }
+        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+            throw new NotImplementedException();
+        }
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+            if (runner.IsServer || runner.IsSharedModeMasterClient)
             {
-                return;
-            }
-
-            if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
-            {
-                try
-                {
-                    _runner.Despawn(networkObject);
-                    _spawnedCharacters.Remove(player);
-                    Debug.Log($"Successfully despawned player {player}");
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error despawning player: {e.Message}");
-                }
+                SpawnPlayer(runner, player);
             }
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            if (runner.IsServer)
+            if (runner.IsServer || runner.IsSharedModeMasterClient)
             {
-                DespawnPlayer(player);
+                DespawnPlayer(runner, player);
             }
         }
-
-        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-        {
-            // Tüm oyuncuları temizle
-            foreach (var player in _spawnedCharacters.Keys.ToList())
-            {
-                DespawnPlayer(player);
-            }
-            _spawnedCharacters.Clear();
-        }
-
-        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-            // AOI dışına çıkan objeleri işle
-        }
-        
-        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-            // AOI içine giren objeleri işle
-        }
-        
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
-            if (runner.IsServer)
-            {
-                SpawnPlayer(player);
-            }
-        }
-        
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
-            // Input işleme gerekli değilse boş bırak
+            throw new NotImplementedException();
         }
-        
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
         {
-            // Eksik input işleme gerekli değilse boş bırak
+            throw new NotImplementedException();
         }
-        
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        {
+            throw new NotImplementedException();
+        }
         public void OnConnectedToServer(NetworkRunner runner)
         {
-            // Server'a bağlanma işlemleri
+            throw new NotImplementedException();
         }
-        
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
         {
-            // Server'dan kopma işlemleri
+            throw new NotImplementedException();
         }
-        
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
         {
-            // Bağlantı isteklerini işle
+            throw new NotImplementedException();
         }
-        
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
         {
-            // Bağlantı hatalarını işle
+            throw new NotImplementedException();
         }
-        
         public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
         {
-            // Simulasyon mesajlarını işle
+            throw new NotImplementedException();
         }
-        
         public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
         {
-            // Session listesi güncellemelerini işle
+            throw new NotImplementedException();
         }
-        
         public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
         {
-            // Özel authentication yanıtlarını işle
+            throw new NotImplementedException();
         }
-        
         public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
         {
-            // Host migration işlemlerini yönet
+            throw new NotImplementedException();
         }
-        
         public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
         {
-            // Güvenilir veri alımını işle
+            throw new NotImplementedException();
         }
-        
         public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
         {
-            // Güvenilir veri ilerleme durumunu işle
+            throw new NotImplementedException();
         }
-        
+
         public void OnSceneLoadDone(NetworkRunner runner)
         {
-            // Sahne yükleme tamamlandığında işle
+            Debug.Log("Scene load completed in ServerPlayerManager");
         }
         
         public void OnSceneLoadStart(NetworkRunner runner)
         {
-            // Sahne yükleme başladığında işle
+            Debug.Log("Scene load started in ServerPlayerManager");
         }
+
+        // Diğer INetworkRunnerCallbacks metodları...
     }
 } 

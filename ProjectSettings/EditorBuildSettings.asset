@@ -6,17 +6,14 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
     path: Assets/_Project/Runtime/Project/Scenes/MainMenu.unity
     guid: ae7496c8b1a25d4488ee0bfd8f17e49a
   - enabled: 1
-    path: Assets/_Project/Runtime/Project/Scenes/Arena.unity
-    guid: f1bbe7f9a136bc44fa815c7446ed70d7
-  - enabled: 0
     path: Assets/_Project/Server/Scenes/ServerScene.unity
     guid: 7cc17bf26e0015e48ace261451fe0aeb
+  - enabled: 1
+    path: Assets/_Project/Runtime/Project/Scenes/Arena.unity
+    guid: f1bbe7f9a136bc44fa815c7446ed70d7
   m_configObjects:
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: dbcecda58942c924b94c8d7994671853, type: 2}
     com.unity.addressableassets: {fileID: 11400000, guid: 523901cd20827614abff460c07c299e4, type: 2}

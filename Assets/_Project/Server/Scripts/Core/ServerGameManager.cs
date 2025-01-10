@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using _Project.Server.Scripts.Player;
 using Fusion.Sockets;
 using _Project.Shared.Scripts.Enums;
+using UnityEngine.SceneManagement;
 
 namespace _Project.Server.Scripts.Core
 {
@@ -12,40 +13,83 @@ namespace _Project.Server.Scripts.Core
     {
         [Header("Network Settings")]
         [SerializeField] private NetworkPrefabRef _playerPrefab;
-        [SerializeField] private ServerPlayerManager _playerManager;
+        [SerializeField] private string _gameSceneName = "Arena";
+        
+        private ServerPlayerManager _playerManager;
         private NetworkRunner _runner;
-        private ServerMatchState _currentMatchState;
+        private Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
+        private bool _gameSceneLoaded;
 
         private void Awake()
         {
             Application.targetFrameRate = 60;
-            _currentMatchState = ServerMatchState.WaitingForPlayers;
         }
 
         public void Initialize(NetworkRunner runner)
         {
+            Init(runner);
+        }
+
+        public void Init(NetworkRunner runner)
+        {
             _runner = runner;
+            _runner.AddCallbacks(this);
+
+            // PlayerManager'ı oluştur
+            var playerManagerObj = new GameObject("PlayerManager");
+            playerManagerObj.transform.parent = transform;
+            _playerManager = playerManagerObj.AddComponent<ServerPlayerManager>();
             
-            // PlayerManager'ı bul veya oluştur
-            _playerManager = FindObjectOfType<ServerPlayerManager>();
-            if (_playerManager == null)
+            // Oyun sahnesini yükle
+            if (_runner.IsServer || _runner.IsSharedModeMasterClient)
             {
-                var playerManagerObj = new GameObject("ServerPlayerManager");
-                _playerManager = playerManagerObj.AddComponent<ServerPlayerManager>();
+                LoadGameScene();
             }
-            
-            // Player prefab kontrolü
-            if (!_playerPrefab.IsValid)
+        }
+
+        private void LoadGameScene()
+        {
+            if (!_gameSceneLoaded)
             {
-                Debug.LogError("Player prefab is not valid in ServerGameManager! Please assign it in the inspector.");
-                return;
+                Debug.Log($"[ServerGameManager] Loading game scene: {_gameSceneName}, Build Index: 1");
+                
+                try 
+                {
+                    var sceneRef = SceneRef.FromIndex(1);
+                    if (sceneRef.IsValid)
+                    {
+                        _runner.LoadScene(sceneRef, LoadSceneMode.Additive);
+                        _gameSceneLoaded = true;
+                        Debug.Log($"[ServerGameManager] Scene load initiated with SceneRef: {sceneRef}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[ServerGameManager] Invalid SceneRef for index: 1");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[ServerGameManager] Error loading scene: {e.Message}");
+                }
             }
-            
-            // PlayerManager'ı başlat
-            _playerManager.SetPlayerPrefab(_playerPrefab);
-            _playerManager.Init(_runner);
-            
-            Debug.Log($"ServerGameManager initialized successfully! Player Prefab: {_playerPrefab}");
+        }
+
+        public void OnSceneLoadDone(NetworkRunner runner)
+        {
+            if (runner.IsServer || runner.IsSharedModeMasterClient)
+            {
+                Debug.Log($"[ServerGameManager] Scene load completed: {_gameSceneName}");
+                var scene = SceneManager.GetSceneByName(_gameSceneName);
+                if (scene.IsValid())
+                {
+                    SceneManager.SetActiveScene(scene);
+                }
+            }
+        }
+
+        public void OnSceneLoadStart(NetworkRunner runner)
+        {
+            Debug.Log($"[ServerGameManager] Starting to load scene: {_gameSceneName}");
         }
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -54,7 +98,19 @@ namespace _Project.Server.Scripts.Core
             
             if (_playerManager != null && runner.IsServer)
             {
-                _playerManager.SpawnPlayer(player);
+                // Eğer oyuncunun zaten bir karakteri varsa, yeni karakter spawn etme
+                if (!_spawnedPlayers.ContainsKey(player))
+                {
+                    var spawnedObject = _playerManager.SpawnPlayer(runner, player);
+                    if (spawnedObject != null)
+                    {
+                        _spawnedPlayers[player] = spawnedObject;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Player {player} already has a spawned character!");
+                }
             }
             else
             {
@@ -64,27 +120,36 @@ namespace _Project.Server.Scripts.Core
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            Debug.Log($"Oyuncu ayrıldı: {player}");
             if (_playerManager != null && runner.IsServer)
             {
-                _playerManager.DespawnPlayer(player);
+                _playerManager.DespawnPlayer(runner, player);
+                _spawnedPlayers.Remove(player);
+            }
+        }
+
+        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+            // AOI (Area of Interest) içine giren objeleri işle
+            if (runner.IsServer)
+            {
+                Debug.Log($"Object {obj.Id} entered AOI for player {player}");
+            }
+        }
+
+        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+            // AOI (Area of Interest) dışına çıkan objeleri işle
+            if (runner.IsServer)
+            {
+                Debug.Log($"Object {obj.Id} exited AOI for player {player}");
             }
         }
 
         public void UpdateMatchState(ServerMatchState newState)
         {
-            _currentMatchState = newState;
-            Debug.Log($"Match state changed to: {newState}");
+            // Match state update işlemi
         }
 
-        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-            throw new NotImplementedException();
-        }
-        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-            throw new NotImplementedException();
-        }
         public void OnInput(NetworkRunner runner, NetworkInput input) { }
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
@@ -109,7 +174,10 @@ namespace _Project.Server.Scripts.Core
             throw new NotImplementedException();
         }
         public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
-        public void OnSceneLoadDone(NetworkRunner runner) { }
-        public void OnSceneLoadStart(NetworkRunner runner) { }
+
+        public NetworkPrefabRef GetPlayerPrefab()
+        {
+            return _playerPrefab;
+        }
     }
 } 

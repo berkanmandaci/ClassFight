@@ -14,58 +14,17 @@ public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         Debug.Log($"Player joined - Local:{runner.LocalPlayer}, Joining:{player}, State Authority:{runner.IsSharedModeMasterClient}");
 
-        // Her oyuncu kendi karakterini spawn eder
-        if (player == runner.LocalPlayer)
+        // Sunucu tarafında spawn işlemini ServerPlayerManager yapacak
+        if (runner.IsServer || runner.IsSharedModeMasterClient)
         {
-            // Eğer bu oyuncu için daha önce spawn yapılmamışsa
-            if (!_spawnedCharacters.ContainsKey(player))
-            {
-                Debug.Log($"Local player {player} spawning own character");
-                Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-5f, 5f), 0, UnityEngine.Random.Range(-5f, 5f));
-
-                // Kendi karakterini spawn et
-                NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-
-                if (networkPlayerObject != null)
-                {
-                    if (networkPlayerObject.TryGetComponent<BaseCharacterController>(out var controller))
-                    {
-                        controller.Owner = player;
-
-                        // PvpArenaModel'den user bilgilerini al
-                        var pvpArenaVo = PvpArenaModel.Instance.PvpArenaVo;
-                        var user = pvpArenaVo.GetUser(ServiceModel.Instance.Session.UserId);
-                        
-                        controller.TeamId = user.TeamId;
-                        controller.RPC_SetUserId(user.Id);
-                        Debug.Log($"Set user info - UserId: {user.Id}, TeamId: {controller.TeamId}");
-                    }
-
-                    _spawnedCharacters.Add(player, networkPlayerObject);
-                    Debug.Log($"Player {player} spawned own character - Object ID: {networkPlayerObject.Id}, State Authority: {networkPlayerObject.StateAuthority}, Input Authority: {networkPlayerObject.InputAuthority}, Has Input Authority: {networkPlayerObject.HasInputAuthority}");
-                }
-                else
-                {
-                    Debug.LogError($"Failed to spawn player {player}");
-                }
-            }
-            else
-            {
-                Debug.Log($"Player {player} already has a spawned character");
-            }
+            Debug.Log($"Skipping spawn on server side for player {player}");
+            return;
         }
 
-        // Eğer yeni oyuncu isek, tüm mevcut oyunculardan bilgilerini göndermelerini iste
+        // Client tarafında sadece kendi karakterini takip et
         if (player == runner.LocalPlayer)
         {
-            foreach (var spawnedCharacter in _spawnedCharacters.Values)
-            {
-                if (spawnedCharacter.TryGetComponent<BaseCharacterController>(out var controller))
-                {
-                    controller.RPC_RequestUserInfo();
-                    Debug.Log($"Requesting user info from existing player - Object ID: {spawnedCharacter.Id}");
-                }
-            }
+            Debug.Log($"Local player {player} waiting for character spawn");
         }
     }
 
@@ -73,41 +32,52 @@ public class NetworkPlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
         {
-            runner.Despawn(networkObject);
+            Debug.Log($"Player {player} left, cleaning up their character");
             _spawnedCharacters.Remove(player);
         }
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        // Sadece local player için input topla
-        if (runner.LocalPlayer != PlayerRef.None)
+        if (runner.LocalPlayer == PlayerRef.None)
+            return;
+
+        var data = new NetworkInputData();
+
+        // Movement input (WASD)
+        data.movementInput.x = Input.GetAxisRaw("Horizontal");
+        data.movementInput.y = Input.GetAxisRaw("Vertical");
+
+        // Normalize movement input
+        if (data.movementInput.sqrMagnitude > 0)
         {
-            var data = new NetworkInputData();
+            data.movementInput.Normalize();
+        }
 
-            // Movement input (WASD)
-            if (Input.GetKey(KeyCode.W)) data.movementInput.y = 1;
-            if (Input.GetKey(KeyCode.S)) data.movementInput.y = -1;
-            if (Input.GetKey(KeyCode.A)) data.movementInput.x = -1;
-            if (Input.GetKey(KeyCode.D)) data.movementInput.x = 1;
+        // Mouse position for rotation
+        data.rotationInput = Input.mousePosition;
 
-            // Normalize movement input
-            if (data.movementInput.sqrMagnitude > 0)
+        input.Set(data);
+    }
+
+    // Spawn edilen karakteri kaydet
+    public void OnSpawned(NetworkRunner runner, NetworkObject networkObject)
+    {
+        if (networkObject.HasInputAuthority)
+        {
+            Debug.Log($"Character spawned with input authority - Object ID: {networkObject.Id}");
+            _spawnedCharacters[runner.LocalPlayer] = networkObject;
+
+            if (networkObject.TryGetComponent<BaseCharacterController>(out var controller))
             {
-                data.movementInput.Normalize();
+                // PvpArenaModel'den user bilgilerini al
+                var pvpArenaVo = PvpArenaModel.Instance.PvpArenaVo;
+                var user = pvpArenaVo.GetUser(ServiceModel.Instance.Session.UserId);
+                
+                controller.TeamId = user.TeamId;
+                controller.RPC_SetUserId(user.Id);
+                Debug.Log($"Set user info - UserId: {user.Id}, TeamId: {controller.TeamId}");
             }
-
-            // Mouse position for rotation
-            data.rotationInput = Input.mousePosition;
-
-            // Action buttons
-            data.buttons.Set(NetworkInputData.ATTACK, Input.GetMouseButton(0)); // Sol tık
-            data.buttons.Set(NetworkInputData.DASH, Input.GetMouseButton(1)); // Sağ tık
-            data.buttons.Set(NetworkInputData.DODGE, Input.GetKey(KeyCode.Space)); // Space
-            data.buttons.Set(NetworkInputData.NEXT_CHAR, Input.GetKey(KeyCode.Q)); // Q
-            data.buttons.Set(NetworkInputData.PREV_CHAR, Input.GetKey(KeyCode.E)); // E
-
-            input.Set(data);
         }
     }
 

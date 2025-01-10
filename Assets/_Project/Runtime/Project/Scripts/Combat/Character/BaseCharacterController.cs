@@ -1,6 +1,7 @@
 using UnityEngine;
 using Fusion;
 using _Project.Runtime.Project.Service.Scripts.Model;
+using System;
 
 public abstract class BaseCharacterController : NetworkBehaviour
 {
@@ -253,14 +254,44 @@ public abstract class BaseCharacterController : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_SetUserId(string userId)
     {
-        UserId = userId;
-        if (characterUI != null)
+        if (string.IsNullOrEmpty(userId))
         {
-            characterUI.Init(userId);
+            Debug.LogError($"Invalid userId received in RPC_SetUserId: {userId}");
+            return;
         }
-        Debug.Log($"Set UserId: {userId} for object {Object.Id}");
+
+        try
+        {
+            _userId = userId;
+            
+            // UI bileşenini bul ve kontrol et
+            var characterUI = GetComponent<CharacterUI>();
+            if (characterUI != null)
+            {
+                // PvpArenaModel'in hazır olduğundan emin ol
+                if (PvpArenaModel.Instance != null && PvpArenaModel.Instance.PvpArenaVo != null)
+                {
+                    characterUI.Init(userId);
+                }
+                else
+                {
+                    Debug.LogWarning("PvpArenaModel or PvpArenaVo is not ready yet. UI initialization delayed.");
+                    // Gerekirse burada bir event sistemi veya coroutine ile tekrar deneme yapılabilir
+                }
+            }
+            else
+            {
+                Debug.LogWarning("CharacterUI component not found on character.");
+            }
+
+            Debug.Log($"UserId set successfully: {userId}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error in RPC_SetUserId: {e.Message}\nStack trace: {e.StackTrace}");
+        }
     }
 }

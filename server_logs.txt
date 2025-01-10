@@ -1,0 +1,408 @@
+[2025-01-10 19:26:23] Server logs başlatıldı
+[2025-01-10 19:26:23] Server başlatılıyor...
+[2025-01-10 19:26:23] Server başlatma işlemi başladı...
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] [2025-01-10 19:26:23] Server başlatma işlemi başladı...
+[2025-01-10 19:26:23] Server ayarları yapılandırılıyor...
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] [2025-01-10 19:26:23] Server ayarları yapılandırılıyor...
+[2025-01-10 19:26:23] NetworkRunner oluşturuldu.
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] [2025-01-10 19:26:23] NetworkRunner oluşturuldu.
+[2025-01-10 19:26:23] ServerGameManager bulundu.
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] [2025-01-10 19:26:23] ServerGameManager bulundu.
+[2025-01-10 19:26:23] Development modunda çalışıyor... IP: 127.0.0.1, Port: 27016
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] [2025-01-10 19:26:23] Development modunda çalışıyor... IP: 127.0.0.1, Port: 27016
+[2025-01-10 19:26:23] Server başlatılıyor... SessionName: DedicatedServer, Lobby: MainLobby, IP: [NetAddress: IsValid: True, ActorId: -1, NativeAddress: [Address Ip=127.0.0.1 Port=27016], IsIPv6: False, IsRelayAddr: False, [0,72058143793676288,27016]]
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] [2025-01-10 19:26:23] Server başlatılıyor... SessionName: DedicatedServer, Lobby: MainLobby, IP: [NetAddress: IsValid: True, ActorId: -1, NativeAddress: [Address Ip=127.0.0.1 Port=27016], IsIPv6: False, IsRelayAddr: False, [0,72058143793676288,27016]]
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion]</color> [Global NetworkProjectConfigAsset]:  Loader Fusion.FusionGlobalScriptableObjectResourceAttribute was used to load [IID:-81838], has unloader: True
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion]</color> SDK: 2.0.3
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion]</color> StartGame: [StartGameArgs: GameMode=Server, SessionName=DedicatedServer, IsVisible=, IsOpen=, Address=[NetAddress: IsValid: True, ActorId: -1, NativeAddress: [Address Ip=127.0.0.1 Port=27016], IsIPv6: False, IsRelayAddr: False, [0,72058143793676288,27016]], CustomPublicAddress=, ObjectProvider=, SceneManager=, PlayerCount=, Scene=, DisableNATPunchthrough=False, CustomCallbackInterfaces=, ConnectionToken=, SessionProperties=GameType=[SessionProperty: Dedicated, Type=System.String], , CustomLobbyName=MainLobby, CustomSTUNServer=, AuthValues=, CustomPhotonAppSettings=, EnableClientSessionCreation=, HostMigrationToken=]
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion]</color> Connecting to Photon Cloud.
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> encryptionMode PayloadEncryption, emptyRoomTtl 0, appId Fusion: 43c06d95***, use ns: , reg: UseNameServer: True, , , Fixed Region: , auth: Udp
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> Changing Photon Cloud Communication Ports to [NameServerPort=27000,MasterServerPort=27001,GameServerPort=27002]
+[2025-01-10 19:26:23] [2025-01-10 19:26:23] [Log] <color=#73ACE5>[Fusion]</color> Starting service: AsyncClientUpdate
+[2025-01-10 19:26:25] [2025-01-10 19:26:25] [Log] <color=#73ACE5>[Fusion]</color> OnRegionListReceived: EnabledRegions=eu[87.120.167.220:27001], asia[91.243.81.74:27001], us[5.8.93.201:27001], usw[78.111.104.162:27001], jp[94.177.131.6:27001], sa[213.156.149.95:27001], kr[92.38.165.229:27001], hk[91.199.84.58:27001], au[87.121.33.222:27001], cae[216.120.180.160:27001], in[216.120.180.165:27001], tr[202.78.174.127:27001], uae[217.195.200.111:27001], ussc[216.120.180.48:27001]
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: eu[87.120.167.220:27001]: 65ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: asia[91.243.81.74:27001]: 398ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: us[5.8.93.201:27001]: 140ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: usw[78.111.104.162:27001]: 200ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: jp[94.177.131.6:27001]: 294ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: sa[213.156.149.95:27001]: 242ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: kr[92.38.165.229:27001]: 344ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: hk[91.199.84.58:27001]: 229ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: au[87.121.33.222:27001]: 304ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: cae[216.120.180.160:27001]: 136ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: in[216.120.180.165:27001]: 191ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: tr[202.78.174.127:27001]: 9ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: uae[217.195.200.111:27001]: 166ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: ussc[216.120.180.48:27001]: 156ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> OnRegionPingCompleted: Best Region=tr[202.78.174.127:27001]: 9ms
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion/RealtimeSDK]</color> RegionPingSummary: tr;9;asia,au,cae,eu,hk,in,jp,kr,sa,tr,uae,us,ussc,usw
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Connected to Photon Cloud.
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Connected to Photon Cloud.
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Joining Session: DedicatedServer, Lobby=MainLobby, Region=tr,Random Join=False
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Stopping service: AsyncClientUpdate
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Starting service: AsyncClientUpdate
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Created Session: DedicatedServer
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Joined Session: DedicatedServer
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> SessionInfo Update: [SessionInfo: IsValid=True, Name=DedicatedServer, IsOpen=True, IsVisible=True, Region=tr, PlayerCount=1, MaxPlayers=11, Properties=GameType=Dedicated,]
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Starting StartGame Operation
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Sending to [0]: [Join: Type=Request, GameMode=ClientServer, PeerMode=Server, JoinRequests=None, UniqueId=0, ProtocolVersion=V1_6_0, FusionSerializationVersion=2.0.3, CustomData=]
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Stopping service: AsyncClientUpdate
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Received from [0] :: [Join: Type=Confirmation, GameMode=ClientServer, PeerMode=Server, JoinRequests=ReflexiveInfo, UniqueId=5442315875272904328, ProtocolVersion=V1_6_0, FusionSerializationVersion=2.0.4, CustomData=]
+[2025-01-10 19:26:27] [2025-01-10 19:26:27] [Log] <color=#73ACE5>[Fusion]</color> Received from [0] :: [Start: RemoteServerID=1, StartRequests=None, ProtocolVersion=V1_6_0, FusionSerializationVersion=2.0.4, CustomData=]
+[2025-01-10 19:26:28] [2025-01-10 19:26:28] [Log] <color=#73ACE5>[Fusion]</color> No Fusion.INetworkObjectProvider provided and there is no matching component, creating Fusion.NetworkObjectProviderDefault, Fusion.Unity
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> No Fusion.INetworkSceneManager provided and there is no matching component, creating Fusion.NetworkSceneManagerDefault, Fusion.Unity
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> Starting with NetworkProjectConfig:
+{"Version":1,"TypeId":"NetworkProjectConfig","PeerMode":0,"LagCompensation":{"Enabled":false,"HitboxBufferLengthInMs":200,"HitboxDefaultCapacity":512,"CachedStaticCollidersSize":64},"EnqueueIncompleteSynchronousSpawns":false,"InvokeRenderInBatchMode":true,"NetworkIdIsObjectName":false,"HideNetworkObjectInactivityGuard":false,"AllowClientServerModesInWebGL":false,"Simulation":{"InputDataWordCount":7,"ReplicationFeatures":1,"InputTransferMode":0,"SimulationUpdateTimeMode":0,"PlayerCount":10,"TickRateSelection":{"Client":64,"ServerIndex":0,"ClientSendIndex":1,"ServerSendIndex":1}},"Network":{"ConnectionTimeout":10.0,"ConnectionShutdownTime":1.0,"ReliableDataTransferModes":3},"HostMigration":{"EnableAutoUpdate":false,"UpdateDelay":10},"EncryptionConfig":{"EnableEncryption":false},"NetworkConditions":{"Enabled":false,"DelayShape":0,"DelayMin":0.15,"DelayMax":0.15,"DelayPeriod":0.0,"DelayThreshold":0.0,"AdditionalJitter":0.05,"LossChanceShape":0,"LossChanceMin":0.05,"LossChanceMax":0.05,"LossChanceThreshold":0.0,"LossChancePeriod":0.0,"AdditionalLoss":0.0},"Heap":{"PageShift":15,"PageCount":256,"GlobalsSize":8},"AssembliesToWeave":["Fusion.Unity","Assembly-CSharp","Assembly-CSharp-firstpass","Fusion.Addons.Physics","Fusion.Addons.FSM"],"UseSerializableDictionary":true,"NullChecksForNetworkedProperties":true,"CheckRpcAttributeUsage":false,"CheckNetworkedPropertiesBeingEmpty":false}
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> Adding to the default updater
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> Registering in PlayerLoop, Update:[UnityEngine.PlayerLoop.Update+ScriptRunBehaviourUpdate, Before] Render:[UnityEngine.PlayerLoop.Update+ScriptRunBehaviourUpdate, After]
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> Starting service: Service_KeepAlive
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> allocating struct [Id:RuntimeConfig] (words: 9)
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> StartGame Operation Done: Ok
+[2025-01-10 19:26:29] Server başarıyla başlatıldı! SessionID: DedicatedServer
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [2025-01-10 19:26:29] Server başarıyla başlatıldı! SessionID: DedicatedServer
+[2025-01-10 19:26:29] Lobby: 
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [2025-01-10 19:26:29] Lobby: 
+[2025-01-10 19:26:29] Server sistemleri başlatılıyor...
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [2025-01-10 19:26:29] Server sistemleri başlatılıyor...
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [ServerGameManager] Loading game scene: Arena, Build Index: 1
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [ServerGameManager] Scene load initiated with SceneRef: [Scene:#1]
+[2025-01-10 19:26:29] Server sistemleri başarıyla başlatıldı.
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [2025-01-10 19:26:29] Server sistemleri başarıyla başlatıldı.
+[2025-01-10 19:26:29] Server başlatma işlemi tamamlandı.
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [2025-01-10 19:26:29] Server başlatma işlemi tamamlandı.
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> allocating struct [Id:SceneInfo] (words: 13)
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] <color=#73ACE5>[Fusion]</color> allocating struct [Id:Physics] (words: 10)
+[2025-01-10 19:26:29] [2025-01-10 19:26:29] [Log] [ServerGameManager] Starting to load scene: Arena
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] [ServerGameManager] Scene load completed: Arena
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] <color=#73ACE5>[Fusion]</color> [STUN] Only one STUN Server found, skip NAT Type Discovery.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Warning] <color=#73ACE5>[Fusion]</color> [STUN] Unable to send STUN Requests to any STUN Server, aborting.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] <color=#73ACE5>[Fusion]</color> SessionInfo Update: [SessionInfo: IsValid=True, Name=DedicatedServer, IsOpen=True, IsVisible=True, Region=tr, PlayerCount=2, MaxPlayers=11, Properties=GameType=Dedicated,]
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] <color=#73ACE5>[Fusion]</color> SessionInfo Update: [SessionInfo: IsValid=True, Name=DedicatedServer, IsOpen=True, IsVisible=True, Region=tr, PlayerCount=1, MaxPlayers=11, Properties=GameType=Dedicated,]
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:31] [2025-01-10 19:26:31] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:32] [2025-01-10 19:26:32] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:33] [2025-01-10 19:26:33] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] <color=#73ACE5>[Fusion]</color> Starting to Shutdown with (True, Ok, False)
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] <color=#73ACE5>[Fusion]</color> Removing from the default updater (deferred)
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] <color=#73ACE5>[Fusion]</color> DISPOSING: False
+[2025-01-10 19:26:34] [2025-01-10 19:26:34] [Log] <color=#73ACE5>[Fusion]</color> Disconnecting from Photon Cloud.
