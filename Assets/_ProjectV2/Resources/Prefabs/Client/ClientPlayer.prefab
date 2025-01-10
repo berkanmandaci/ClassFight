@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -6496226768606954949}
   - component: {fileID: -4233028921780113485}
   - component: {fileID: 7533873847837383993}
+  - component: {fileID: 4700172102978780678}
   m_Layer: 0
   m_Name: ClientPlayer
   m_TagString: Untagged
@@ -53,6 +54,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -4233028921780113485}
+  - {fileID: 4700172102978780678}
 --- !u!114 &-4233028921780113485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,6 +96,24 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4700172102978780678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4039480991372551500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21b99f01579bc30409882ae52449075a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  rotationSpeed: 10
+  jumpForce: 5
+  animator: {fileID: 7609687057041796714}
+  characterController: {fileID: 7533873847837383993}
+  playerCamera: {fileID: 0}
 --- !u!1 &7701718947935447552
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,6 +123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8350689590358231471}
+  - component: {fileID: 7609687057041796714}
   m_Layer: 0
   m_Name: PlayerVisuals
   m_TagString: Untagged
@@ -125,3 +146,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8788782163604351110}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &7609687057041796714
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7701718947935447552}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
