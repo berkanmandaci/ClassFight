@@ -6,6 +6,7 @@ using _Project.Runtime.Project.Service.Scripts.Model;
 using _Project.Scripts.Vo;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using Fusion.Sockets;
 using Nakama;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,8 +15,14 @@ namespace _Project.Runtime.Project.Scripts.Models
 {
     public class MatchmakingModel : SingletonBehaviour<MatchmakingModel>
     {
+        [Header("Network Settings")]
         [SerializeField] private NetworkRunner _networkRunnerPrefab;
         [SerializeField] private string _gameSceneName = "GameScene";
+
+        [Header("Development Settings")]
+        [SerializeField] private bool _isDevelopmentBuild = true;
+        [SerializeField] private string _developmentIP = "127.0.0.1";
+        [SerializeField] private ushort _developmentPort = 27016;
 
         private NetworkRunner _runner;
         private ISocket Socket => ServiceModel.Instance.Socket;
@@ -68,42 +75,54 @@ namespace _Project.Runtime.Project.Scripts.Models
         {
             try
             {
-                // NetworkRunner oluştur
                 if (_runner == null)
                 {
                     _runner = Instantiate(_networkRunnerPrefab);
                     DontDestroyOnLoad(_runner.gameObject);
                 }
 
-                Debug.Log($"Connecting to Fusion room: {roomName}");
+                Debug.Log($"Dedicated Server'a bağlanılıyor...");
 
-                // Önce sahneyi yükle
                 SceneManager.LoadScene(_gameSceneName);
                 await UniTask.WaitForEndOfFrame();
 
-                // Bağlantı ayarları
                 var args = new StartGameArgs()
                 {
-                    GameMode = Fusion.GameMode.Shared,
-                    SessionName = roomName,
-                    SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+                    GameMode = Fusion.GameMode.Client,
+                    SessionName = "DedicatedServer",
+                    CustomLobbyName = "MainLobby",
+                    SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                    SessionProperties = new Dictionary<string, SessionProperty>()
+                    {
+                        { "GameType", "Dedicated" }
+                    }
                 };
 
+                // Development build için özel ayarlar
+                if (_isDevelopmentBuild)
+                {
+                    args.Address = NetAddress.CreateFromIpPort(_developmentIP, _developmentPort);
+                    Debug.Log($"Development modunda bağlanılıyor... Server: {_developmentIP}:{_developmentPort}");
+                }
+
+                Debug.Log($"Bağlantı deneniyor... SessionName: {args.SessionName}, Lobby: {args.CustomLobbyName}");
                 var result = await _runner.StartGame(args);
 
                 if (result.Ok)
                 {
-                    Debug.Log("Successfully connected to Fusion room: " + roomName);
+                    Debug.Log($"Dedicated Server'a başarıyla bağlanıldı! SessionID: {_runner.SessionInfo.Name}");
+                    Debug.Log($"Lobby: {_runner.LobbyInfo?.Name}");
                 }
                 else
                 {
-                    Debug.LogError($"Failed to connect to Fusion room: {result.ShutdownReason}");
-                    OnMatchError?.Invoke(new Exception($"Fusion connection failed: {result.ShutdownReason}"));
+                    Debug.LogError($"Dedicated Server'a bağlanılamadı: {result.ShutdownReason} - {result.ErrorMessage}");
+                    OnMatchError?.Invoke(new Exception($"Fusion connection failed: {result.ShutdownReason} - {result.ErrorMessage}"));
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error in StartFusionGame: {e.Message}");
+                Debug.LogError($"Bağlantı hatası: {e.Message}");
+                Debug.LogError($"Stack Trace: {e.StackTrace}");
                 OnMatchError?.Invoke(e);
             }
         }
