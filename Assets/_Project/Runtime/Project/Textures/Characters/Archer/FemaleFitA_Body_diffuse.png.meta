@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      FemaleFitA_Body_diffuse_0: -7324045226708292319
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

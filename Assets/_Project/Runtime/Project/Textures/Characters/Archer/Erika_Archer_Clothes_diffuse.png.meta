@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Erika_Archer_Clothes_diffuse_0: -1495924065356668484
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
