@@ -1,156 +1,157 @@
 using UnityEngine;
-using Fusion;
-using Fusion.Sockets;
-using System.Collections.Generic;
+using Mirror;
 using ProjectV2.Shared;
-using System;
-using Cysharp.Threading.Tasks;
 
 namespace ProjectV2.Network
 {
-    public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
+    public class NetworkManager : Mirror.NetworkManager
     {
-        [SerializeField] private NetworkRunner networkRunnerPrefab;
-        
-        private NetworkRunner runner;
-        private Dictionary<PlayerRef, NetworkObject> spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
+        [Header("Game Settings")]
+        [SerializeField] private int minPlayers = GameDefines.MatchSettings.MIN_PLAYERS;
+        [SerializeField] private int maxPlayers = GameDefines.MatchSettings.MAX_PLAYERS;
+        [SerializeField] private string gameSceneName = GameDefines.NetworkSettings.GAME_SCENE_NAME;
 
-        public static NetworkManager Instance { get; private set; }
+        public static new NetworkManager singleton { get; private set; }
 
-        private void Awake()
+        #region Unity Callbacks
+
+        public override void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
+            if (singleton != null)
             {
                 Destroy(gameObject);
+                return;
             }
+
+            singleton = this;
+            base.Awake();
         }
 
-        public async UniTask InitializeNetwork(bool isServer)
+        public override void OnDestroy()
         {
-            try
+            if (singleton == this) singleton = null;
+            base.OnDestroy();
+        }
+
+        #endregion
+
+        #region Server Callbacks
+
+        public override void OnStartServer()
+        {
+            Debug.Log("Server started!");
+        }
+
+        public override void OnStopServer()
+        {
+            Debug.Log("Server stopped!");
+        }
+
+        public override void OnServerConnect(NetworkConnectionToClient conn)
+        {
+            if (numPlayers >= maxPlayers)
             {
-                Debug.Log($"Initializing network as {(isServer ? "Server" : "Client")}");
-
-                if (runner != null)
-                {
-                    await runner.Shutdown();
-                    Destroy(runner.gameObject);
-                }
-
-                runner = Instantiate(networkRunnerPrefab);
-                runner.name = isServer ? "Server Network Runner" : "Client Network Runner";
-                
-                var args = new StartGameArgs()
-                {
-                    GameMode = isServer ? GameMode.Server : GameMode.Client,
-                    SessionName = GameDefines.NetworkSettings.LOBBY_NAME,
-                    SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
-                };
-
-#if SERVER_BUILD
-                if (isServer)
-                {
-                    args.Address = NetAddress.CreateFromIpPort(
-                        GameDefines.NetworkSettings.DEFAULT_IP, 
-                        GameDefines.NetworkSettings.DEFAULT_PORT
-                    );
-                }
-#endif
-
-                var result = await runner.StartGame(args);
-                
-                if (!result.Ok)
-                {
-                    throw new Exception($"Failed to start {(isServer ? "server" : "client")}: {result.ShutdownReason}");
-                }
-
-                Debug.Log($"Successfully started {(isServer ? "server" : "client")}");
+                Debug.Log($"Server is full! Max players: {maxPlayers}");
+                conn.Disconnect();
+                return;
             }
-            catch (Exception e)
-            {
-                Debug.LogError($"Error initializing network: {e.Message}");
-                throw;
-            }
+
+            Debug.Log($"Client connected: {conn.address}");
         }
 
-        #region INetworkRunnerCallbacks Implementation
-
-        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
-            throw new NotImplementedException();
-        }
-        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-            throw new NotImplementedException();
-        }
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
-#if SERVER_BUILD
-            Debug.Log($"Player {player} joined on server");
-            // Server-specific player join logic
-#else
-            Debug.Log($"Local player {player} joined");
-            // Client-specific player join logic
-#endif
+            Debug.Log($"Client disconnected: {conn.address}");
+            base.OnServerDisconnect(conn);
         }
 
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
-            Debug.Log($"Player {player} left");
-            if (spawnedPlayers.TryGetValue(player, out NetworkObject playerObject))
-            {
-                runner.Despawn(playerObject);
-                spawnedPlayers.Remove(player);
-            }
+            Transform startPos = GetStartPosition();
+            GameObject player = startPos != null
+                ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+                : Instantiate(playerPrefab);
+
+            NetworkServer.AddPlayerForConnection(conn, player);
+            Debug.Log($"Player added for client {conn.address}");
         }
 
-        public void OnInput(NetworkRunner runner, NetworkInput input) { }
-        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) 
+        public override void OnServerSceneChanged(string sceneName)
         {
-            Debug.Log($"Network shutdown: {shutdownReason}");
-        }
-        
-        public void OnConnectedToServer(NetworkRunner runner) 
-        {
-#if !SERVER_BUILD
-            Debug.Log("Connected to server");
-#endif
-        }
-        public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
-        {
-            throw new NotImplementedException();
+            Debug.Log($"Server loaded scene: {sceneName}");
         }
 
-        public void OnDisconnectedFromServer(NetworkRunner runner) 
+        #endregion
+
+        #region Client Callbacks
+
+        public override void OnClientConnect()
         {
-#if !SERVER_BUILD
-            Debug.Log("Disconnected from server");
-#endif
+            Debug.Log("Connected to server!");
+            base.OnClientConnect();
         }
-        
-        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+
+        public override void OnClientDisconnect()
         {
-            throw new NotImplementedException();
+            Debug.Log("Disconnected from server!");
+            base.OnClientDisconnect();
         }
-        public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+
+        public override void OnStartClient()
         {
-            throw new NotImplementedException();
+            Debug.Log("Client started!");
         }
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
-        public void OnSceneLoadDone(NetworkRunner runner) { }
-        public void OnSceneLoadStart(NetworkRunner runner) { }
+
+        public override void OnStopClient()
+        {
+            Debug.Log("Client stopped!");
+        }
+
+        public override void OnClientSceneChanged()
+        {
+            Debug.Log("Client scene changed!");
+            base.OnClientSceneChanged();
+        }
+
+        #endregion
+
+        #region Start & Stop
+
+        public void StartHost()
+        {
+            Debug.Log("Starting host...");
+            base.StartHost();
+        }
+
+        public void StartServer()
+        {
+            Debug.Log("Starting server...");
+            base.StartServer();
+        }
+
+        public void StartClient()
+        {
+            Debug.Log("Starting client...");
+            base.StartClient();
+        }
+
+        public void StopHost()
+        {
+            Debug.Log("Stopping host...");
+            base.StopHost();
+        }
+
+        public void StopServer()
+        {
+            Debug.Log("Stopping server...");
+            base.StopServer();
+        }
+
+        public void StopClient()
+        {
+            Debug.Log("Stopping client...");
+            base.StopClient();
+        }
 
         #endregion
     }
