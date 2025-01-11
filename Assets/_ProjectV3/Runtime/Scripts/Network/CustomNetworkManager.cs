@@ -7,9 +7,8 @@ namespace _ProjectV3.Runtime.Scripts.Network
     public class CustomNetworkManager : NetworkManager
     {
         [Header("Server Settings")]
-        [SerializeField] private int maxConnections = 100;
         [SerializeField] private ushort serverPort = 7777;
-        [SerializeField] private NetworkPlayer playerPrefab;
+        [SerializeField] private NetworkPlayer playerPrefabRef;
         
         public bool IsServer { get; private set; }
         public bool IsClient { get; private set; }
@@ -21,13 +20,24 @@ namespace _ProjectV3.Runtime.Scripts.Network
             base.Awake();
             
             // Server ayarlarını yapılandır
-            transport.GetComponent<TelepathyTransport>().port = serverPort;
-            maxConnections = maxConnections;
+            if (transport != null && transport.GetComponent<TelepathyTransport>() != null)
+            {
+                transport.GetComponent<TelepathyTransport>().port = serverPort;
+            }
+            else
+            {
+                Debug.LogError("Transport component bulunamadı!");
+            }
 
             // Player prefab'ını ayarla
-            if (playerPrefab != null)
+            if (playerPrefabRef != null)
             {
-                playerPrefab = spawnPrefabs[0].GetComponent<NetworkPlayer>();
+                playerPrefab = playerPrefabRef.gameObject;
+                spawnPrefabs.Add(playerPrefabRef.gameObject);
+            }
+            else
+            {
+                Debug.LogError("Player Prefab atanmamış!");
             }
         }
         
@@ -64,7 +74,7 @@ namespace _ProjectV3.Runtime.Scripts.Network
             }
 
             // Player'ı spawn et
-            GameObject player = Instantiate(playerPrefab.gameObject, spawnPos, spawnRot);
+            GameObject player = Instantiate(playerPrefab, spawnPos, spawnRot);
             NetworkServer.AddPlayerForConnection(conn, player);
 
             Debug.Log($"Player spawn edildi. ConnectionID: {conn.connectionId}");
