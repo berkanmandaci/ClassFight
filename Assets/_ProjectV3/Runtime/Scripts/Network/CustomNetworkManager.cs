@@ -1,6 +1,7 @@
 using UnityEngine;
 using Mirror;
 using _ProjectV3.Shared.Scripts.Player;
+using kcp2k;
 
 namespace _ProjectV3.Runtime.Scripts.Network
 {
@@ -9,6 +10,7 @@ namespace _ProjectV3.Runtime.Scripts.Network
         [Header("Server Settings")]
         [SerializeField] private ushort serverPort = 7777;
         [SerializeField] private NetworkPlayer playerPrefabRef;
+        [SerializeField] private Transform spawnPointsParent; // Spawn noktalarının parent objesi
         
         public bool IsServer { get; private set; }
         public bool IsClient { get; private set; }
@@ -19,25 +21,65 @@ namespace _ProjectV3.Runtime.Scripts.Network
         {
             base.Awake();
             
-            // Server ayarlarını yapılandır
-            if (transport != null && transport.GetComponent<TelepathyTransport>() != null)
+            // Transport kontrolü
+            if (transport == null)
             {
-                transport.GetComponent<TelepathyTransport>().port = serverPort;
+                // Transport component yoksa, KCP Transport ekle
+                var kcpTransport = gameObject.AddComponent<KcpTransport>();
+                transport = kcpTransport;
+                kcpTransport.Port = serverPort;
+                Debug.Log("KCP Transport otomatik olarak eklendi.");
             }
             else
             {
-                Debug.LogError("Transport component bulunamadı!");
+                // Transport varsa port ayarını yap
+                if (transport is TelepathyTransport telepathyTransport)
+                {
+                    telepathyTransport.port = serverPort;
+                }
+                else if (transport is KcpTransport kcpTransport)
+                {
+                    kcpTransport.Port = serverPort;
+                }
             }
 
             // Player prefab'ını ayarla
             if (playerPrefabRef != null)
             {
                 playerPrefab = playerPrefabRef.gameObject;
-                spawnPrefabs.Add(playerPrefabRef.gameObject);
+                if (!spawnPrefabs.Contains(playerPrefabRef.gameObject))
+                {
+                    spawnPrefabs.Add(playerPrefabRef.gameObject);
+                }
             }
             else
             {
                 Debug.LogError("Player Prefab atanmamış!");
+            }
+        }
+
+        private void Start()
+        {
+            // Spawn noktalarını ayarla
+            if (spawnPointsParent != null)
+            {
+                // Önce mevcut listeyi temizle
+                startPositions.Clear();
+                
+                // Parent objenin altındaki tüm child'ları spawn noktası olarak ekle
+                for (int i = 0; i < spawnPointsParent.childCount; i++)
+                {
+                    Transform spawnPoint = spawnPointsParent.GetChild(i);
+                    if (!startPositions.Contains(spawnPoint))
+                    {
+                        startPositions.Add(spawnPoint);
+                        Debug.Log($"Spawn noktası eklendi: {spawnPoint.name}");
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Spawn Points Parent atanmamış! Spawn noktaları manuel olarak atanmalı.");
             }
         }
         
