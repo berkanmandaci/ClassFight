@@ -1,11 +1,11 @@
 using UnityEngine;
 using Mirror;
 
-namespace ProjectV3.Network
+namespace ProjectV3.Shared.Network
 {
-    public class NetworkManagerV3 : NetworkManager
+    public class NetworkManager : Mirror.NetworkManager
     {
-        public static new NetworkManagerV3 singleton { get; private set; }
+        public static new NetworkManager singleton { get; private set; }
 
         [Header("Spawn Settings")]
         [SerializeField] private Vector3[] spawnPoints;

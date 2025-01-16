@@ -1,9 +1,9 @@
 {
-    "name": "ProjectV3.Runtime",
-    "rootNamespace": "ProjectV3",
+    "name": "ProjectV3.Client",
+    "rootNamespace": "ProjectV3.Client",
     "references": [
         "GUID:30817c1a0e6d646d99c048fc403f5979",
-        "GUID:fe25561d224ed4743af4c60938a59d0b"
+        "ProjectV3.Shared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
