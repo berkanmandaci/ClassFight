@@ -3,8 +3,7 @@
     "rootNamespace": "ProjectV3.Shared",
     "references": [
         "GUID:30817c1a0e6d646d99c048fc403f5979",
-        "GUID:c0b2e6a9e6b86d14b9b965c0f81f1c2c",
-        "GUID:d63d7a0e1c4ff2047b22a107c2a1c0e0"
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -15,4 +14,4 @@
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
-} 
+}

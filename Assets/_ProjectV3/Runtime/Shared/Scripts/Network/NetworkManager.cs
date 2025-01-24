@@ -1,5 +1,6 @@
 using UnityEngine;
 using Mirror;
+using ProjectV3.Shared.Core;
 
 namespace ProjectV3.Shared.Network
 {
@@ -11,6 +12,8 @@ namespace ProjectV3.Shared.Network
         [SerializeField] private Vector3[] spawnPoints;
         private int nextSpawnPointIndex;
 
+        private LogManager logManager;
+
         public override void Awake()
         {
             if (singleton != null && singleton != this)
@@ -19,13 +22,36 @@ namespace ProjectV3.Shared.Network
                 return;
             }
             singleton = this;
+
+            // LogManager'ı ekle ve başlat
+            logManager = gameObject.AddComponent<LogManager>();
+            logManager.Initialize(NetworkServer.active);
+
             base.Awake();
         }
 
         public override void OnStartServer()
         {
             base.OnStartServer();
+            
+            // Server başladığında LogManager'ı yeniden başlat
+            if (logManager != null)
+            {
+                logManager.Initialize(true);
+            }
+            
             Debug.Log("Server Started");
+        }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            
+            // Client başladığında LogManager'ı yeniden başlat
+            if (logManager != null && !NetworkServer.active)
+            {
+                logManager.Initialize(false);
+            }
         }
 
         public override void OnStopServer()
