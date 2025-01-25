@@ -102,7 +102,7 @@ namespace ProjectV3.Client
             string deviceId = SystemInfo.deviceUniqueIdentifier;
             deviceId += Application.platform.ToString();
 
-            deviceId += CurrentPlayer.ReadOnlyTags().First();
+            // deviceId += CurrentPlayer.ReadOnlyTags().First();
             LogModel.Instance.Log("DeviceId: " + deviceId);
             Dictionary<string, string> vars = GetLanguage();
             try

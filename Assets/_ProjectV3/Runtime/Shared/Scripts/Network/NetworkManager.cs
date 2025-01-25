@@ -4,9 +4,9 @@ using ProjectV3.Shared.Core;
 
 namespace ProjectV3.Shared.Network
 {
-    public class NetworkManager : Mirror.NetworkManager
+    public class ProjectNetworkManager : Mirror.NetworkManager
     {
-        public static new NetworkManager singleton { get; private set; }
+        public static new ProjectNetworkManager singleton { get; private set; }
 
         [Header("Spawn Settings")]
         [SerializeField] private Vector3[] spawnPoints;

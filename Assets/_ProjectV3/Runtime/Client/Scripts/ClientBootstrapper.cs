@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
@@ -19,11 +20,19 @@ namespace ProjectV3.Client
             Init();
         }
 
-        private void Init()
+        private async void Init()
         {
-            _uiManager.Init();
-            InitializeServices().Forget();
-            PvpServerModel.Instance.Connect();
+            try
+            {
+                _uiManager.Init();
+                InitializeServices().Forget();
+                await HomeScreenController.Run();
+            }
+            catch (Exception e)
+            {
+                LogModel.Instance.Error(e);
+                throw; // TODO handle exception
+            }
         }
 
         private async UniTaskVoid InitializeServices()
@@ -101,7 +110,7 @@ namespace ProjectV3.Client
 
         private void OnApplicationPause(bool pauseStatus)
         {
-            serviceModel.OnApplicationPause(pauseStatus).Forget();
+            // serviceModel.OnApplicationPause(pauseStatus).Forget();
         }
     }
 }

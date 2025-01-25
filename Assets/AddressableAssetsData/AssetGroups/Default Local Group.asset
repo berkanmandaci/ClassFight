@@ -13,16 +13,26 @@ MonoBehaviour:
   m_Name: Default Local Group
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
-  m_GUID: 4c863121cab57f64a93ee483abcca65c
+  m_GUID: b7d6b3fbaba416743bd1cd688548f890
   m_SerializeEntries:
+  - m_GUID: 1385abb70dd360a439bd940889446ba1
+    m_Address: HomeScreen
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cadef6f7f65ea03468afa8272bf8dd8d
     m_Address: UIManager
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6e182c2e6949a94fbbe00a96f42c160
+    m_Address: LoadingScreen
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: 58986d7ba0f136347b0860975f1833e5, type: 2}
+  m_Settings: {fileID: 11400000, guid: 3b2fcd13a06229c4abaac719d8eff60a, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 964a46ef3b2657d44b07f5cddd4c25b4, type: 2}
-    - {fileID: 11400000, guid: fb22ad8c2511e024789ba84320f9b116, type: 2}
+    - {fileID: 11400000, guid: 8da8a4ebd35b0244aa8864e2829b7c6c, type: 2}
+    - {fileID: 11400000, guid: aff1ba470b0e31444b40bc3ff8b3d321, type: 2}

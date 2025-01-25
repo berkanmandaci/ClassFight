@@ -9,8 +9,7 @@ namespace ProjectV3.Server
         [Header("Network Settings")]
         [SerializeField] private ushort port = 7777;
         
-         [SerializeField] private ProjectV3.Shared.Network.NetworkManager networkManager;
-
+        [SerializeField] private ProjectNetworkManager networkManager;
 
         private void Start()
         {

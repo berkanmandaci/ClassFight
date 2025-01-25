@@ -1,6 +1,7 @@
 using _Project.Core.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
+using ProjectV3.Shared.Game;
 
 namespace ProjectV3.Client
 {
@@ -25,11 +26,13 @@ namespace ProjectV3.Client
         private void OnClick3vs3()
         {
             LogModel.Instance.Log("3vs3 Button Clicked");
+            HomeScreenController.JoinMatchmaking(GameModeType.TeamDeathmatch);
         }
         
         private void OnClickFreeForAll()
         {
             LogModel.Instance.Log("Free For All Button Clicked");
+            HomeScreenController.JoinMatchmaking(GameModeType.FreeForAll);
         }
 
         private void OnDestroy()
