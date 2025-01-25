@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using _Project.Runtime.Core.Extensions.Signal;
 using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
-using Newtonsoft.Json;
 using Nakama;
+using Newtonsoft.Json;
 using UnityEngine;
-
-namespace _Project.Runtime.Project.Service.Scripts.Model
+namespace ProjectV3.Client
 {
     public class SocketConnected : ASignal
     {
@@ -31,7 +30,7 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
 
         public void Init()
         {
-            Client = new Client("http", "13.61.21.22", 7350, "defaultkey");
+            Client = new Nakama.Client("http", "13.61.21.22", 7350, "defaultkey");
             // Signals.Get<SocketConnected>().AddListener(GetNotifications);
         }
 
@@ -60,7 +59,7 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
             }
         }
 
-    
+
         public async UniTask<T> RpcRequest<T>(string serviceKey, object data)
         {
             var payload = JsonConvert.SerializeObject(data);
@@ -259,7 +258,7 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
             LogRequest(message.ToString());
         }
 
-      
+
 
         public async UniTask FollowUsersAsync(IEnumerable<string> userIDs, IEnumerable<string> usernames = null)
         {
@@ -272,7 +271,7 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
         }
 
 
-    
+
         public void OnDestroy()
         {
 

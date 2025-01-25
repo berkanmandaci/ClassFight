@@ -1,7 +1,7 @@
 ﻿using System;
 using _Project.Runtime.Core.Extensions.Singleton;
 using UnityEngine;
-namespace _Project.Runtime.Project.Service.Scripts.Model
+namespace ProjectV3.Client
 {
     public class LogModel : Singleton<LogModel>
     {
@@ -15,6 +15,11 @@ namespace _Project.Runtime.Project.Service.Scripts.Model
                     Debug.LogError(innerException);
                 }
             }
+        }
+        
+        public void Warning(string message)
+        {
+            Debug.LogWarning(message);
         }
         public void Log(string message, string ff4500)
         {

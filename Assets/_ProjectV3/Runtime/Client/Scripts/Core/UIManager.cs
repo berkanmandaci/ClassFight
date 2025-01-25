@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using _Project.Core.Scripts.Enums;
+using _Project.Core.Scripts;
 using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
+using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Enums;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-
-namespace _Project.Core.Scripts
+namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 {
     public class UIManager : SingletonBehaviour<UIManager>
     {
@@ -20,6 +20,7 @@ namespace _Project.Core.Scripts
 
         public void Init()
         {
+            UILayers= new Dictionary<UILayerKey, Transform>();
             UILayers = uiLayersList.ToDictionary(x => x.GetComponent<UILayer>().Key, x => x.transform);
         }
 

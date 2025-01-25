@@ -1,79 +1,107 @@
 using UnityEngine;
-using Mirror;
-using ProjectV3.Shared.Network;
+using Cysharp.Threading.Tasks;
+using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
 
 namespace ProjectV3.Client
 {
     public class ClientBootstrapper : MonoBehaviour
     {
-        [Header("Network Settings")]
-        [SerializeField] private string serverAddress = "localhost";
-        [SerializeField] private ushort port = 7777;
-        [SerializeField] private bool autoConnect = true;
-        
-        private ProjectV3.Shared.Network.NetworkManager networkManager;
 
-        private void Awake()
-        {
-            networkManager = GetComponent<ProjectV3.Shared.Network.NetworkManager>();
-            if (networkManager == null)
-            {
-                Debug.LogError("[Client] NetworkManager component not found!");
-                return;
-            }
+        [SerializeField] private bool useDeviceLogin = true;
+        [SerializeField] private UIManager _uiManager;
 
-            // Network ayarlarını yap
-            networkManager.networkAddress = serverAddress;
 
-            // Otomatik bağlantı aktifse
-            if (autoConnect)
-            {
-                Debug.Log("[Client] Auto-connect enabled, will attempt connection on Start");
-            }
-        }
+        private AuthenticationModel authModel => AuthenticationModel.Instance;
+        private ServiceModel serviceModel => ServiceModel.Instance;
 
         private void Start()
         {
-            if (autoConnect)
+            Init();
+        }
+
+        private void Init()
+        {
+            _uiManager.Init();
+            InitializeServices().Forget();
+            PvpServerModel.Instance.Connect();
+        }
+
+        private async UniTaskVoid InitializeServices()
+        {
+            // Initialize ServiceModel
+            serviceModel.Init();
+
+            // Try auto login
+            bool loginSuccess = await authModel.TryAutoLogin();
+
+            if (loginSuccess)
             {
-                ConnectToServer();
+                Debug.Log("[Client] Auto login successful!");
+                await ConnectToServices();
+            }
+            else if (useDeviceLogin)
+            {
+                Debug.Log("[Client] Auto login failed, trying device login...");
+                await authModel.LoginWithDeviceIdAsync();
+                await ConnectToServices();
+            }
+            else
+            {
+                Debug.Log("[Client] Authentication required!");
+                // TODO: Show login UI
             }
         }
 
-        public void ConnectToServer()
+        private async UniTask ConnectToServices()
         {
-            if (NetworkClient.isConnected)
+            if (authModel.ActiveSession == null)
             {
-                Debug.Log("[Client] Already connected to server!");
+                Debug.LogError("[Client] No active session found!");
                 return;
             }
 
-            if (NetworkServer.active)
+            try
             {
-                Debug.Log("[Client] Cannot connect while server is active!");
-                return;
-            }
+                // Connect to Nakama socket
+                await serviceModel.ConnectSocketAsync(authModel.ActiveSession);
 
-            Debug.Log($"[Client] Initializing connection to {serverAddress}:{port}");
-            networkManager.networkAddress = serverAddress;
-            networkManager.StartClient();
+                // Connect to Mirror network if auto connect is enabled
+
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[Client] Failed to connect to services: {e.Message}");
+            }
         }
 
-        public void DisconnectFromServer()
+
+
+        public async UniTask DisconnectFromServices()
         {
-            if (!NetworkClient.isConnected)
+            // Disconnect from Nakama
+            if (serviceModel.Socket != null && serviceModel.Socket.IsConnected)
             {
-                Debug.Log("[Client] Not connected to any server!");
-                return;
+                await serviceModel.Socket.CloseAsync();
             }
 
-            Debug.Log("[Client] Disconnecting from server...");
-            networkManager.StopClient();
+            // Disconnect from Mirror
+            PvpServerModel.Instance.StopConnection();
+
+            // Logout from Nakama
+            if (authModel.ActiveSession != null)
+            {
+                await authModel.Logout();
+            }
         }
 
         private void OnApplicationQuit()
         {
-            DisconnectFromServer();
+            DisconnectFromServices().Forget();
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            serviceModel.OnApplicationPause(pauseStatus).Forget();
         }
     }
-} 
+}

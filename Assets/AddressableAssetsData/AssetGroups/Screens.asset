@@ -13,28 +13,14 @@ MonoBehaviour:
   m_Name: Screens
   m_EditorClassIdentifier: 
   m_GroupName: Screens
-  m_Data:
-    m_SerializedData: []
-  m_GUID: fc296d3395aaed94ca0cea2997bd33b9
+  m_GUID: f87559c978a0542459c4cf5777940a35
   m_SerializeEntries:
-  - m_GUID: 1e9ae81a12d15444e9a83181a4226475
-    m_Address: FirstScreen
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0447bafdb20baa94d831388c37bf59f7
-    m_Address: MessagePopupScreen
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fdf3908ff7a9736499b4ed19f6e11c20
-    m_Address: WinMessagePopupScreen
+  - m_GUID: 1385abb70dd360a439bd940889446ba1
+    m_Address: HomeScreen
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 58986d7ba0f136347b0860975f1833e5, type: 2}
   m_SchemaSet:
-    m_Schemas:
-    - {fileID: 11400000, guid: 84615b09fed8cd54aa8a41b978f2e5c0, type: 2}
-    - {fileID: 11400000, guid: c4f094077fed66940a13a0c8c98d49a0, type: 2}
+    m_Schemas: []
