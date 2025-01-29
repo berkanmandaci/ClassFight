@@ -5,7 +5,6 @@ using _Project.Runtime.Core.Extensions.Singleton;
 using _Project.Runtime.Project.Game.Scripts.Vo;
 using Cysharp.Threading.Tasks;
 using Nakama;
-using UnityEngine;
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Models
 {
     public class NotificationsModel : Singleton<NotificationsModel>
@@ -22,6 +21,11 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Models
         //Log
         private const long ServerShutdownCode = 1000;
 
+
+        //Pvp
+
+        private const long MatchJoinedCode = 1001;
+
         public bool NotificationPermission { get; set; }
 
 
@@ -32,7 +36,7 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Models
             NotificationsVo = new List<NotificationsVo>();
             _codeActionsDictionary = new Dictionary<long, Action<IApiNotification>>
             {
-                // { SeasonTourStartedCode, SeasonTourStartedController.Instance.Run },
+                { MatchJoinedCode, MatchMakingNotificationController.Instance.Run },
                 { ServerShutdownCode, ShutdownLog }
             };
 

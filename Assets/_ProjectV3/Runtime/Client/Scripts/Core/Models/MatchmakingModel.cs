@@ -105,6 +105,11 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
             }
         }
 
+        public async UniTask JoinMatch(string matchId)
+        {
+            LogModel.Instance.Log($"JoinMatch: {matchId}");
+        }
+
         public async UniTask<IMatchmakerMatched> WaitForMatch(IMatchmakerTicket ticket)
         {
             try

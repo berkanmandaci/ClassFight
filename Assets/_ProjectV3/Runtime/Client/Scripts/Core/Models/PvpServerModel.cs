@@ -19,17 +19,9 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
         private bool isReconnecting = false;
         private IMatchmakerMatched currentMatch;
 
-        private void OnEnable()
-        {
-            Signals.Get<MatchFoundSignal>().AddListener(OnMatchFound);
-        }
+    
 
-        private void OnDisable()
-        {
-            Signals.Get<MatchFoundSignal>().RemoveListener(OnMatchFound);
-        }
-
-        private async void OnMatchFound(IMatchmakerMatched match)
+        public async void OnMatchFound(IMatchmakerMatched match)
         {
             try
             {
@@ -56,6 +48,30 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 LogModel.Instance.Error($"Match bağlantı hatası: {e.Message}");
                 throw;
             }
+        }
+        
+        public async UniTask OnMatchFound()
+        {
+            try
+            {
+                var serverInfo = new ServerInfo
+                {
+                    host = "localhost", // TODO: Gerçek sunucu bilgilerini al
+                    port = 7777
+                };
+                LogModel.Instance.Log($"Sunucu bilgileri alındı:");
+                LogModel.Instance.Log($"Host: {serverInfo.host}");
+                LogModel.Instance.Log($"Port: {serverInfo.port}");
+
+                // Mirror sunucusuna bağlan
+                await ConnectToGameServer(serverInfo);
+            }
+            catch (Exception e)
+            {
+                LogModel.Instance.Error(e);
+                throw;
+            }
+  
         }
 
         private async UniTask ConnectToGameServer(ServerInfo serverInfo)
