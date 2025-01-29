@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using Nakama;
 using Unity.Multiplayer.Playmode;
 using UnityEngine;
+using Random = UnityEngine.Random;
 namespace ProjectV3.Client
 {
     public class AuthenticationKeys
@@ -104,6 +105,8 @@ namespace ProjectV3.Client
 
             // deviceId += CurrentPlayer.ReadOnlyTags().First();
             LogModel.Instance.Log("DeviceId: " + deviceId);
+
+            deviceId += Random.Range(0, 1000).ToString();
             Dictionary<string, string> vars = GetLanguage();
             try
             {

@@ -26,13 +26,13 @@ namespace ProjectV3.Client
         private void OnClick3vs3()
         {
             LogModel.Instance.Log("3vs3 Button Clicked");
-            HomeScreenController.JoinMatchmaking(GameModeType.TeamDeathmatch);
+            _ = HomeScreenController.StartMatchmaking(GameModeType.TeamDeathmatch);
         }
         
         private void OnClickFreeForAll()
         {
             LogModel.Instance.Log("Free For All Button Clicked");
-            HomeScreenController.JoinMatchmaking(GameModeType.FreeForAll);
+            _ = HomeScreenController.StartMatchmaking(GameModeType.FreeForAll);
         }
 
         private void OnDestroy()

@@ -18,6 +18,10 @@ namespace ProjectV3.Client
     public class ReceivedMessageSignal : ASignal<IApiChannelMessage>
     {
     }
+    
+    public class ApiNotificationReceivedSignal : ASignal<IApiNotification>
+    {
+    }
 
 
     public class ServiceModel : Singleton<ServiceModel>
@@ -30,7 +34,8 @@ namespace ProjectV3.Client
 
         public void Init()
         {
-            Client = new Nakama.Client("http", "13.61.21.22", 7350, "defaultkey");
+            // Client = new Nakama.Client("http", "13.61.21.22", 7350, "defaultkey");
+            Client = new Nakama.Client("http", "127.0.0.1", 7350, "defaultkey");
             // Signals.Get<SocketConnected>().AddListener(GetNotifications);
         }
 
@@ -38,6 +43,7 @@ namespace ProjectV3.Client
         {
             Socket = Client.NewSocket();
             Socket.ReceivedChannelMessage += ReceiveMessagesAsync;
+            Socket.ReceivedNotification += ReceiveNotificationMessagesAsync;
             Socket.ReceivedError += SocketOnReceivedError;
             Socket.Closed += OnSocketClose;
             await Socket.ConnectAsync(session);
@@ -46,6 +52,11 @@ namespace ProjectV3.Client
             AuthenticationModel.Instance.SetStatusOnline(true).Forget();
             Signals.Get<SocketConnected>().Dispatch();
         }
+        private void ReceiveNotificationMessagesAsync(IApiNotification obj)
+        {
+            Signals.Get<ApiNotificationReceivedSignal>().Dispatch(obj);
+        }
+
 
         public async UniTask OnApplicationPause(bool pauseStatus)
         {
@@ -280,6 +291,7 @@ namespace ProjectV3.Client
                 _reconnectCancel?.Cancel();
                 Socket.ReceivedChannelMessage -= ReceiveMessagesAsync;
                 Socket.ReceivedError -= SocketOnReceivedError;
+                Socket.ReceivedNotification -= ReceiveNotificationMessagesAsync;
                 Socket.Closed -= OnSocketClose;
                 Socket.CloseAsync();
                 Socket = null;

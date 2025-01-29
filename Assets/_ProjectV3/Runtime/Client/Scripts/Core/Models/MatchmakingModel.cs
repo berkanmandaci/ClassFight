@@ -1,130 +1,172 @@
 using System;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
 using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Nakama;
+using _Project.Runtime.Core.Extensions.Signal;
 using ProjectV3.Shared.Game;
-using UnityEngine;
 
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 {
+    public class MatchFoundSignal : ASignal<IMatchmakerMatched>
+    {
+    }
+
     public class MatchmakingModel : Singleton<MatchmakingModel>
     {
-        private const float MATCHMAKING_TIMEOUT = 60f; // 60 saniye
+        private ServiceModel serviceModel => ServiceModel.Instance;
+        private ISocket Socket => serviceModel.Socket;
+        private bool isMatchmaking = false;
         private IMatchmakerTicket currentTicket;
-        private IMatchmakerMatched matchmakerMatched;
-        private bool isMatchFound;
+        private const int MATCHMAKING_TIMEOUT = 60; // 60 saniye
+        private IMatchmakerMatched currentMatch;
 
-        public async UniTask<IMatchmakerTicket> JoinMatchmaking(MatchmakingData data)
+        private void OnEnable()
         {
-            try
+            if (Socket != null)
             {
-                // Eğer zaten matchmaking'deyse iptal et
-                if (currentTicket != null)
-                {
-                    await CancelMatchmaking();
-                }
-
-                // Nakama socket'i al
-                var socket = ServiceModel.Instance.Socket;
-                if (socket == null || !socket.IsConnected)
-                {
-                    throw new Exception("Nakama socket is not connected");
-                }
-
-                // Event listener'ı ekle
-                isMatchFound = false;
-                socket.ReceivedMatchmakerMatched += OnMatchmakerMatched;
-
-                // Matchmaking kriterleri
-                var query = $"gameMode:{(int)data.GameMode} region:{data.Region}";
-                var minCount = data.GameMode == GameModeType.TeamDeathmatch ? 2 : 2; // 3v3 veya 6 FFA
-                var maxCount = minCount;
-
-                // Matchmaking'e katıl
-                currentTicket = await socket.AddMatchmakerAsync(
-                    query: query,
-                    minCount: minCount,
-                    maxCount: maxCount,
-                    stringProperties: null,
-                    numericProperties: null
-                );
-
-                LogModel.Instance.Log($"Joined matchmaking with ticket: {currentTicket.Ticket}");
-                return currentTicket;
+                Socket.ReceivedMatchmakerMatched += OnMatchmakerMatched;
             }
-            catch (Exception e)
+        }
+
+        private void OnDisable()
+        {
+            if (Socket != null)
             {
-                LogModel.Instance.Error(e);
-                throw;
+                Socket.ReceivedMatchmakerMatched -= OnMatchmakerMatched;
             }
         }
 
         private void OnMatchmakerMatched(IMatchmakerMatched matched)
         {
-            matchmakerMatched = matched;
-            isMatchFound = true;
-            LogModel.Instance.Log($"Match found with {matched.Users.Count()} players");
+            currentMatch = matched;
+            LogModel.Instance.Log($"=== Eşleşme bulundu! ===");
+            LogModel.Instance.Log($"Match ID: {matched.MatchId}");
+            LogModel.Instance.Log($"Oyuncu sayısı: {matched.Users.Count()}");
+
+            // Match bulundu sinyali gönder
+            Signals.Get<MatchFoundSignal>().Dispatch(matched);
         }
 
-        public async UniTask<MatchResult> WaitForMatch(IMatchmakerTicket ticket)
+        public async UniTask<IMatchmakerTicket> JoinMatchmaking(MatchmakingData data)
         {
             try
             {
-                var timeoutTask = UniTask.Delay(TimeSpan.FromSeconds(MATCHMAKING_TIMEOUT));
-                var matchFoundTask = UniTask.WaitUntil(() => isMatchFound);
-
-                // Hangisi önce tamamlanırsa
-                var result = await UniTask.WhenAny(matchFoundTask, timeoutTask);
-
-                if (result == 0 && matchmakerMatched != null) // Eşleşme bulundu
+                if (isMatchmaking)
                 {
-                    return new MatchResult
-                    {
-                        MatchId = matchmakerMatched.Self.Presence.SessionId,
-                        Players = matchmakerMatched.Users.ToArray(),
-                        ServerHost = "localhost", // Local test için
-                        ServerPort = 7777 // Default port
-                    };
+                    LogModel.Instance.Warning("Zaten matchmaking'e katılmış durumdasınız!");
+                    return currentTicket;
                 }
-                else // Timeout
+
+                if (Socket == null || !Socket.IsConnected)
                 {
-                    await CancelMatchmaking();
-                    return null;
+                    throw new Exception("Nakama socket bağlantısı bulunamadı!");
                 }
+
+                isMatchmaking = true;
+                LogModel.Instance.Log($"=== Matchmaking başlatılıyor ===");
+                LogModel.Instance.Log($"Game Mode: {data.GameMode}");
+                LogModel.Instance.Log($"Region: {data.Region}");
+
+                // Matchmaking kriterlerini ayarla
+                var query = "*"; // Tüm oyuncularla eşleş
+                var minCount = 2;
+                var maxCount = 2;
+                
+                // Matchmaking özelliklerini ayarla
+                var stringProperties = new Dictionary<string, string>
+                {
+                    { "region", data.Region }
+                };
+
+                var numericProperties = new Dictionary<string, double>
+                {
+                    { "gameMode", (double)data.GameMode }
+                };
+
+                // Matchmaking'e katıl
+                currentTicket = await Socket.AddMatchmakerAsync(
+                    query,
+                    minCount,
+                    maxCount,
+                    stringProperties,
+                    numericProperties
+                );
+
+                LogModel.Instance.Log($"Matchmaking ticket alındı: {currentTicket.Ticket}");
+                return currentTicket;
             }
             catch (Exception e)
             {
-                LogModel.Instance.Error(e);
+                LogModel.Instance.Error($"Matchmaking hatası: {e.Message}");
+                await CancelMatchmaking();
+                throw;
+            }
+        }
+
+        public async UniTask<IMatchmakerMatched> WaitForMatch(IMatchmakerTicket ticket)
+        {
+            try
+            {
+                if (ticket == null)
+                {
+                    throw new Exception("Geçersiz matchmaking ticket!");
+                }
+
+                LogModel.Instance.Log("Eşleşme bekleniyor...");
+
+                // Match bulunana kadar bekle
+                var timeoutTask = UniTask.Delay(TimeSpan.FromSeconds(MATCHMAKING_TIMEOUT));
+                var matchTask = UniTask.WaitUntil(() => currentMatch != null);
+
+                var result = await UniTask.WhenAny(matchTask, timeoutTask);
+
+                if (result == 1)
+                {
+                    throw new Exception($"Matchmaking zaman aşımına uğradı ({MATCHMAKING_TIMEOUT} saniye)");
+                }
+
+                if (currentMatch == null)
+                {
+                    throw new Exception("Eşleşme bulunamadı!");
+                }
+
+                return currentMatch;
+            }
+            catch (Exception e)
+            {
+                LogModel.Instance.Error($"Eşleşme hatası: {e.Message}");
+                await CancelMatchmaking();
                 throw;
             }
             finally
             {
-                // Event listener'ı kaldır
-                if (ServiceModel.Instance.Socket != null)
-                {
-                    ServiceModel.Instance.Socket.ReceivedMatchmakerMatched -= OnMatchmakerMatched;
-                }
+                isMatchmaking = false;
+                currentTicket = null;
             }
         }
 
         public async UniTask CancelMatchmaking()
         {
-            if (currentTicket != null)
+            try
             {
-                try
+                if (currentTicket != null && Socket != null && Socket.IsConnected)
                 {
-                    var socket = ServiceModel.Instance.Socket;
-                    await socket.RemoveMatchmakerAsync(currentTicket);
-                    currentTicket = null;
-                    LogModel.Instance.Log("Matchmaking cancelled");
+                    LogModel.Instance.Log("Matchmaking iptal ediliyor...");
+                    await Socket.RemoveMatchmakerAsync(currentTicket);
+                    LogModel.Instance.Log("Matchmaking iptal edildi");
                 }
-                catch (Exception e)
-                {
-                    LogModel.Instance.Error(e);
-                    throw;
-                }
+            }
+            catch (Exception e)
+            {
+                LogModel.Instance.Error($"Matchmaking iptal hatası: {e.Message}");
+            }
+            finally
+            {
+                isMatchmaking = false;
+                currentTicket = null;
+                currentMatch = null;
             }
         }
     }
@@ -133,20 +175,5 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
     {
         public GameModeType GameMode { get; set; }
         public string Region { get; set; }
-    }
-
-    public class MatchResult
-    {
-        public string MatchId { get; set; }
-        public IMatchmakerUser[] Players { get; set; }
-        public string ServerHost { get; set; }
-        public int ServerPort { get; set; }
-    }
-
-    public static class RegionCode
-    {
-        public const string EU = "eu";
-        public const string US = "us";
-        public const string ASIA = "asia";
     }
 } 

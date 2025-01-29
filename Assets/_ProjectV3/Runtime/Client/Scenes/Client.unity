@@ -233,6 +233,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useDeviceLogin: 1
   _uiManager: {fileID: 457264703}
+  _mainAudioListener: {fileID: 0}
+--- !u!1 &945671633
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 945671634}
+  - component: {fileID: 945671635}
+  m_Layer: 0
+  m_Name: BundleModel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &945671634
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945671633}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &945671635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945671633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 372d1aa2913216747932cec30b50dbd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1034447990
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,6 +380,11 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
+  maxMessageSize: 16384
+  messageQueueSize: 10000
+  noDelay: 1
+  sendTimeout: 5000
+  receiveTimeout: 5000
   spawnPoints: []
 --- !u!1 &1279884086
 GameObject:
@@ -346,7 +396,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1279884089}
   - component: {fileID: 1279884088}
-  - component: {fileID: 1279884087}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -354,14 +403,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &1279884087
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1279884086}
-  m_Enabled: 1
 --- !u!20 &1279884088
 Camera:
   m_ObjectHideFlags: 0
@@ -505,3 +546,4 @@ SceneRoots:
   - {fileID: 1034447991}
   - {fileID: 943271656}
   - {fileID: 863980615}
+  - {fileID: 945671634}

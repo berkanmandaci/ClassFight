@@ -9,27 +9,43 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 {
     public class SceneModel : Singleton<SceneModel>
     {
-        private const string GAME_SCENE_NAME = "GameScene";
-        private const string MENU_SCENE_NAME = "MenuScene";
+        // private const string GAME_SCENE_NAME = "ProjectV3/Runtime/Client/Scenes/Client/GameScene";
+        private const string GAME_SCENE_NAME = "ProjectV3/Runtime/Client/Scenes/Client/GameScene";
+        private const string MENU_SCENE_NAME = "ProjectV3/Runtime/Client/Scenes/Client/MenuScene";
 
         public async UniTask LoadGameScene()
         {
             try
             {
-                LogModel.Instance.Log($"Loading game scene: {GAME_SCENE_NAME}");
+                LogModel.Instance.Log($"=== Oyun sahnesi yükleniyor: {GAME_SCENE_NAME} ===");
+                
+                // Sahnenin varlığını kontrol et
+                if (!Application.CanStreamedLevelBeLoaded(GAME_SCENE_NAME))
+                {
+                    throw new Exception($"Sahne bulunamadı: {GAME_SCENE_NAME}. Build Settings'de sahnenin ekli olduğundan emin olun.");
+                }
                 
                 // Yükleme ekranını göster
                 var loadingScreen = await UIManager.Instance.OpenUI(UIScreenKeys.LoadingScreen);
-                loadingScreen.Init();
+                if (loadingScreen != null)
+                {
+                    loadingScreen.Init();
+                }
 
                 // Sahneyi asenkron olarak yükle
                 var operation = SceneManager.LoadSceneAsync(GAME_SCENE_NAME);
+                if (operation == null)
+                {
+                    throw new Exception($"Sahne yükleme işlemi başlatılamadı: {GAME_SCENE_NAME}");
+                }
+
                 operation.allowSceneActivation = false;
 
                 // Yükleme ilerlemesini bekle
                 while (operation.progress < 0.9f)
                 {
-                    await UniTask.Yield();
+                    LogModel.Instance.Log($"Sahne yükleme ilerlemesi: {operation.progress:P}");
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
                 }
 
                 // Yükleme tamamlandı, sahneyi aktifleştir
@@ -39,11 +55,11 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 // Yükleme ekranını kapat
                 UIManager.Instance.CloseUI(UIScreenKeys.LoadingScreen);
 
-                LogModel.Instance.Log("Game scene loaded successfully");
+                LogModel.Instance.Log("=== Oyun sahnesi başarıyla yüklendi ===");
             }
             catch (Exception e)
             {
-                LogModel.Instance.Error(e);
+                LogModel.Instance.Error($"Sahne yükleme hatası: {e.Message}\nStack Trace: {e.StackTrace}");
                 throw;
             }
         }

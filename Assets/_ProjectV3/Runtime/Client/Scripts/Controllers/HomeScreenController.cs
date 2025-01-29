@@ -1,3 +1,4 @@
+using System;
 using _Project.Core.Scripts.Enums;
 using Cysharp.Threading.Tasks;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
@@ -8,82 +9,70 @@ namespace ProjectV3.Client
 {
     public class HomeScreenController
     {
+        private static MatchmakingModel matchmakingModel => MatchmakingModel.Instance;
+        private static UIManager uiManager => UIManager.Instance;
+        private static LogModel logModel => LogModel.Instance;
+
         public static async UniTask Run()
         {
-            var result = await UIManager.Instance.OpenUI(UIScreenKeys.HomeScreen);
-            result.Init();
+            var view = await uiManager.OpenUI(UIScreenKeys.HomeScreen);
+            view.Init();
         }
 
-        public static async void JoinMatchmaking(GameModeType gameMode)
-        {
-            LogModel.Instance.Log($"Joining matchmaking for {gameMode}");
-            
-            try
-            {
-                // Matchmaking UI'ını göster
-                var loadingScreen = await UIManager.Instance.OpenUI(UIScreenKeys.LoadingScreen);
-                loadingScreen.Init();
-
-                // Nakama matchmaking'e katıl
-                var matchTicket = await MatchmakingModel.Instance.JoinMatchmaking(new MatchmakingData
-                {
-                    GameMode = gameMode,
-                    Region = RegionCode.EU // Veya kullanıcının bölgesine göre
-                });
-
-                LogModel.Instance.Log($"Matchmaking ticket received: {matchTicket.Ticket}");
-
-                // Matchmaking sonucunu bekle
-                var matchResult = await MatchmakingModel.Instance.WaitForMatch(matchTicket);
-
-                if (matchResult != null)
-                {
-                    LogModel.Instance.Log($"Match found! Match ID: {matchResult.MatchId}");
-                    
-                    // Mirror sunucusuna bağlan
-                    await ConnectToGameServer(matchResult);
-                }
-                else
-                {
-                    LogModel.Instance.Warning("Matchmaking failed or timed out");
-                    // Hata ekranını göster
-                    await ShowMatchmakingError("Eşleşme başarısız oldu. Lütfen tekrar deneyin.");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                LogModel.Instance.Error(ex);
-                await ShowMatchmakingError("Bir hata oluştu. Lütfen tekrar deneyin.");
-            }
-        }
-
-        private static async UniTask ConnectToGameServer(MatchResult matchResult)
+        public static async UniTaskVoid StartMatchmaking(GameModeType gameMode)
         {
             try
             {
-                // PvpServerModel üzerinden Mirror sunucusuna bağlan
-                await PvpServerModel.Instance.ConnectToMatch(matchResult);
-                
-                // Oyun sahnesini yükle
-                // Not: Bu kısım Mirror NetworkManager tarafından da yapılabilir
-                await SceneModel.Instance.LoadGameScene();
-            }
-            catch (System.Exception ex)
-            {
-                LogModel.Instance.Error(ex);
-                await ShowMatchmakingError("Oyun sunucusuna bağlanılamadı.");
-            }
-        }
+                logModel.Log($"=== Matchmaking başlatılıyor - {gameMode} ===");
 
-        private static async UniTask ShowMatchmakingError(string message)
-        {
-            // Loading ekranını kapat
-            UIManager.Instance.CloseUI(UIScreenKeys.LoadingScreen);
-            
-            // Hata popup'ını göster
-            var errorPopup = await UIManager.Instance.OpenUI(UIScreenKeys.ErrorPopup);
-            errorPopup.Init();
-            // Hata mesajını ayarla (popup'ın kendi implementasyonuna göre)
+                // Loading ekranını göster
+                var loadingScreen = await uiManager.OpenUI(UIScreenKeys.LoadingScreen);
+                if (loadingScreen != null)
+                {
+                    loadingScreen.Init();
+                }
+
+                try
+                {
+                    // Matchmaking'e katıl
+                    var matchmakingData = new MatchmakingData
+                    {
+                        GameMode = gameMode,
+                        Region = "eu" // TODO: Bölge seçimini ekle
+                    };
+
+                    // Matchmaking ticket'ı al
+                    var ticket = await matchmakingModel.JoinMatchmaking(matchmakingData);
+                    if (ticket == null)
+                    {
+                        throw new Exception("Matchmaking ticket alınamadı!");
+                    }
+
+                    // Eşleşme bekle
+                    var match = await matchmakingModel.WaitForMatch(ticket);
+                    if (match == null)
+                    {
+                        throw new Exception("Eşleşme bulunamadı!");
+                    }
+
+                    logModel.Log($"Match bulundu! ID: {match.MatchId}");
+                }
+                catch (Exception e)
+                {
+                    logModel.Error($"Matchmaking hatası: {e.Message}");
+                    await matchmakingModel.CancelMatchmaking();
+                    await Run();
+                }
+            }
+            catch (Exception e)
+            {
+                logModel.Error($"Genel hata: {e.Message}\nStack Trace: {e.StackTrace}");
+                await Run();
+            }
+            finally
+            {
+                 // uiManager.CloseUI(UIScreenKeys.LoadingScreen);
+            }
         }
     }
 }

@@ -16,6 +16,10 @@ namespace ProjectV3.Client
                 }
             }
         }
+        public void Error(string message)
+        {
+            Debug.LogError(message);
+        }
         
         public void Warning(string message)
         {

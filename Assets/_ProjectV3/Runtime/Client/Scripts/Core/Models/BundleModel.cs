@@ -12,6 +12,11 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 {
     public class BundleModel : SingletonBehaviour<BundleModel>
     {
+
+        private void Start()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
         public async UniTask<GameObject> InstantiatePrefab(string key, Transform parent = null)
         {
             var handle = Addressables.InstantiateAsync(key, parent);
