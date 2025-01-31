@@ -1,5 +1,4 @@
 using System;
-using _Project.Core.Scripts.Enums;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
@@ -11,7 +10,6 @@ namespace ProjectV3.Client
     {
         [SerializeField] private bool useDeviceLogin = true;
         [SerializeField] private UIManager _uiManager;
-        [SerializeField] private AudioListener _mainAudioListener;
 
         private AuthenticationModel authModel => AuthenticationModel.Instance;
         private ServiceModel serviceModel => ServiceModel.Instance;
@@ -20,25 +18,11 @@ namespace ProjectV3.Client
         private void Start()
         {
             Application.runInBackground = true;
-            CheckAudioListeners();
             Init();
         }
 
-        private void CheckAudioListeners()
-        {
-            var listeners = FindObjectsOfType<AudioListener>();
-            if (listeners.Length > 1)
-            {
-                LogModel.Instance.Warning($"Sahnede {listeners.Length} adet AudioListener bulundu. Fazla olanlar kaldırılıyor...");
-                foreach (var listener in listeners)
-                {
-                    if (listener != _mainAudioListener)
-                    {
-                        Destroy(listener);
-                    }
-                }
-            }
-        }
+        
+        
 
         private async void Init()
         {

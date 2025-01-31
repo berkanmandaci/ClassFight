@@ -20,7 +20,7 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Controllers
 
         public abstract void Run(IApiNotification obj);
 
-        public T Deserialize<T>(IApiNotification notification)
+        protected T Deserialize<T>(IApiNotification notification)
         {
             var data = notification.Content;
             LogModel.Instance.Log("Received> Notification Code: (" + notification.Code + ") Data: " + data);
