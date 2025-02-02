@@ -38,6 +38,23 @@ namespace ProjectV3.Client.Controllers
             Debug.Log("[Setup] ClientPlayerController initialized");
         }
 
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            
+            // Visual Controller'ı aktifleştir
+            if (_visualController != null)
+            {
+                _visualController.gameObject.SetActive(true);
+            }
+
+            // Eğer bu local player ise kamerayı ayarla
+            if (isLocalPlayer)
+            {
+                SetupCamera();
+            }
+        }
+
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
@@ -45,7 +62,10 @@ namespace ProjectV3.Client.Controllers
             
             EnablePlayerInput();
             _mainCamera = Camera.main;
-            
+        }
+
+        private void SetupCamera()
+        {
             // Tüm Cinemachine kameralarını bul ve hedefi ayarla
             var vcams = FindObjectsOfType<CinemachineCamera>();
             foreach (var vcam in vcams)
@@ -123,6 +143,7 @@ namespace ProjectV3.Client.Controllers
                 Vector3 movement = moveDirection * _moveSpeed * Time.deltaTime;
                 transform.position += movement;
                 UpdateAnimator(1f);
+                Debug.Log($"[Movement] Position updated: {transform.position}, Movement: {movement}");
             }
             else
             {
@@ -134,22 +155,19 @@ namespace ProjectV3.Client.Controllers
         {
             if (_mainCamera == null) return;
 
-            // Fare pozisyonundan ışın gönder
             Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
             
-            // Yerle kesişim noktasını bul
             if (_groundPlane.Raycast(ray, out float distance))
             {
                 Vector3 worldAimPoint = ray.GetPoint(distance);
                 Vector3 aimDirection = (worldAimPoint - transform.position).normalized;
                 aimDirection.y = 0f;
 
-                // Karakteri hedef noktaya döndür (NetworkTransform otomatik senkronize edecek)
                 if (aimDirection != Vector3.zero)
                 {
                     transform.rotation = Quaternion.LookRotation(aimDirection);
+                    Debug.Log($"[Aiming] Rotation updated: {transform.rotation.eulerAngles}");
 
-                    // Silah pivot'ını döndür
                     if (_weaponPivot != null)
                     {
                         _weaponPivot.rotation = transform.rotation;
