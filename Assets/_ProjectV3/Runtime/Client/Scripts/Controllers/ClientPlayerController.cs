@@ -35,11 +35,14 @@ namespace ProjectV3.Client.Controllers
         {
             InitializeComponents();
             _groundPlane = new Plane(Vector3.up, Vector3.zero);
+            Debug.Log("[Setup] ClientPlayerController initialized");
         }
 
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
+            Debug.Log("[Network] OnStartLocalPlayer called - isLocalPlayer: " + isLocalPlayer);
+            
             EnablePlayerInput();
             _mainCamera = Camera.main;
             
@@ -109,16 +112,21 @@ namespace ProjectV3.Client.Controllers
         #region Movement & Aiming
         private void HandleMovement()
         {
+            if (!isLocalPlayer) return;
+
             // Hareket yönünü hesapla
             Vector3 moveDirection = new Vector3(_moveInput.x, 0f, _moveInput.y).normalized;
-            Debug.Log($"[Movement] Direction: {moveDirection}, Magnitude: {moveDirection.magnitude}");
 
-            // Hareketi uygula
+            // Hareketi direkt uygula (NetworkTransform otomatik senkronize edecek)
             if (moveDirection.magnitude > 0.1f)
             {
                 Vector3 movement = moveDirection * _moveSpeed * Time.deltaTime;
-                Debug.Log($"[Movement] Applying movement: {movement}, Speed: {_moveSpeed}");
-                CmdMove(movement, transform.rotation.eulerAngles.y);
+                transform.position += movement;
+                UpdateAnimator(1f);
+            }
+            else
+            {
+                UpdateAnimator(0f);
             }
         }
 
@@ -136,7 +144,7 @@ namespace ProjectV3.Client.Controllers
                 Vector3 aimDirection = (worldAimPoint - transform.position).normalized;
                 aimDirection.y = 0f;
 
-                // Karakteri hedef noktaya döndür
+                // Karakteri hedef noktaya döndür (NetworkTransform otomatik senkronize edecek)
                 if (aimDirection != Vector3.zero)
                 {
                     transform.rotation = Quaternion.LookRotation(aimDirection);
@@ -161,46 +169,6 @@ namespace ProjectV3.Client.Controllers
         #endregion
 
         #region Network Commands
-        [Command]
-        private void CmdMove(Vector3 movement, float rotation)
-        {
-            Debug.Log($"[Server] CmdMove received - Movement: {movement}, Rotation: {rotation}");
-            
-            // Anti-cheat kontrolleri
-            if (movement.magnitude > _moveSpeed * Time.deltaTime * 1.5f)
-            {
-                Debug.LogWarning($"[Server] Movement rejected - Too fast: {movement.magnitude}");
-                return;
-            }
-
-            // Karakterin pozisyonunu güncelle
-            transform.position += movement;
-            transform.rotation = Quaternion.Euler(0, rotation, 0);
-            Debug.Log($"[Server] Position updated - New Position: {transform.position}");
-
-            // Tüm istemcilere hareket bilgisini gönder
-            RpcUpdateMovement(transform.position, rotation);
-        }
-
-        [ClientRpc]
-        private void RpcUpdateMovement(Vector3 position, float rotation)
-        {
-            if (!isLocalPlayer)
-            {
-                Debug.Log($"[Client] Updating other player - Position: {position}, Rotation: {rotation}");
-                // Diğer oyuncuların pozisyonlarını güncelle
-                transform.position = position;
-                transform.rotation = Quaternion.Euler(0, rotation, 0);
-
-                // Animasyonları güncelle
-                if (_animator != null)
-                {
-                    _animator.SetBool("IsMoving", true);
-                    _animator.SetFloat("MoveSpeed", 1f);
-                }
-            }
-        }
-
         [Command]
         private void CmdRequestAttack(AttackType attackType)
         {
