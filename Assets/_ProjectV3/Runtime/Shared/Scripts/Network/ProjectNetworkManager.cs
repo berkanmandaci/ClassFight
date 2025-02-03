@@ -35,6 +35,7 @@ namespace ProjectV3.Shared.Network
 
         public override void Awake()
         {
+            Debug.Log("[NetworkManager] Initializing...");
             if (singleton != null && singleton != this)
             {
                 Destroy(gameObject);

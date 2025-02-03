@@ -271,47 +271,24 @@ namespace ProjectV3.Shared.Combat
 
         protected virtual void UpdateDash()
         {
-            if (!_isDashing) return;
+            if (!_isDashing || !isServer) return;
 
             float normalizedTime = 1 - (_dashTimeLeft / _dashDuration);
-            float speedMultiplier = _dashSpeedCurve.Evaluate(normalizedTime);
+            Vector3 dashMovement = _dashDirection * _dashSpeed;
+            
+            // Server'da pozisyonu güncelle
+            Vector3 newPosition = transform.position + (dashMovement * Time.fixedDeltaTime);
+            transform.position = newPosition;
+            
+            Debug.Log($"[Dash][Physics] Position Delta: {dashMovement * Time.fixedDeltaTime}, Current Position: {transform.position}");
 
-            if (_rigidbody != null)
-            {
-                // Dash başlangıcında bir kere güçlü bir impuls uygula
-                if (_dashTimeLeft == _dashDuration)
-                {
-                    Vector3 dashForce = _dashDirection * _dashSpeed * 10f; // Impuls kuvveti
-                    _rigidbody.AddForce(dashForce, ForceMode.Impulse);
-                    Debug.Log($"[Dash][Physics] Initial Force Applied: {dashForce}");
-                }
-
-                // Dash yönünde sürekli kuvvet uygula
-                Vector3 continuousForce = _dashDirection * (_dashSpeed * speedMultiplier);
-                _rigidbody.AddForce(continuousForce, ForceMode.Acceleration);
-                
-                Vector3 currentVelocity = _rigidbody.linearVelocity;
-                Debug.Log($"[Dash][Physics] Current Velocity: {currentVelocity.magnitude:F2} m/s, Direction: {_dashDirection}");
-            }
-
-            Vector3 oldPosition = transform.position;
             _dashTimeLeft -= Time.fixedDeltaTime;
-
-            // Bir sonraki frame'de pozisyon değişimini kontrol et
-            StartCoroutine(CheckPositionChange(oldPosition));
 
             if (_dashTimeLeft <= 0)
             {
                 Debug.Log("[Dash] Completed naturally");
                 CompleteDash();
             }
-        }
-
-        private IEnumerator CheckPositionChange(Vector3 oldPosition)
-        {
-            yield return new WaitForFixedUpdate();
-            Vector3 actualMovement = transform.position - oldPosition;
-            Debug.Log($"[Dash] Position Delta: {actualMovement.magnitude:F2} units, Time Left: {_dashTimeLeft:F2}s");
         }
 
         protected virtual void UpdateDodge()
@@ -353,15 +330,16 @@ namespace ProjectV3.Shared.Combat
 
         protected virtual void CompleteDash()
         {
+            if (!isServer) return;
+
             Debug.Log($"[Dash] Completing - Final Position: {transform.position}");
             _isDashing = false;
             
             if (_rigidbody != null)
             {
-                // Dash bitişinde hareketi yumuşak bir şekilde durdur
-                _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, Vector3.zero, 0.8f);
+                _rigidbody.isKinematic = false; // Fizik etkileşimlerini tekrar etkinleştir
+                _rigidbody.linearVelocity = Vector3.zero;
                 _rigidbody.angularVelocity = Vector3.zero;
-                Debug.Log($"[Dash] Final Velocity: {_rigidbody.linearVelocity}");
             }
             
             RpcOnDashComplete();
@@ -393,13 +371,17 @@ namespace ProjectV3.Shared.Combat
             _isDashing = true;
             _currentDashStacks--;
             _dashTimeLeft = _dashDuration;
-            _dashDirection = transform.forward;
+            
+            // Hareket yönünü kullan, eğer hareket yoksa karakterin baktığı yönü kullan
+            Vector3 moveDirection = new Vector3(_moveInput.x, 0, _moveInput.y);
+            _dashDirection = moveDirection != Vector3.zero ? moveDirection.normalized : transform.forward;
             
             // Dash başlangıcında Rigidbody'yi sıfırla
             if (_rigidbody != null)
             {
                 _rigidbody.linearVelocity = Vector3.zero;
                 _rigidbody.angularVelocity = Vector3.zero;
+                _rigidbody.isKinematic = true; // Dash sırasında fizik etkileşimlerini devre dışı bırak
             }
             
             Debug.Log($"[Dash][Server] Started - Direction: {_dashDirection}, Duration: {_dashDuration}s");
@@ -437,6 +419,12 @@ namespace ProjectV3.Shared.Combat
                 _animator.SetFloat("DashDirectionZ", direction.z);
                 Debug.Log("[Dash][Client] Animation triggered");
             }
+
+            // Client tarafında da Rigidbody'yi devre dışı bırak
+            if (_rigidbody != null)
+            {
+                _rigidbody.isKinematic = true;
+            }
         }
 
         [ClientRpc]
@@ -458,6 +446,12 @@ namespace ProjectV3.Shared.Combat
             if (_animator != null)
             {
                 _animator.ResetTrigger("Dash");
+            }
+
+            // Client tarafında Rigidbody'yi tekrar etkinleştir
+            if (_rigidbody != null)
+            {
+                _rigidbody.isKinematic = false;
             }
         }
 
