@@ -39072,16 +39072,32 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: 0b87e947-541f-4b13-8497-f5c6728a227c
-    m_ActionName: Player/Move
+    m_ActionId: 351f2ccd-1f9f-44bf-9bec-d62ac5c5f408
+    m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: 7255dbee-efcb-4d16-862f-9129b97813f7
+    m_ActionId: 6b444451-8a00-4d00-a97e-f47457f736a8
     m_ActionName: 'Player/Aim[/Mouse/position]'
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: 30d40523-fdcd-4c7f-82ef-2670abb09019
+    m_ActionId: 6c2ab1b8-8984-453a-af3d-a3c78ae1679a
     m_ActionName: 'Player/Fire[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d6a95e02-36e9-4a2f-8893-c9e6c9e0a114
+    m_ActionName: 'Player/Dash[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e2a9c127-baa7-4b49-8a13-f3c1b4d3a724
+    m_ActionName: 'Player/Dodge[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b8f1d8d5-9e32-4bf7-b4c2-517f2c7e4431
+    m_ActionName: 'Player/NextCharacter[/Keyboard/q]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c8f2b8d5-9e32-4bf7-b4c2-517f2c7e4432
+    m_ActionName: 'Player/PreviousCharacter[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -39104,10 +39120,68 @@ MonoBehaviour:
   syncInterval: 0
   _moveSpeed: 5
   _rotationSpeed: 15
+  _dashCooldown: 2
+  _dashDistance: 5
+  _dashDuration: 0.2
+  _dashSpeed: 20
+  _maxDashStacks: 2
+  _dashSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _dodgeCooldown: 1
+  _dodgeDistance: 3
+  _dodgeDuration: 0.5
+  _dodgeSpeed: 15
+  _dodgeImmunityDuration: 0.3
+  _dodgeSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   _playerInput: {fileID: 2294935191537439517}
-  _visualController: {fileID: 7824983889792908320}
   _animator: {fileID: 7138330220650415096}
   _weaponPivot: {fileID: 5950625652900886615}
+  _visualController: {fileID: 7824983889792908320}
 --- !u!1 &8146956847247609412
 GameObject:
   m_ObjectHideFlags: 0
