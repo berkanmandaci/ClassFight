@@ -11,6 +11,9 @@ namespace ProjectV3.Server.Player
     public class ServerPlayerController : NetworkBehaviour
     {
         #region Properties
+        [Header("References")]
+        [SerializeField] private GameObject _visualRoot; // Görsel elemanların root objesi
+
         [Header("Player Settings")]
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _maxHealth = 100f;
@@ -46,6 +49,13 @@ namespace ProjectV3.Server.Player
             _currentHealth = _maxHealth;
             _syncedHealth = _currentHealth;
             UpdatePlayerState(PlayerState.Idle);
+
+            // Server tarafında görsel elemanları devre dışı bırak
+            if (_visualRoot != null)
+            {
+                _visualRoot.SetActive(false);
+                Debug.Log($"[Server] Visual elements disabled for player {netId}");
+            }
         }
 
         private void InitializeComponents()
