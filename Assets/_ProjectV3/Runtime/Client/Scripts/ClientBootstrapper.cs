@@ -59,7 +59,7 @@ namespace ProjectV3.Client
                 if (loginSuccess)
                 {
                     LogModel.Instance.Log("Otomatik giriş başarılı!");
-                    await ConnectToServices();
+                    // await ConnectToServices();
                 }
                 else if (useDeviceLogin)
                 {
@@ -140,19 +140,19 @@ namespace ProjectV3.Client
             DisconnectFromServices().Forget();
         }
 
-        private async void OnApplicationPause(bool pauseStatus)
-        {
-            if (!isQuitting)
-            {
-                if (pauseStatus)
-                {
-                    await DisconnectFromServices();
-                }
-                else
-                {
-                    await InitializeServices();
-                }
-            }
-        }
+        // private async void OnApplicationPause(bool pauseStatus)
+        // {
+        //     if (!isQuitting)
+        //     {
+        //         if (pauseStatus)
+        //         {
+        //             await DisconnectFromServices();
+        //         }
+        //         else
+        //         {
+        //             await InitializeServices();
+        //         }
+        //     }
+        // }
     }
 }

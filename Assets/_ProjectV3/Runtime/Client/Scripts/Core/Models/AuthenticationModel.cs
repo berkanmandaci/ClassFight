@@ -153,25 +153,25 @@ namespace ProjectV3.Client
             }
         }
 
-        public async Task<bool> TryAuthenticateUserAsync(IClient client, string email, string password)
-        {
-            try
-            {
-                var session = await client.AuthenticateEmailAsync(email, password);
-                ActiveSession = session;
-                CacheAuthToken();
-                var account = await client.GetAccountAsync(session);
-                LogModel.Instance.Log("UserName:" + account.User.Username);
-                LogModel.Instance.Log("Id:" + account.User.Id);
-                await GetAccountAsync();
-                return true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Login Error: " + e.Message);
-                return false;
-            }
-        }
+        // public async Task<bool> TryAuthenticateUserAsync(IClient client, string email, string password)
+        // {
+        //     try
+        //     {
+        //         var session = await client.AuthenticateEmailAsync(email, password);
+        //         ActiveSession = session;
+        //         CacheAuthToken();
+        //         var account = await client.GetAccountAsync(session);
+        //         LogModel.Instance.Log("UserName:" + account.User.Username);
+        //         LogModel.Instance.Log("Id:" + account.User.Id);
+        //         await GetAccountAsync();
+        //         return true;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Debug.LogError("Login Error: " + e.Message);
+        //         return false;
+        //     }
+        // }
 
         private async UniTask<bool> LoginWithAuthToken(string authToken, string refreshToken)
         {
@@ -257,7 +257,7 @@ namespace ProjectV3.Client
                 throw;
             }
 
-
+            
             try
             {
                 await ServiceModel.Instance.ConnectSocketAsync(ActiveSession);
@@ -265,7 +265,7 @@ namespace ProjectV3.Client
             catch (Exception e)
             {
                 Debug.LogError(e);
-
+            
                 if (e.Message == "User account not found.")
                 {
                     ClearLoginPlayerPrefs();
@@ -275,10 +275,10 @@ namespace ProjectV3.Client
                 {
                     await GetAccountAsync();
                 }
-
+            
                 throw;
             }
-
+            
             // await LoginSuccessController.Run();
             PlayerPrefs.SetString("LoginSuccess", "true");
             Debug.Log("AuthenticationModel>Connected.");

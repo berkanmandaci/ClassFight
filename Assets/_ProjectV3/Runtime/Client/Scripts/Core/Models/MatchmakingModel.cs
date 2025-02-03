@@ -22,29 +22,15 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
         private const int MATCHMAKING_TIMEOUT = 60; // 60 saniye
         private IMatchmakerMatched currentMatch;
 
-        private void OnEnable()
-        {
-            if (Socket != null)
-            {
-                Socket.ReceivedMatchmakerMatched += OnMatchmakerMatched;
-            }
-        }
 
-        private void OnDisable()
-        {
-            if (Socket != null)
-            {
-                Socket.ReceivedMatchmakerMatched -= OnMatchmakerMatched;
-            }
-        }
-
-        private void OnMatchmakerMatched(IMatchmakerMatched matched)
+        public void OnMatchmakerMatched(IMatchmakerMatched matched)
         {
             currentMatch = matched;
             LogModel.Instance.Log($"=== Eşleşme bulundu! ===");
             LogModel.Instance.Log($"Match ID: {matched.MatchId}");
             LogModel.Instance.Log($"Oyuncu sayısı: {matched.Users.Count()}");
 
+            currentMatch = matched;
             // Match bulundu sinyali gönder
             Signals.Get<MatchFoundSignal>().Dispatch(matched);
         }

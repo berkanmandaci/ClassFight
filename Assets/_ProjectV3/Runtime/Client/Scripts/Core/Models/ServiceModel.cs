@@ -8,6 +8,7 @@ using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Nakama;
 using Newtonsoft.Json;
+using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
 using UnityEngine;
 namespace ProjectV3.Client
 {
@@ -45,6 +46,7 @@ namespace ProjectV3.Client
             Socket.ReceivedChannelMessage += ReceiveMessagesAsync;
             Socket.ReceivedNotification += ReceiveNotificationMessagesAsync;
             Socket.ReceivedError += SocketOnReceivedError;
+            Socket.ReceivedMatchmakerMatched += MatchmakingModel.Instance.OnMatchmakerMatched;
             Socket.Closed += OnSocketClose;
             await Socket.ConnectAsync(session);
 
@@ -292,6 +294,7 @@ namespace ProjectV3.Client
                 Socket.ReceivedChannelMessage -= ReceiveMessagesAsync;
                 Socket.ReceivedError -= SocketOnReceivedError;
                 Socket.ReceivedNotification -= ReceiveNotificationMessagesAsync;
+                Socket.ReceivedMatchmakerMatched -= MatchmakingModel.Instance.OnMatchmakerMatched;
                 Socket.Closed -= OnSocketClose;
                 Socket.CloseAsync();
                 Socket = null;
