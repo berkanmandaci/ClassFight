@@ -1,5 +1,4 @@
 using System;
-using _Project.Runtime.Core.Extensions.Signal;
 using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Mirror;
@@ -18,18 +17,37 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
         private bool isConnecting = false;
         private bool isReconnecting = false;
         private IMatchmakerMatched currentMatch;
+        private readonly object connectionLock = new object();
+        private string lastProcessedMatchId;
 
-    
-
-        public async void OnMatchFound(IMatchmakerMatched match)
+        public async UniTask OnMatchFound(IMatchmakerMatched match = null)
         {
+            if (match != null && !string.IsNullOrEmpty(lastProcessedMatchId) && lastProcessedMatchId == match.MatchId)
+            {
+                LogModel.Instance.Warning($"Bu match ({match.MatchId}) zaten işlendi, tekrar işlenmiyor.");
+                return;
+            }
+
+            lock (connectionLock)
+            {
+                if (isConnecting)
+                {
+                    LogModel.Instance.Warning("Zaten bağlantı kurulmaya çalışılıyor...");
+                    return;
+                }
+                isConnecting = true;
+            }
+
             try
             {
-                currentMatch = match;
-                LogModel.Instance.Log($"=== Match bulundu, sunucu bilgileri alınıyor ===");
-                LogModel.Instance.Log($"Match ID: {match.MatchId}");
+                if (match != null)
+                {
+                    currentMatch = match;
+                    lastProcessedMatchId = match.MatchId;
+                    LogModel.Instance.Log($"=== Match bulundu, sunucu bilgileri alınıyor ===");
+                    LogModel.Instance.Log($"Match ID: {match.MatchId}");
+                }
 
-                // Sunucu bilgilerini hazırla
                 var serverInfo = new ServerInfo
                 {
                     host = "localhost", // TODO: Gerçek sunucu bilgilerini al
@@ -40,7 +58,6 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 LogModel.Instance.Log($"Host: {serverInfo.host}");
                 LogModel.Instance.Log($"Port: {serverInfo.port}");
 
-                // Mirror sunucusuna bağlan
                 await ConnectToGameServer(serverInfo);
             }
             catch (Exception e)
@@ -48,43 +65,19 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 LogModel.Instance.Error($"Match bağlantı hatası: {e.Message}");
                 throw;
             }
-        }
-        
-        public async UniTask OnMatchFound()
-        {
-            try
+            finally
             {
-                var serverInfo = new ServerInfo
+                lock (connectionLock)
                 {
-                    host = "localhost", // TODO: Gerçek sunucu bilgilerini al
-                    port = 7777
-                };
-                LogModel.Instance.Log($"Sunucu bilgileri alındı:");
-                LogModel.Instance.Log($"Host: {serverInfo.host}");
-                LogModel.Instance.Log($"Port: {serverInfo.port}");
-
-                // Mirror sunucusuna bağlan
-                await ConnectToGameServer(serverInfo);
+                    isConnecting = false;
+                }
             }
-            catch (Exception e)
-            {
-                LogModel.Instance.Error(e);
-                throw;
-            }
-  
         }
 
         private async UniTask ConnectToGameServer(ServerInfo serverInfo)
         {
             try
             {
-                if (isConnecting)
-                {
-                    LogModel.Instance.Warning("Zaten bağlantı kurulmaya çalışılıyor...");
-                    return;
-                }
-
-                isConnecting = true;
                 LogModel.Instance.Log($"=== Oyun sunucusuna bağlanılıyor ===");
 
                 if (networkManager == null)
@@ -103,7 +96,7 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 
                 try
                 {
-                    LogModel.Instance.Log("Bağlantı başlatılıyor...");
+                    LogModel.Instance.Log("Mirror bağlantısı başlatılıyor...");
                     networkManager.StartClient();
 
                     // Bağlantıyı bekle
@@ -131,22 +124,16 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                         NetworkClient.Send(new MatchInfoMessage { matchId = currentMatch.MatchId });
                     }
 
-                    LogModel.Instance.Log("=== Sunucu bağlantısı başarılı ===");
+                    LogModel.Instance.Log("=== Mirror sunucu bağlantısı başarılı ===");
                 }
                 catch (Exception e)
                 {
                     await CleanupPreviousConnection();
-                    throw new Exception($"Bağlantı hatası: {e.Message}");
+                    throw new Exception($"Mirror bağlantı hatası: {e.Message}");
                 }
-            }
-            catch (Exception e)
-            {
-                LogModel.Instance.Error($"Sunucu bağlantı hatası: {e.Message}");
-                throw;
             }
             finally
             {
-                isConnecting = false;
                 UnsubscribeFromNetworkEvents();
             }
         }
