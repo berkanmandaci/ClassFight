@@ -806,6 +806,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5664389941682017095}
+  - component: {fileID: 5956328060584330258}
   m_Layer: 0
   m_Name: ArenaScene
   m_TagString: Untagged
@@ -835,6 +836,19 @@ Transform:
   - {fileID: 8820428498275454763}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5956328060584330258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7843433556515226804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c76c61f722d09d40a4df24ade3a3e20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camera: {fileID: 7670474476780264678}
 --- !u!1 &8244031445479851099
 GameObject:
   m_ObjectHideFlags: 0

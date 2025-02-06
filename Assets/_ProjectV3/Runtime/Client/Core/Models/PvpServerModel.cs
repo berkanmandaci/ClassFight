@@ -128,13 +128,14 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 }
                 catch (Exception e)
                 {
+                    UnsubscribeFromNetworkEvents();
                     await CleanupPreviousConnection();
                     throw new Exception($"Mirror bağlantı hatası: {e.Message}");
                 }
             }
             finally
             {
-                UnsubscribeFromNetworkEvents();
+                // Event'leri temizlemeyi finally bloğundan kaldırdık çünkü artık daha kontrollü yönetiyoruz
             }
         }
 
@@ -163,16 +164,29 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 
         private void SubscribeToNetworkEvents()
         {
+            // Önce mevcut event'leri temizle
+            UnsubscribeFromNetworkEvents();
+            
+            // Sonra yeni event'leri ekle
             NetworkClient.OnConnectedEvent += OnClientConnected;
             NetworkClient.OnDisconnectedEvent += OnClientDisconnected;
             NetworkClient.RegisterHandler<ErrorMessage>(OnErrorMessage);
+            LogModel.Instance.Log("Network event'leri kaydedildi");
         }
 
         private void UnsubscribeFromNetworkEvents()
         {
             NetworkClient.OnConnectedEvent -= OnClientConnected;
             NetworkClient.OnDisconnectedEvent -= OnClientDisconnected;
-            NetworkClient.UnregisterHandler<ErrorMessage>();
+            try 
+            {
+                NetworkClient.UnregisterHandler<ErrorMessage>();
+            }
+            catch (Exception) 
+            {
+                // Handler zaten unregister edilmiş olabilir
+            }
+            LogModel.Instance.Log("Network event'leri temizlendi");
         }
 
         private void OnClientConnected()

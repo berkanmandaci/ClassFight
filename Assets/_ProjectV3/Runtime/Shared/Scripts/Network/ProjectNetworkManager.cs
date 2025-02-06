@@ -17,15 +17,14 @@ namespace ProjectV3.Shared.Network
         [SerializeField] private int sendTimeout = 5000; // 5 saniye
         [SerializeField] private int receiveTimeout = 5000; // 5 saniye
 
-        [Header("Spawn Settings")]
-        [SerializeField] private Vector3[] spawnPoints = new Vector3[]
-        {
-            new Vector3(-5, 1, 0),
-            new Vector3(5, 1, 0),
-            new Vector3(0, 1, -5),
-            new Vector3(0, 1, 5),
-            new Vector3(-5, 1, -5),
-            new Vector3(5, 1, 5)
+        // [Header("Spawn Settings")]
+        private readonly Vector3[] spawnPoints = {
+            new(-5, 1, 0),
+            new(5, 1, 0),
+            new(0, 1, -5),
+            new(0, 1, 5),
+            new(-5, 1, -5),
+            new(5, 1, 5)
         };
 
         private int nextSpawnPointIndex;
@@ -69,7 +68,7 @@ namespace ProjectV3.Shared.Network
             var properties = transport.GetType().GetProperties();
             foreach (var property in properties)
             {
-                switch (property.Name)
+                switch ( property.Name )
                 {
                     case "MaxMessageSize":
                         property.SetValue(transport, maxMessageSize);
@@ -96,25 +95,25 @@ namespace ProjectV3.Shared.Network
         public override void OnStartServer()
         {
             base.OnStartServer();
-            
+
             spawnedPlayers.Clear();
             nextSpawnPointIndex = 0;
             isShuttingDown = false;
-            
+
             if (logManager != null)
             {
                 logManager.Initialize(true);
             }
-            
+
             Debug.Log($"[Server] Started");
         }
 
         public override void OnStartClient()
         {
             base.OnStartClient();
-            
+
             isShuttingDown = false;
-            
+
             if (logManager != null && !NetworkServer.active)
             {
                 logManager.Initialize(false);
@@ -134,14 +133,14 @@ namespace ProjectV3.Shared.Network
             if (!isShuttingDown)
             {
                 Debug.Log($"[Server] Client disconnecting - Connection ID: {conn.connectionId}");
-                
+
                 if (spawnedPlayers.TryGetValue(conn.connectionId, out GameObject playerObj))
                 {
                     NetworkServer.Destroy(playerObj);
                     spawnedPlayers.Remove(conn.connectionId);
                 }
             }
-            
+
             base.OnServerDisconnect(conn);
         }
 
@@ -176,7 +175,7 @@ namespace ProjectV3.Shared.Network
                     spawnPos = spawnPoints[nextSpawnPointIndex];
                     nextSpawnPointIndex = (nextSpawnPointIndex + 1) % spawnPoints.Length;
                 }
-
+                nextSpawnPointIndex++;
                 GameObject player = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
                 if (player == null)
                 {
@@ -186,8 +185,8 @@ namespace ProjectV3.Shared.Network
 
                 NetworkServer.AddPlayerForConnection(conn, player);
                 spawnedPlayers[conn.connectionId] = player;
-                
-                Debug.Log($"[Server] Player spawned - Connection ID: {conn.connectionId}, Position: {spawnPos}");
+
+                Debug.Log($"[Server] Player spawned - Connection ID: {conn.connectionId}, Position: {spawnPos}  \" - Next index: \" + {nextSpawnPointIndex}");
             }
             catch (System.Exception e)
             {
@@ -228,7 +227,7 @@ namespace ProjectV3.Shared.Network
         public override void OnValidate()
         {
             base.OnValidate();
-            
+
             // Transport ayarlarını kontrol et
             var transport = GetComponent<Transport>();
             if (transport != null)
@@ -253,4 +252,4 @@ namespace ProjectV3.Shared.Network
             }
         }
     }
-} 
+}

@@ -1,4 +1,5 @@
 using _Project.Core.Scripts;
+using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
 using UnityEngine;
 using UnityEngine.UI;
 using ProjectV3.Shared.Game;
@@ -39,6 +40,11 @@ namespace ProjectV3.Client
         {
             _3vs3Button.onClick.RemoveListener(OnClick3vs3);
             _freeForAllButton.onClick.RemoveListener(OnClickFreeForAll);
+        }
+
+        public void OnClickTestButton()
+        {
+            _ = PvpServerModel.Instance.OnMatchFound();
         }
     }
 }
