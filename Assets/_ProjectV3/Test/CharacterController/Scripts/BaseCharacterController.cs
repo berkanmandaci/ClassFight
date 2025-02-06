@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
 using ProjectV3.Client;
+using Cysharp.Threading.Tasks;
 
 namespace ProjectV3.Test
 {
@@ -169,12 +170,12 @@ namespace ProjectV3.Test
         private void RpcDash(Vector3 dashDirection)
         {
             _characterController.Move(dashDirection * _dashDistance);
-            StartCoroutine(ResetDashState());
+            ResetDashStateAsync().Forget();
         }
 
-        private System.Collections.IEnumerator ResetDashState()
+        private async UniTaskVoid ResetDashStateAsync()
         {
-            yield return new WaitForSeconds(0.05f);
+            await UniTask.Delay(50); // 0.05 saniye
             _isDashing = false;
         }
 
@@ -199,12 +200,12 @@ namespace ProjectV3.Test
         private void RpcDodge(Vector3 dodgeDirection)
         {
             _characterController.Move(dodgeDirection * _dodgeSpeed * Time.deltaTime);
-            StartCoroutine(ResetDodgeState());
+            ResetDodgeStateAsync().Forget();
         }
 
-        private System.Collections.IEnumerator ResetDodgeState()
+        private async UniTaskVoid ResetDodgeStateAsync()
         {
-            yield return new WaitForSeconds(0.2f);
+            await UniTask.Delay(200); // 0.2 saniye
             _isDodging = false;
         }
 
