@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace ProjectV3.Shared.Network
 {
-    public class ProjectNetworkManager : Mirror.NetworkManager
+    public class ProjectNetworkManager : NetworkManager
     {
-        public static new ProjectNetworkManager singleton { get; private set; }
+        public new static ProjectNetworkManager singleton { get; private set; }
         public bool isShuttingDown { get; private set; }
 
         [Header("Network Settings")]
@@ -18,7 +18,8 @@ namespace ProjectV3.Shared.Network
         [SerializeField] private int receiveTimeout = 5000; // 5 saniye
 
         // [Header("Spawn Settings")]
-        private readonly Vector3[] spawnPoints = {
+        private readonly Vector3[] spawnPoints =
+        {
             new(-5, 1, 0),
             new(5, 1, 0),
             new(0, 1, -5),

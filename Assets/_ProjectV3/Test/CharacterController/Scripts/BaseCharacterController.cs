@@ -135,7 +135,7 @@ namespace ProjectV3.Test
             }
         }
 
-        public void OnAttack(InputAction.CallbackContext context)
+        protected virtual void OnAttack(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed) return;
 
