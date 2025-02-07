@@ -2,29 +2,35 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
 using Cysharp.Threading.Tasks;
+using System;
 
 namespace ProjectV3.Shared.Combat
 {
     public class BaseCharacterController : NetworkBehaviour
     {
+        #region Serialized Fields
         [Header("Hareket Ayarları")]
         [SerializeField] private float _moveSpeed = 7f;
         [SerializeField] private float _dashDistance = 5f;
         [SerializeField] private float _dodgeSpeed = 15f;
-
         
         [Header("Referanslar")]
         [SerializeField] private GameObject _archerGameObject;
         [SerializeField] private GameObject _warriorGameObject;
         [SerializeField] private GameObject _tankGameObject;
+        #endregion
 
+        #region Private Fields
         private Vector2 _moveInput;
         private Vector2 _aimInput;
         private Vector3 _moveDirection;
+        private bool _isInitialized;
+        
         [SyncVar] private bool _isDashing;
         [SyncVar] private bool _isDodging;
         [SyncVar(hook = nameof(OnCharacterTypeChanged))] 
         private CharacterType _currentCharacterType = CharacterType.Archer;
+        
         private CharacterController _characterController;
         private PlayerInput _playerInput;
         private InputAction _moveAction;
@@ -39,31 +45,111 @@ namespace ProjectV3.Shared.Combat
         private ICharacterController _archerController;
         private ICharacterController _warriorController;
         private ICharacterController _tankController;
+        #endregion
 
+        #region Enums
         private enum CharacterType
         {
             Archer,
             Warrior,
             Tank
         }
+        #endregion
 
+        #region Unity Lifecycle
         private void Awake()
         {
-            // Başlangıçta tüm kontrolcü referanslarını al
-            _archerController = _archerGameObject.GetComponent<ICharacterController>();
-            _warriorController = _warriorGameObject.GetComponent<ICharacterController>();
-            _tankController = _tankGameObject.GetComponent<ICharacterController>();
+            InitializeComponents();
         }
 
         public override void OnStartLocalPlayer()
         {
-            enabled = true;
+            if (!InitializeLocalPlayer())
+                return;
 
+            SetupInputActions();
+            SubscribeToInputEvents();
+            SetupCamera();
+            ActivateCharacter(_currentCharacterType);
+        }
 
-            _characterController = GetComponent<CharacterController>();
-            _playerInput = GetComponent<PlayerInput>();
+        private void OnDisable()
+        {
+            if (!isLocalPlayer) return;
+            UnsubscribeFromInputEvents();
+        }
 
-            // Input actions'ları al
+        private void Update()
+        {
+            if (!isLocalPlayer || !_isInitialized) return;
+
+            HandleRotation();
+
+            if (!_isDashing && !_isDodging)
+            {
+                Move();
+            }
+        }
+        #endregion
+
+        #region Initialization
+        private void InitializeComponents()
+        {
+            try
+            {
+                _characterController = GetComponent<CharacterController>();
+                if (_characterController == null)
+                    throw new Exception("CharacterController bulunamadı!");
+
+                _archerController = _archerGameObject?.GetComponent<ICharacterController>();
+                _warriorController = _warriorGameObject?.GetComponent<ICharacterController>();
+                _tankController = _tankGameObject?.GetComponent<ICharacterController>();
+
+                ValidateControllers();
+                _isInitialized = true;
+                
+                Debug.Log($"[{gameObject.name}] Bileşenler başarıyla başlatıldı.");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Başlatma hatası: {e.Message}");
+                _isInitialized = false;
+            }
+        }
+
+        private bool InitializeLocalPlayer()
+        {
+            try
+            {
+                enabled = true;
+                _playerInput = GetComponent<PlayerInput>();
+                
+                if (_playerInput == null)
+                    throw new Exception("PlayerInput bulunamadı!");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Local player başlatma hatası: {e.Message}");
+                return false;
+            }
+        }
+
+        private void ValidateControllers()
+        {
+            if (_archerController == null)
+                Debug.LogWarning($"[{gameObject.name}] Archer controller bulunamadı!");
+            if (_warriorController == null)
+                Debug.LogWarning($"[{gameObject.name}] Warrior controller bulunamadı!");
+            if (_tankController == null)
+                Debug.LogWarning($"[{gameObject.name}] Tank controller bulunamadı!");
+        }
+        #endregion
+
+        #region Input Setup
+        private void SetupInputActions()
+        {
             _moveAction = _playerInput.actions["Move"];
             _aimAction = _playerInput.actions["Aim"];
             _attackAction = _playerInput.actions["Attack"];
@@ -71,36 +157,25 @@ namespace ProjectV3.Shared.Combat
             _dodgeAction = _playerInput.actions["Dodge"];
             _previousCharacterAction = _playerInput.actions["PreviousCharacter"];
             _nextCharacterAction = _playerInput.actions["NextCharacter"];
-
-            // Event'lere abone ol
-            _moveAction.performed += OnMove;
-            _moveAction.canceled += OnMove;
-
-            _aimAction.performed += OnAim;
-            _aimAction.canceled += OnAim;
-
-            _attackAction.performed += OnAttack;
-
-            _dashAction.performed += OnDash;
-
-            _dodgeAction.performed += OnDodge;
-            
-            _previousCharacterAction.performed += OnPreviousCharacter;
-            _nextCharacterAction.performed += OnNextCharacter;
-
-            CombatArenaModel.Instance.GetCamera().Follow = transform;
-            _playerInput.enabled = true;
-
-            // İlk karakteri aktif et
-            ActivateCharacter(_currentCharacterType);
         }
 
-
-        private void OnDisable()
+        private void SubscribeToInputEvents()
         {
-            if (!isLocalPlayer) return;
+            _moveAction.performed += OnMove;
+            _moveAction.canceled += OnMove;
+            _aimAction.performed += OnAim;
+            _aimAction.canceled += OnAim;
+            _attackAction.performed += OnAttack;
+            _dashAction.performed += OnDash;
+            _dodgeAction.performed += OnDodge;
+            _previousCharacterAction.performed += OnPreviousCharacter;
+            _nextCharacterAction.performed += OnNextCharacter;
+            
+            _playerInput.enabled = true;
+        }
 
-            // Event'lerden çık
+        private void UnsubscribeFromInputEvents()
+        {
             if (_moveAction != null)
             {
                 _moveAction.performed -= OnMove;
@@ -121,26 +196,16 @@ namespace ProjectV3.Shared.Combat
 
             if (_dodgeAction != null)
                 _dodgeAction.performed -= OnDodge;
-            
+
             if (_previousCharacterAction != null)
                 _previousCharacterAction.performed -= OnPreviousCharacter;
-            
+
             if (_nextCharacterAction != null)
                 _nextCharacterAction.performed -= OnNextCharacter;
         }
+        #endregion
 
-        private void Update()
-        {
-            if (!isLocalPlayer) return;
-
-            HandleRotation();
-
-            if (!_isDashing && !_isDodging)
-            {
-                Move();
-            }
-        }
-
+        #region Input Handlers
         public void OnMove(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer) return;
@@ -152,50 +217,66 @@ namespace ProjectV3.Shared.Combat
         public void OnAim(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer) return;
-
             _aimInput = context.ReadValue<Vector2>();
-        }
-
-        private void HandleRotation()
-        {
-            if (!isLocalPlayer) return;
-
-            Vector2 mousePosition = Mouse.current.position.ReadValue();
-            Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-            Vector2 direction = (mousePosition - screenCenter).normalized;
-            Vector3 targetDirection = new Vector3(direction.x, 0, direction.y);
-
-            if (targetDirection != Vector3.zero)
-            {
-                transform.rotation = Quaternion.LookRotation(targetDirection);
-            }
         }
 
         protected virtual void OnAttack(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed) return;
 
-            CmdAttack();
-            _activeCharacter.OnAttack();
-        }
-
-        [Command]
-        private void CmdAttack()
-        {
-            RpcAttack();
-        }
-
-        [ClientRpc]
-        private void RpcAttack()
-        {
-            Debug.Log("Attack RPC çağrıldı!");
+            try
+            {
+                CmdAttack();
+                _activeCharacter?.OnAttack();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Saldırı hatası: {e.Message}");
+            }
         }
 
         public void OnDash(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed || _isDashing) return;
-            _isDashing = true;
-            CmdDash(_moveDirection == Vector3.zero ? transform.forward : _moveDirection);
+
+            try
+            {
+                _isDashing = true;
+                CmdDash(_moveDirection == Vector3.zero ? transform.forward : _moveDirection);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Dash hatası: {e.Message}");
+                _isDashing = false;
+            }
+        }
+
+        public void OnDodge(InputAction.CallbackContext context)
+        {
+            if (!isLocalPlayer || !context.performed || _isDodging) return;
+
+            try
+            {
+                Vector3 dodgeDirection = -_moveDirection;
+                if (dodgeDirection == Vector3.zero)
+                {
+                    dodgeDirection = -transform.forward;
+                }
+                CmdDodge(dodgeDirection);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Dodge hatası: {e.Message}");
+                _isDodging = false;
+            }
+        }
+        #endregion
+
+        #region Network Commands
+        [Command]
+        private void CmdAttack()
+        {
+            RpcAttack();
         }
 
         [Command]
@@ -205,50 +286,96 @@ namespace ProjectV3.Shared.Combat
             RpcDash(dashDirection);
         }
 
-        [ClientRpc]
-        private void RpcDash(Vector3 dashDirection)
-        {
-            _characterController.Move(dashDirection * _dashDistance);
-            ResetDashStateAsync().Forget();
-        }
-
-        public void OnDodge(InputAction.CallbackContext context)
-        {
-            if (!isLocalPlayer || !context.performed || _isDodging) return;
-
-            Vector3 dodgeDirection = -_moveDirection;
-            if (dodgeDirection == Vector3.zero)
-            {
-                dodgeDirection = -transform.forward;
-            }
-            CmdDodge(dodgeDirection);
-        }
-
         [Command]
         private void CmdDodge(Vector3 dodgeDirection)
         {
             _isDodging = true;
             RpcDodge(dodgeDirection);
         }
+        #endregion
+
+        #region Network RPCs
+        [ClientRpc]
+        private void RpcAttack()
+        {
+            Debug.Log("Attack RPC çağrıldı!");
+        }
+
+        [ClientRpc]
+        private void RpcDash(Vector3 dashDirection)
+        {
+            try
+            {
+                if (!isActiveAndEnabled || !gameObject.activeInHierarchy)
+                {
+                    Debug.LogWarning($"[{gameObject.name}] RpcDash çağrıldı ama obje aktif değil!");
+                    return;
+                }
+
+                if (_characterController == null)
+                {
+                    _characterController = GetComponent<CharacterController>();
+                    if (_characterController == null)
+                    {
+                        throw new Exception("CharacterController bulunamadı!");
+                    }
+                }
+
+                _characterController.Move(dashDirection * _dashDistance);
+                ResetDashStateAsync().Forget();
+
+                Debug.Log($"[{(isServer ? "Server" : "Client")}] Dash gerçekleştirildi. Yön: {dashDirection}, Mesafe: {_dashDistance}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] RpcDash hatası: {e.Message}");
+                _isDashing = false;
+            }
+        }
 
         [ClientRpc]
         private void RpcDodge(Vector3 dodgeDirection)
         {
-            _characterController.Move(dodgeDirection * _dodgeSpeed * Time.deltaTime);
-            ResetDodgeStateAsync().Forget();
-        }
+            try
+            {
+                if (!isActiveAndEnabled || !gameObject.activeInHierarchy)
+                {
+                    Debug.LogWarning($"[{gameObject.name}] RpcDodge çağrıldı ama obje aktif değil!");
+                    return;
+                }
 
+                if (_characterController == null)
+                {
+                    _characterController = GetComponent<CharacterController>();
+                    if (_characterController == null)
+                    {
+                        throw new Exception("CharacterController bulunamadı!");
+                    }
+                }
+
+                _characterController.Move(dodgeDirection * _dodgeSpeed * Time.deltaTime);
+                ResetDodgeStateAsync().Forget();
+
+                Debug.Log($"[{(isServer ? "Server" : "Client")}] Dodge gerçekleştirildi. Yön: {dodgeDirection}, Hız: {_dodgeSpeed}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] RpcDodge hatası: {e.Message}");
+                _isDodging = false;
+            }
+        }
+        #endregion
+
+        #region Character Management
         private void OnPreviousCharacter(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed) return;
-
             ChangeCharacter(-1);
         }
         
         private void OnNextCharacter(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed) return;
-
             ChangeCharacter(1);
         }
         
@@ -256,36 +383,35 @@ namespace ProjectV3.Shared.Combat
         {
             if (!isLocalPlayer) return;
 
-            int currentIndex = (int)_currentCharacterType;
-            int totalCharacters = System.Enum.GetValues(typeof(CharacterType)).Length;
-            
-            // Yeni karakter indeksini hesapla (döngüsel)
-            int newIndex = (currentIndex + direction + totalCharacters) % totalCharacters;
-            
-            // Server'a karakter değişimini bildir
-            CmdChangeCharacter((CharacterType)newIndex);
+            try
+            {
+                int currentIndex = (int)_currentCharacterType;
+                int totalCharacters = Enum.GetValues(typeof(CharacterType)).Length;
+                int newIndex = (currentIndex + direction + totalCharacters) % totalCharacters;
+                
+                CmdChangeCharacter((CharacterType)newIndex);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Karakter değiştirme hatası: {e.Message}");
+            }
         }
 
         [Command]
         private void CmdChangeCharacter(CharacterType newType)
         {
-            // Server'da karakter değişimini yap
             CharacterType oldType = _currentCharacterType;
             _currentCharacterType = newType;
             
-            // Server'da karakteri değiştir
             OnCharacterTypeChanged(oldType, newType);
-            
-            // Tüm clientlara bildir
             RpcChangeCharacter(oldType, newType);
         }
 
         [ClientRpc]
         private void RpcChangeCharacter(CharacterType oldType, CharacterType newType)
         {
-            if (isServer) return; // Server zaten değişikliği yapmış durumda
+            if (isServer) return;
             
-            // Client'larda karakter değişimini yap
             OnCharacterTypeChanged(oldType, newType);
             _currentCharacterType = newType;
         }
@@ -294,12 +420,16 @@ namespace ProjectV3.Shared.Combat
         {
             if (oldType == newType) return;
 
-            // Önceki karakteri deaktif et
-            DeactivateCharacter(oldType);
-            // Yeni karakteri aktif et
-            ActivateCharacter(newType);
-
-            Debug.Log($"[{(isServer ? "Server" : "Client")}] Karakter değiştirildi: {oldType} -> {newType}");
+            try
+            {
+                DeactivateCharacter(oldType);
+                ActivateCharacter(newType);
+                Debug.Log($"[{(isServer ? "Server" : "Client")}] Karakter değiştirildi: {oldType} -> {newType}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Karakter değiştirme hatası: {e.Message}");
+            }
         }
 
         private void DeactivateCharacter(CharacterType type)
@@ -307,13 +437,13 @@ namespace ProjectV3.Shared.Combat
             switch (type)
             {
                 case CharacterType.Archer:
-                    _archerGameObject.SetActive(false);
+                    if (_archerGameObject != null) _archerGameObject.SetActive(false);
                     break;
                 case CharacterType.Warrior:
-                    _warriorGameObject.SetActive(false);
+                    if (_warriorGameObject != null) _warriorGameObject.SetActive(false);
                     break;
                 case CharacterType.Tank:
-                    _tankGameObject.SetActive(false);
+                    if (_tankGameObject != null) _tankGameObject.SetActive(false);
                     break;
             }
         }
@@ -323,40 +453,111 @@ namespace ProjectV3.Shared.Combat
             switch (type)
             {
                 case CharacterType.Archer:
-                    _archerGameObject.SetActive(true);
-                    _activeCharacter = _archerController;
+                    if (_archerGameObject != null)
+                    {
+                        _archerGameObject.SetActive(true);
+                        _activeCharacter = _archerController;
+                    }
                     break;
                 case CharacterType.Warrior:
-                    _warriorGameObject.SetActive(true);
-                    _activeCharacter = _warriorController;
+                    if (_warriorGameObject != null)
+                    {
+                        _warriorGameObject.SetActive(true);
+                        _activeCharacter = _warriorController;
+                    }
                     break;
                 case CharacterType.Tank:
-                    _tankGameObject.SetActive(true);
-                    _activeCharacter = _tankController;
+                    if (_tankGameObject != null)
+                    {
+                        _tankGameObject.SetActive(true);
+                        _activeCharacter = _tankController;
+                    }
                     break;
+            }
+        }
+        #endregion
+
+        #region Movement and Camera
+        private void HandleRotation()
+        {
+            if (!isLocalPlayer) return;
+
+            try
+            {
+                Vector2 mousePosition = Mouse.current.position.ReadValue();
+                Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+                Vector2 direction = (mousePosition - screenCenter).normalized;
+                Vector3 targetDirection = new Vector3(direction.x, 0, direction.y);
+
+                if (targetDirection != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(targetDirection);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Rotasyon hatası: {e.Message}");
             }
         }
 
         private void Move()
         {
-            if (!isLocalPlayer) return;
+            if (!isLocalPlayer || _characterController == null) return;
 
-            if (_moveDirection != Vector3.zero)
+            try
             {
-                _characterController.Move(_moveDirection * _moveSpeed * Time.deltaTime);
+                if (_moveDirection != Vector3.zero)
+                {
+                    _characterController.Move(_moveDirection * _moveSpeed * Time.deltaTime);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Hareket hatası: {e.Message}");
             }
         }
 
+        private void SetupCamera()
+        {
+            try
+            {
+                CombatArenaModel.Instance.GetCamera().Follow = transform;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Kamera ayarlama hatası: {e.Message}");
+            }
+        }
+        #endregion
+
+        #region Async State Reset
         private async UniTaskVoid ResetDashStateAsync()
         {
-            await UniTask.Delay(50); // 0.05 saniye
-            _isDashing = false;
+            try
+            {
+                await UniTask.Delay(50); // 0.05 saniye
+                _isDashing = false;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Dash durumu sıfırlama hatası: {e.Message}");
+                _isDashing = false;
+            }
         }
 
         private async UniTaskVoid ResetDodgeStateAsync()
         {
-            await UniTask.Delay(200); // 0.2 saniye
-            _isDodging = false;
+            try
+            {
+                await UniTask.Delay(200); // 0.2 saniye
+                _isDodging = false;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{gameObject.name}] Dodge durumu sıfırlama hatası: {e.Message}");
+                _isDodging = false;
+            }
         }
+        #endregion
     }
 }
