@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Core.Scripts;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Enums;
+using ProjectV3.Shared.Extensions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core

@@ -2,7 +2,7 @@
 using Mirror;
 using System.Collections;
 
-namespace ProjectV3.Test.Combat
+namespace ProjectV3.Shared.Combat
 {
     public class ArcherCharacterController : NetworkBehaviour, ICharacterController
     {

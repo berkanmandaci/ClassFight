@@ -1,7 +1,7 @@
 using System;
 using _Project.Core.Scripts.Enums;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
+using ProjectV3.Shared.Extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

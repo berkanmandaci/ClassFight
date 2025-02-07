@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using _Project.Runtime.Core.Extensions.Signal;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Nakama;
-namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Models
+using ProjectV3.Shared.Extensions;
+namespace ProjectV3.Client
 {
     public class IncomingFriendRequestSignal : ASignal
     {

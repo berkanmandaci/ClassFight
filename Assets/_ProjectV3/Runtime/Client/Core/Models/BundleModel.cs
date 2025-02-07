@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
+using ProjectV3.Shared.Extensions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
-namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
+namespace ProjectV3.Client.Core
 {
     public class BundleModel : SingletonBehaviour<BundleModel>
     {

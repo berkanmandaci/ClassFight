@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using _Project.Runtime.Core.Extensions.Signal;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Nakama;
 using Newtonsoft.Json;
-using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
+using ProjectV3.Shared.Extensions;
 using UnityEngine;
 namespace ProjectV3.Client
 {

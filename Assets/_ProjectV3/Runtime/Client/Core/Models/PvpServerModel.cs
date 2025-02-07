@@ -1,10 +1,9 @@
 using System;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Mirror;
 using Nakama;
+using ProjectV3.Shared.Extensions;
 using ProjectV3.Shared.Network;
-using UnityEngine;
 
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 {

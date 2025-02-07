@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace _Project.Runtime.Core.Extensions.Singleton
+namespace ProjectV3.Shared.Extensions
 {
   public class SingletonData<T>
         where T : class

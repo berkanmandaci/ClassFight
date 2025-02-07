@@ -1,8 +1,8 @@
-using _Project.Runtime.Core.Extensions.Singleton;
+using ProjectV3.Shared.Extensions;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace ProjectV3.Client
+namespace ProjectV3.Shared.Combat
 {
     public class CombatArenaModel : SingletonBehaviour<CombatArenaModel>
     {

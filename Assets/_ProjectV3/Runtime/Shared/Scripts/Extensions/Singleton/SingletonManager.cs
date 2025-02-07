@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace _Project.Runtime.Core.Extensions.Singleton
+namespace ProjectV3.Shared.Extensions
 {
   public static class SingletonManager
   {

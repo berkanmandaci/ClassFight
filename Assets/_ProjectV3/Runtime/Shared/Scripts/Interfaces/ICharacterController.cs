@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjectV3.Test
+namespace ProjectV3.Shared.Combat
 {
     public interface ICharacterController
     {

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-namespace ProjectV3.Test.Combat
+namespace ProjectV3.Shared.Combat
 {
     public class WarriorCharacterController : MonoBehaviour, ICharacterController
     {

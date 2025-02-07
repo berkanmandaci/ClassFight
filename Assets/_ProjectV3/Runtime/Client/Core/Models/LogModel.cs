@@ -1,5 +1,5 @@
 ﻿using System;
-using _Project.Runtime.Core.Extensions.Singleton;
+using ProjectV3.Shared.Extensions;
 using UnityEngine;
 namespace ProjectV3.Client
 {

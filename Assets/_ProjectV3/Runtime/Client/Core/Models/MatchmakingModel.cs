@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using _Project.Runtime.Core.Extensions.Singleton;
 using Cysharp.Threading.Tasks;
 using Nakama;
 using _Project.Runtime.Core.Extensions.Signal;
+using ProjectV3.Shared.Extensions;
 using ProjectV3.Shared.Game;
 
-namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
+namespace ProjectV3.Client
 {
     public class MatchFoundSignal : ASignal<IMatchmakerMatched>
     {

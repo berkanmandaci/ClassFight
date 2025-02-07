@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Project.Runtime.Core.Extensions.Singleton
+namespace ProjectV3.Shared.Extensions
 {
   public class SingletonBehaviour<T> : MonoBehaviour, ISingleton where T : MonoBehaviour
   {

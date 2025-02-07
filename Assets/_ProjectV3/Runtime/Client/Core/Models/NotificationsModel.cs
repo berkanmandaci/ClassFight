@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using _Project.Runtime.Core.Extensions.Signal;
-using _Project.Runtime.Core.Extensions.Singleton;
 using _Project.Runtime.Project.Game.Scripts.Vo;
 using Cysharp.Threading.Tasks;
 using Nakama;
+using ProjectV3.Shared.Extensions;
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Models
 {
     public class NotificationsModel : Singleton<NotificationsModel>

@@ -1,10 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
-using ProjectV3.Client;
 using Cysharp.Threading.Tasks;
 
-namespace ProjectV3.Test
+namespace ProjectV3.Shared.Combat
 {
     public class BaseCharacterController : NetworkBehaviour
     {

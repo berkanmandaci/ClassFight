@@ -1,4 +1,4 @@
-﻿namespace _Project.Runtime.Core.Extensions.Singleton
+﻿namespace ProjectV3.Shared.Extensions
 {
   public class Singleton<T> : ISingleton where T : class, new()
   {
