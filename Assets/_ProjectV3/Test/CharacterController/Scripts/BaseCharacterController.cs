@@ -177,6 +177,7 @@ namespace ProjectV3.Test
             if (!isLocalPlayer || !context.performed) return;
 
             CmdAttack();
+            _activeCharacter.OnAttack();
         }
 
         [Command]
@@ -188,7 +189,7 @@ namespace ProjectV3.Test
         [ClientRpc]
         private void RpcAttack()
         {
-            Debug.Log("Attack!");
+            Debug.Log("Attack RPC çağrıldı!");
         }
 
         public void OnDash(InputAction.CallbackContext context)

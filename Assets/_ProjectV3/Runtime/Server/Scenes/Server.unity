@@ -312,7 +312,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 71789669818092711, guid: 6c8eda52d7f2b4046ad0998531904c4e, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 1
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 3762659367942407328, guid: c374623629bc8a444aed6e10a20c10f4, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -333,7 +334,6 @@ MonoBehaviour:
   noDelay: 1
   sendTimeout: 5000
   receiveTimeout: 5000
-  spawnPoints: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
