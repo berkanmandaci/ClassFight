@@ -581,9 +581,6 @@ namespace ProjectV3.Shared.Combat
         public void SetCombatData(CombatUserVo combatData)
         {
             _combatData = combatData;
-            _archerController.Init(combatData);
-            _warriorController.Init(combatData);
-            _tankController.Init(combatData);
             
             // HUD'u başlat
             if (_hudController != null)
