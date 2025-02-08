@@ -322,6 +322,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea068c227254a868413afdc8aa5be77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _characterController: {fileID: 7103374226332682520}
 --- !u!1 &2150314541245114443
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,6 +430,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _characterController: {fileID: 7103374226332682520}
   _arrowPrefab: {fileID: 3762659367942407328, guid: c374623629bc8a444aed6e10a20c10f4, type: 3}
   _arrowSpawnPoint: {fileID: 1518925899094241624}
   _arrowSpeed: 20
@@ -1169,6 +1174,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5754b68f9e4126a7597c3e42015693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _characterController: {fileID: 7103374226332682520}
 --- !u!1 &7571501067207234081
 GameObject:
   m_ObjectHideFlags: 0

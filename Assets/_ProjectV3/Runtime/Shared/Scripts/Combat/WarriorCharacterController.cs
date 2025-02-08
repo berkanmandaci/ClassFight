@@ -2,14 +2,8 @@
 using UnityEngine;
 namespace ProjectV3.Shared.Combat
 {
-    public class WarriorCharacterController : MonoBehaviour, ICharacterController
+    public class WarriorCharacterController : BaseCharacter, ICharacterController
     {
-        private CombatUserVo _combatData;
-
-        public void Init(CombatUserVo combatUserVo)
-        {
-            _combatData = combatUserVo;
-        }
         public void OnMove(Vector2 moveInput)
         {
         }
