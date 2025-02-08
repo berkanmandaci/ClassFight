@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using System;
 using ProjectV3.Shared.Enums;
 using ProjectV3.Shared.Vo;
-using ProjectV3.Shared.UI;
 
 namespace ProjectV3.Shared.Combat
 {
@@ -21,9 +20,6 @@ namespace ProjectV3.Shared.Combat
         [SerializeField] private GameObject _archerGameObject;
         [SerializeField] private GameObject _warriorGameObject;
         [SerializeField] private GameObject _tankGameObject;
-
-        [Header("UI References")]
-        [SerializeField] private PlayerHudController _hudController;
         #endregion
 
         #region Private Fields
@@ -431,13 +427,6 @@ namespace ProjectV3.Shared.Combat
             {
                 DeactivateCharacter(oldType);
                 ActivateCharacter(newType);
-                
-                // Combat verilerini güncelle
-                if (_combatData != null)
-                {
-                    _combatData.OnCharacterTypeChanged(newType);
-                }
-                
                 Debug.Log($"[{(isServer ? "Server" : "Client")}] Karakter değiştirildi: {oldType} -> {newType}");
             }
             catch (Exception e)
@@ -581,17 +570,6 @@ namespace ProjectV3.Shared.Combat
         public void SetCombatData(CombatUserVo combatData)
         {
             _combatData = combatData;
-            
-            // HUD'u başlat
-            if (_hudController != null)
-            {
-                _hudController.Init(combatData);
-                Debug.Log($"[{gameObject.name}] HUD başlatıldı");
-            }
-            else
-            {
-                Debug.LogWarning($"[{gameObject.name}] HUD Controller bulunamadı!");
-            }
             
             Debug.Log($"[{gameObject.name}] Combat verileri ayarlandı: {_combatData.UserData.DisplayName}");
         }

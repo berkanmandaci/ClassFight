@@ -5,7 +5,7 @@ using ProjectV3.Shared.Vo;
 
 namespace ProjectV3.Shared.Combat
 {
-    public class ArcherCharacterController : NetworkBehaviour, ICharacterController
+    public class ArcherCharacterController : BaseCharacter, ICharacterController
     {
         [Header("Ok Ayarları")]
         [SerializeField] private GameObject _arrowPrefab;
@@ -15,14 +15,7 @@ namespace ProjectV3.Shared.Combat
 
         private float _lastAttackTime;
         private readonly float _attackCooldown = 1f;
-        private CombatUserVo _combatData;
-
-        public void Init(CombatUserVo combatUserVo)
-        {
-            _combatData = combatUserVo;
-            Debug.Log($"[Archer] Başlatıldı - Oyuncu: {_combatData?.UserData?.DisplayName ?? "Bilinmeyen"}");
-        }
-
+  
         public void OnMove(Vector2 moveInput)
         {
             // Base controller handles movement
