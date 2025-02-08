@@ -57,6 +57,13 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 LogModel.Instance.Log($"Host: {serverInfo.host}");
                 LogModel.Instance.Log($"Port: {serverInfo.port}");
 
+                // Match verilerini NetworkManager'a kaydet
+                if (currentMatch != null && NetworkClient.connection != null)
+                {
+                    networkManager.RegisterMatchData(NetworkClient.connection.connectionId, currentMatch);
+                    LogModel.Instance.Log($"Match verileri NetworkManager'a kaydedildi");
+                }
+
                 await ConnectToGameServer(serverInfo);
             }
             catch (Exception e)

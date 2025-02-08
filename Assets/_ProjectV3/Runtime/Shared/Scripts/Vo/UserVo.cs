@@ -1,25 +1,27 @@
-﻿using Nakama;
-namespace _Project.Scripts.Vo
+﻿using System;
+
+namespace ProjectV3.Shared.Vo
 {
+    [Serializable]
     public class UserVo
     {
-        public string Id => User.Id;
-
-        public string DisplayName => User.DisplayName;
-
+        public string Id { get; private set; }
+        public string Username { get; private set; }
+        public string DisplayName { get; private set; }
         public int Level { get; set; }
-
         public float Experience { get; set; }
-
         public float ExperienceToNextLevel { get; set; }
-
         public int Elo { get; set; }
-        
-        private IApiUser User { get; set; }
 
-        public UserVo(IApiUser apiUser)
+        public UserVo(string id, string username, string displayName = null)
         {
-            User = apiUser;
+            Id = id;
+            Username = username;
+            DisplayName = displayName ?? username;
+            Level = 1;
+            Experience = 0;
+            ExperienceToNextLevel = 100;
+            Elo = 1000;
         }
     }
 }

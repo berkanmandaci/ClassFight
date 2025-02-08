@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 using Mirror;
 using Cysharp.Threading.Tasks;
 using System;
+using ProjectV3.Shared.Enums;
+using ProjectV3.Shared.Vo;
 
 namespace ProjectV3.Shared.Combat
 {
@@ -45,16 +47,11 @@ namespace ProjectV3.Shared.Combat
         private ICharacterController _archerController;
         private ICharacterController _warriorController;
         private ICharacterController _tankController;
+
+        // Combat verilerini tutan referans
+        private CombatUserVo _combatData;
         #endregion
 
-        #region Enums
-        private enum CharacterType
-        {
-            Archer,
-            Warrior,
-            Tank
-        }
-        #endregion
 
         #region Unity Lifecycle
         private void Awake()
@@ -88,6 +85,12 @@ namespace ProjectV3.Shared.Combat
             if (!_isDashing && !_isDodging)
             {
                 Move();
+            }
+
+            // Combat verilerini güncelle
+            if (_combatData != null)
+            {
+                _combatData.UpdatePlayTime(Time.deltaTime);
             }
         }
         #endregion
@@ -559,5 +562,19 @@ namespace ProjectV3.Shared.Combat
             }
         }
         #endregion
+
+        public CharacterType GetCurrentCharacterType() => _currentCharacterType;
+        
+        public CombatUserVo GetCombatData() => _combatData;
+
+        public void SetCombatData(CombatUserVo combatData)
+        {
+            _combatData = combatData;
+            _archerController.Init(combatData);
+            _warriorController.Init(combatData);
+            _tankController.Init(combatData);
+            
+            Debug.Log($"[{gameObject.name}] Combat verileri ayarlandı: {_combatData.UserData.DisplayName}");
+        }
     }
 }

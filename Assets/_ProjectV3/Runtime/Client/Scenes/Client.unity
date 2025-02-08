@@ -367,6 +367,7 @@ GameObject:
   - component: {fileID: 1034447991}
   - component: {fileID: 1034447994}
   - component: {fileID: 1034447995}
+  - component: {fileID: 1034447996}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -464,6 +465,22 @@ MonoBehaviour:
   noDelay: 1
   sendTimeout: 5000
   receiveTimeout: 5000
+  freeForAllModePrefab: {fileID: 0}
+  teamDeathmatchModePrefab: {fileID: 0}
+  logManager: {fileID: 1034447996}
+--- !u!114 &1034447996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034447990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c03436cef4b1f5f4c9b239221ce543fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isServer: 0
 --- !u!1 &1279884086
 GameObject:
   m_ObjectHideFlags: 0

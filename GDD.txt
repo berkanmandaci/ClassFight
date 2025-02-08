@@ -1,0 +1,153 @@
+Oyun Konsepti
+
+
+Ana tema: Oyuncunun bir pvp arenaya düşüp.
+Oyunun benzersiz özellikleri : 3 ayrı class arasında anlık geçiş yapılabilecek. Okçu, tank, savaşçı.
+
+
+Oyun Mekanikleri
+
+Temel oynanış döngüsü : 
+
+Oyuncu etkileşimleri : 
+Oyun sistemleri : hasar, can ve kalkan toplama
+
+
+Karakterler ve Nesneler
+
+Oyuncu karakterinin özellikleri
+
+Etkileşimli nesneler. Can ve kalkan paketleri.
+
+
+
+
+Teknik Gereksinimler
+
+Hedef platform : Mobil, Pc
+Gerekli Unity özellikleri: mirror network
+Performans beklentileri: maximum optimization
+
+
+Combat Sistemi
+
+Okçu: 1 saniye bekleme süresi olan ok fırlatacak. Sade
+
+Saldırı Tuşu: 
+
+Tank: Bir kalkan açacak
+
+
+                         PC               Controller(Xbox)                   
+
+Attack                 Mouse left click       L1              
+        
+Dash                   Mouse right click      R1                      
+
+Dodge                  Space                  X                       
+
+Move                   WASD                   Left Analog            
+
+Rotation               Mouse                  Right Analog
+
+Next Character         Q                      R2
+
+Previous Character     E                      L2
+
+
+
+Kontrol mekanizmaları: Mobil yön joystick. Sınıf değiştirme tuşları. Tek bir atak tuşu. Her classın kullanabildiği dash ve attacktan sıyrılma (dodge) tuşu. Bulunduğum sınıf dışındaki diğer sınıflara geçebileceğim butonlar.
+
+
+
+Saldırı (Attack):
+
+PC'de: Sol fare tıklaması
+Kontrolcüde: L1 düğmesi
+
+
+Dash (Hızlı Hareket):
+
+PC'de: Sağ fare tıklaması
+Kontrolcüde: R1 düğmesi
+
+
+Dodge (Kaçınma):
+
+PC'de: Boşluk tuşu
+Kontrolcüde: X düğmesi
+
+
+Hareket (Move):
+
+PC'de: WASD tuşları
+Kontrolcüde: Sol analog çubuk
+
+
+Dönüş (Rotation):
+
+PC'de: Fare
+Kontrolcüde: Sağ analog çubuk
+
+
+Sonraki Karakter (Next Character):
+
+PC'de: Q tuşu
+Kontrolcüde: R2 düğmesi
+
+
+Önceki Karakter (Previous Character):
+
+PC'de: E tuşu
+Kontrolcüde: L2 düğmesi
+
+
+Oyunun türü : Rekabetçi çok oyunculu
+
+Kamera bakış açısı: Topdown
+
+Benzer oyunlar: Battlerite, brawl stars
+
+
+Görsel tema: genshin impact benzeri
+
+
+Hedef platform : Mobil, Pc, PlayStation, Web, Xbox (All platforms)
+
+DataBase: Her bir sınıf için ayrı olacak şekilde. All Time Total Damage, Total kill, Total asist, Alınan hasar. vb. ...  Ranked elo sistemi Her oyun modu için rank ayrı olacak . (Bronze, silver, gold, plat, emerald, diaomond, chalangers) her bir lig için 4 küme. Bu statlara göre leader board. 6 ay da bir sıfırlanan sezon sistemi.
+
+UI: Karakter Can barları, hasar verildiğinde vurulan hasarın sayılsal değeri gösterilecek. Hasar alındığında can barından eksilme animasyonu. Tank rolüne geçtiğinde Ekstra bir bar aktif olarak kalkanının sağlık değeri gözükecek. 
+
+Oynanış: 2 oyun modu olucak. 2 vs 2 veya free for all 3 oyuncu pvp arenada spawn bölgelerinde idle animasyonlarla başlayacaklar. 3 2 1. Go! Geri sayımından sonra karakterler kontrol edilebilir olacak. Modun kazanma şartları tamamlandığında. Oyun tamamlanıcak.
+
+Kazanma Şartları : 
+2 vs 2: Takımdaki herkez öldüğünde rakip raoundu kazanıcak. 3 roundtan ikisini kazanan oyunu kazanaıcak. kazanan takım elo kazanır. kaybeden takım elo kaybede.
+ 
+Free for all: 3 round oynanacak. Roundta en son hayatta kalan olmak 5 puan, en çok hasar vuran olmak 5 puan, En çok kill alan olmak 5 puan. 3 roundun sonunda en çok puanı toplayan  kişi  elo alır. 2. elosu sabit kalır. diğer  kişi elo  kaybeder.
+
+
+Combat Sistemi:
+ 
+
+Saldırı Tuşu Okçu: 1 saniye bekleme süresi olan ok fırlatacak. 
+
+Saldırı Tuşu Savaşçı: Bekleme süresi yok. 3 kere kombolanabilir.
+
+Saldırı tuşu Tank: 1 saniye bekeleme süresi ile kalkanı savuracak. Rakip karaktere gelirse hasar verecek. Okçunun okuna doğru zamanlama ile vurursa. Oku geri fırlatıcak. Okun verdiği hasar atağı savuşturan tank oyuncuya ait olacak. Savaşçıya doğru zamanda saldırırsa savaşçı stun yiyecek.
+
+
+
+Tüm karakterler için:
+
+Dash tuşu: Rotasyon verildiyse o yöne sıçrama haraketi yapacak. 2 saniye bekleme süresi olacak. 2 defa stacklenebilecek. Dash atıldığında stunlı oyuncu stundan çıkacak.
+
+Dodge Tuşu: Oyuncu bu tuşu doğru zamanda kullanırsa. Gelen hasardan kaçınacak. 1 saniye bekleme süresi. Kullanan kişi yarım saniye haraket edemez durumda olacak. Dash kullanarak bu hareket edemez durumundan çıkacak.
+
+Kullanılacak Teknolojiler: Data base için: Nakama. Online bağlantı için : mirror network Oyun motoru: unity, asenkron işlemler için Unitask, Ses için FMOD, MVC, OOP, SOLID
+
+
+
+Work flow: Öncelik combat sistemi.
+
+
+Sonradan eklenebilecek özellikler: Her classın skill treesi. Ultimate yeteneği. Ultimate dolma barı.
