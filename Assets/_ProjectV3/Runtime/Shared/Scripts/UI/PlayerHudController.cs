@@ -18,11 +18,19 @@ namespace ProjectV3.Shared.UI
         [SerializeField] private GameObject _shieldContainer; // Shield UI'ın parent objesi
 
         private CombatUserVo _combatData;
-        private float _maxHealth = 100f;
-        private float _maxShield = 100f;
 
-        private void Awake()
+        
+        private float _maxHealth => _combatData.MaxHealth;
+        private float _maxShield => _combatData.MaxShield;
+        
+
+        public void Init(CombatUserVo combatData)
         {
+            UnsubscribeFromEvents();
+            
+            _combatData = combatData;
+
+            
             // Slider'ların başlangıç değerlerini ayarla
             if (_healthSlider != null)
             {
@@ -33,27 +41,13 @@ namespace ProjectV3.Shared.UI
             if (_shieldSlider != null)
             {
                 _shieldSlider.maxValue = _maxShield;
-                _shieldSlider.value = 0;
+                _shieldSlider.value = _maxShield;
             }
 
             // Shield UI'ı başlangıçta gizle
             if (_shieldContainer != null)
             {
                 _shieldContainer.SetActive(false);
-            }
-        }
-
-        public void Init(CombatUserVo combatData)
-        {
-            UnsubscribeFromEvents();
-            
-            _combatData = combatData;
-            _maxHealth = combatData.MaxHealth;
-
-            if (_healthSlider != null)
-            {
-                _healthSlider.maxValue = _maxHealth;
-                _healthSlider.value = _maxHealth;
             }
 
             UpdateDisplayName();

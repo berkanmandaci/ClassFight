@@ -807,6 +807,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5664389941682017095}
   - component: {fileID: 5956328060584330258}
+  - component: {fileID: 155662095746122010}
   m_Layer: 0
   m_Name: ArenaScene
   m_TagString: Untagged
@@ -848,7 +849,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c76c61f722d09d40a4df24ade3a3e20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   _camera: {fileID: 7670474476780264678}
+--- !u!114 &155662095746122010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7843433556515226804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 2328323125
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
 --- !u!1 &8244031445479851099
 GameObject:
   m_ObjectHideFlags: 0

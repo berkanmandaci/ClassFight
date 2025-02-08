@@ -12,6 +12,7 @@ namespace ProjectV3.Shared.Vo
         #region Character Stats
         [Header("Temel Stats")]
         public float MaxHealth { get; private set; } = 100f;
+        public float MaxShield { get; private set; } = 100f;
         public float CurrentHealth { get; private set; }
         public float ShieldAmount { get; private set; }
         public bool IsDead => CurrentHealth <= 0;
@@ -104,6 +105,7 @@ namespace ProjectV3.Shared.Vo
                 ShieldAmount -= damage;
                 Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in kalkanı {damage} hasar aldı. Kalan kalkan: {ShieldAmount}");
             }
+            OnShieldChanged?.Invoke();
             return remainingDamage;
         }
 
@@ -111,6 +113,7 @@ namespace ProjectV3.Shared.Vo
         {
             float previousHealth = CurrentHealth;
             CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+            OnHealthChanged?.Invoke();
             Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in canı {previousHealth}'den {CurrentHealth}'e düştü");
         }
 
@@ -131,6 +134,7 @@ namespace ProjectV3.Shared.Vo
 
             float previousHealth = CurrentHealth;
             CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
+            OnHealthChanged?.Invoke();
             Debug.Log($"[CombatUserVo] {UserData.DisplayName} iyileştirildi: {previousHealth} -> {CurrentHealth}");
         }
 
@@ -142,6 +146,7 @@ namespace ProjectV3.Shared.Vo
             Debug.Log($"[CombatUserVo] {UserData.DisplayName} öldü! Öldüren: {killer.UserData.DisplayName}");
             Debug.Log($"[CombatUserVo] İstatistikler - Ölümler: {Deaths}, Öldürmeler: {Kills}, Asistler: {Assists}");
 
+            OnDeath?.Invoke();
             // TODO: Ölüm animasyonunu oynat
             // TODO: Yeniden doğma sistemini başlat
         }
@@ -215,5 +220,9 @@ namespace ProjectV3.Shared.Vo
             return Deaths > 0 ? (Kills + (Assists * 0.5f)) / Deaths : Kills + (Assists * 0.5f);
         }
         #endregion
+        public event Action OnHealthChanged;
+        public event Action OnShieldChanged;
+        public event Action OnDeath;
+        public event Action<CharacterType> OnCharacterChanged;
     }
 } 

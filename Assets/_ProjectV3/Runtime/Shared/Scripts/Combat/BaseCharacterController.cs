@@ -4,6 +4,7 @@ using Mirror;
 using Cysharp.Threading.Tasks;
 using System;
 using ProjectV3.Shared.Enums;
+using ProjectV3.Shared.UI;
 using ProjectV3.Shared.Vo;
 
 namespace ProjectV3.Shared.Combat
@@ -11,28 +12,32 @@ namespace ProjectV3.Shared.Combat
     public class BaseCharacterController : NetworkBehaviour
     {
         #region Serialized Fields
+
         [Header("Hareket Ayarları")]
         [SerializeField] private float _moveSpeed = 7f;
         [SerializeField] private float _dashDistance = 5f;
         [SerializeField] private float _dodgeSpeed = 15f;
-        
+
         [Header("Referanslar")]
         [SerializeField] private GameObject _archerGameObject;
         [SerializeField] private GameObject _warriorGameObject;
         [SerializeField] private GameObject _tankGameObject;
+        [SerializeField] private PlayerHudController _playerHud;
+
         #endregion
 
         #region Private Fields
+
         private Vector2 _moveInput;
         private Vector2 _aimInput;
         private Vector3 _moveDirection;
         private bool _isInitialized;
-        
+
         [SyncVar] private bool _isDashing;
         [SyncVar] private bool _isDodging;
-        [SyncVar(hook = nameof(OnCharacterTypeChanged))] 
+        [SyncVar(hook = nameof(OnCharacterTypeChanged))]
         private CharacterType _currentCharacterType = CharacterType.Archer;
-        
+
         private CharacterController _characterController;
         private PlayerInput _playerInput;
         private InputAction _moveAction;
@@ -48,12 +53,13 @@ namespace ProjectV3.Shared.Combat
         private ICharacterController _warriorController;
         private ICharacterController _tankController;
 
-        // Combat verilerini tutan referans
         private CombatUserVo _combatData;
+
         #endregion
 
 
         #region Unity Lifecycle
+
         private void Awake()
         {
             InitializeComponents();
@@ -93,9 +99,11 @@ namespace ProjectV3.Shared.Combat
                 _combatData.UpdatePlayTime(Time.deltaTime);
             }
         }
+
         #endregion
 
         #region Initialization
+
         private void InitializeComponents()
         {
             try
@@ -110,7 +118,7 @@ namespace ProjectV3.Shared.Combat
 
                 ValidateControllers();
                 _isInitialized = true;
-                
+
                 Debug.Log($"[{gameObject.name}] Bileşenler başarıyla başlatıldı.");
             }
             catch (Exception e)
@@ -126,7 +134,7 @@ namespace ProjectV3.Shared.Combat
             {
                 enabled = true;
                 _playerInput = GetComponent<PlayerInput>();
-                
+
                 if (_playerInput == null)
                     throw new Exception("PlayerInput bulunamadı!");
 
@@ -148,9 +156,11 @@ namespace ProjectV3.Shared.Combat
             if (_tankController == null)
                 Debug.LogWarning($"[{gameObject.name}] Tank controller bulunamadı!");
         }
+
         #endregion
 
         #region Input Setup
+
         private void SetupInputActions()
         {
             _moveAction = _playerInput.actions["Move"];
@@ -173,7 +183,7 @@ namespace ProjectV3.Shared.Combat
             _dodgeAction.performed += OnDodge;
             _previousCharacterAction.performed += OnPreviousCharacter;
             _nextCharacterAction.performed += OnNextCharacter;
-            
+
             _playerInput.enabled = true;
         }
 
@@ -206,9 +216,11 @@ namespace ProjectV3.Shared.Combat
             if (_nextCharacterAction != null)
                 _nextCharacterAction.performed -= OnNextCharacter;
         }
+
         #endregion
 
         #region Input Handlers
+
         public void OnMove(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer) return;
@@ -273,9 +285,11 @@ namespace ProjectV3.Shared.Combat
                 _isDodging = false;
             }
         }
+
         #endregion
 
         #region Network Commands
+
         [Command]
         private void CmdAttack()
         {
@@ -295,9 +309,11 @@ namespace ProjectV3.Shared.Combat
             _isDodging = true;
             RpcDodge(dodgeDirection);
         }
+
         #endregion
 
         #region Network RPCs
+
         [ClientRpc]
         private void RpcAttack()
         {
@@ -367,21 +383,23 @@ namespace ProjectV3.Shared.Combat
                 _isDodging = false;
             }
         }
+
         #endregion
 
         #region Character Management
+
         private void OnPreviousCharacter(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed) return;
             ChangeCharacter(-1);
         }
-        
+
         private void OnNextCharacter(InputAction.CallbackContext context)
         {
             if (!isLocalPlayer || !context.performed) return;
             ChangeCharacter(1);
         }
-        
+
         private void ChangeCharacter(int direction)
         {
             if (!isLocalPlayer) return;
@@ -391,7 +409,7 @@ namespace ProjectV3.Shared.Combat
                 int currentIndex = (int)_currentCharacterType;
                 int totalCharacters = Enum.GetValues(typeof(CharacterType)).Length;
                 int newIndex = (currentIndex + direction + totalCharacters) % totalCharacters;
-                
+
                 CmdChangeCharacter((CharacterType)newIndex);
             }
             catch (Exception e)
@@ -405,7 +423,7 @@ namespace ProjectV3.Shared.Combat
         {
             CharacterType oldType = _currentCharacterType;
             _currentCharacterType = newType;
-            
+
             OnCharacterTypeChanged(oldType, newType);
             RpcChangeCharacter(oldType, newType);
         }
@@ -414,7 +432,7 @@ namespace ProjectV3.Shared.Combat
         private void RpcChangeCharacter(CharacterType oldType, CharacterType newType)
         {
             if (isServer) return;
-            
+
             OnCharacterTypeChanged(oldType, newType);
             _currentCharacterType = newType;
         }
@@ -437,7 +455,7 @@ namespace ProjectV3.Shared.Combat
 
         private void DeactivateCharacter(CharacterType type)
         {
-            switch (type)
+            switch ( type )
             {
                 case CharacterType.Archer:
                     if (_archerGameObject != null) _archerGameObject.SetActive(false);
@@ -453,7 +471,7 @@ namespace ProjectV3.Shared.Combat
 
         private void ActivateCharacter(CharacterType type)
         {
-            switch (type)
+            switch ( type )
             {
                 case CharacterType.Archer:
                     if (_archerGameObject != null)
@@ -478,9 +496,11 @@ namespace ProjectV3.Shared.Combat
                     break;
             }
         }
+
         #endregion
 
         #region Movement and Camera
+
         private void HandleRotation()
         {
             if (!isLocalPlayer) return;
@@ -531,9 +551,11 @@ namespace ProjectV3.Shared.Combat
                 Debug.LogError($"[{gameObject.name}] Kamera ayarlama hatası: {e.Message}");
             }
         }
+
         #endregion
 
         #region Async State Reset
+
         private async UniTaskVoid ResetDashStateAsync()
         {
             try
@@ -561,16 +583,17 @@ namespace ProjectV3.Shared.Combat
                 _isDodging = false;
             }
         }
+
         #endregion
 
         public CharacterType GetCurrentCharacterType() => _currentCharacterType;
-        
+
         public CombatUserVo GetCombatData() => _combatData;
 
-        public void SetCombatData(CombatUserVo combatData)
+        public void Init(CombatUserVo combatData)
         {
             _combatData = combatData;
-            
+            _playerHud.Init(_combatData);
             Debug.Log($"[{gameObject.name}] Combat verileri ayarlandı: {_combatData.UserData.DisplayName}");
         }
     }

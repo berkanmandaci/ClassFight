@@ -147,6 +147,7 @@ namespace ProjectV3.Shared.Network
                 {
                     // Oyuncuyu takımdan çıkar
                     CombatArenaModel.Instance.UnregisterPlayer(combatData);
+                    CombatArenaModel.Instance.UnregisterCombatData(conn.connectionId);
                     _combatUsers.Remove(conn.connectionId);
                 }
 
@@ -273,8 +274,11 @@ namespace ProjectV3.Shared.Network
                 // Combat verilerini kaydet
                 _combatUsers[conn.connectionId] = combatData;
 
+                // Combat verilerini CombatArenaModel'e kaydet
+                CombatArenaModel.Instance.RegisterCombatData(conn.connectionId, combatData);
+
                 // Combat verilerini karaktere ata
-                characterController.SetCombatData(combatData); 
+                characterController.Init(combatData); 
 
                 // Oyuncuyu takıma kaydet
                 CombatArenaModel.Instance.RegisterPlayer(combatData, conn.connectionId);
@@ -347,12 +351,6 @@ namespace ProjectV3.Shared.Network
             {
                 Debug.LogError("[Setup] Player Prefab must have a NetworkIdentity component!");
             }
-        }
-
-        // Combat verilerine erişim metodu
-        public CombatUserVo GetCombatData(int connectionId)
-        {
-            return _combatUsers.TryGetValue(connectionId, out var combatData) ? combatData : null;
         }
     }
 }

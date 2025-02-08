@@ -1,25 +1,110 @@
 using System.Collections.Generic;
-using ProjectV3.Shared.Extensions;
 using ProjectV3.Shared.Vo;
 using ProjectV3.Shared.Game;
 using Unity.Cinemachine;
 using UnityEngine;
+using Mirror;
 
 namespace ProjectV3.Shared.Combat
 {
-    public class CombatArenaModel : SingletonBehaviour<CombatArenaModel>
+    public class CombatArenaModel : NetworkBehaviour
     {
+        private static CombatArenaModel _instance;
+        public static CombatArenaModel Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<CombatArenaModel>();
+                    if (_instance == null)
+                    {
+                        Debug.LogError("[CombatArena] Instance bulunamadı! Prefab sahneye eklenmiş mi?");
+                    }
+                }
+                return _instance;
+            }
+        }
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Debug.LogWarning("[CombatArena] Sahnede birden fazla CombatArenaModel var! Fazla olan yok ediliyor.");
+                Destroy(gameObject);
+                return;
+            }
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+            Debug.Log("[CombatArena] Singleton başlatıldı");
+        }
+
         [SerializeField] private CinemachineCamera _camera;
-        
+
         private Dictionary<int, List<CombatUserVo>> _teams = new Dictionary<int, List<CombatUserVo>>();
         private const int MAX_TEAM_SIZE_TDM = 2; // TeamDeathmatch için takım başına 2 oyuncu
         private const int MAX_TEAM_SIZE_FFA = 1; // FreeForAll için takım başına 1 oyuncu
         private GameModeType _currentGameMode = GameModeType.None;
         private int _teamCounter = 0;
 
+        // Tüm oyuncuların combat verilerini tutan dictionary
+        private readonly SyncDictionary<int, CombatUserVo> _combatUsers = new SyncDictionary<int, CombatUserVo>();
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            _combatUsers.Clear();
+            Debug.Log("[CombatArena] Server başlatıldı, combat verileri temizlendi");
+        }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            Debug.Log("[CombatArena] Client başlatıldı");
+        }
+
         public CinemachineCamera GetCamera() => _camera;
 
         public GameModeType GetCurrentGameMode() => _currentGameMode;
+
+        // Combat verilerine erişim metodu
+        public CombatUserVo GetCombatData(int connectionId)
+        {
+            if (_combatUsers.TryGetValue(connectionId, out var combatData))
+            {
+                Debug.Log($"[CombatArena] Combat verisi bulundu - Connection ID: {connectionId}, Oyuncu: {combatData.UserData.DisplayName}");
+                return combatData;
+            }
+
+            Debug.LogWarning($"[CombatArena] Combat verisi bulunamadı - Connection ID: {connectionId}");
+            return null;
+        }
+
+        // Combat verilerini kaydetme metodu (sadece server)
+        [Server]
+        public void RegisterCombatData(int connectionId, CombatUserVo combatData)
+        {
+            if (combatData == null)
+            {
+                Debug.LogError($"[CombatArena] Null combat verisi kaydedilemez - Connection ID: {connectionId}");
+                return;
+            }
+
+            _combatUsers[connectionId] = combatData;
+            Debug.Log($"[CombatArena] Combat verisi kaydedildi - Connection ID: {connectionId}, Oyuncu: {combatData.UserData.DisplayName}");
+        }
+
+        // Combat verilerini silme metodu (sadece server)
+        [Server]
+        public void UnregisterCombatData(int connectionId)
+        {
+            if (_combatUsers.ContainsKey(connectionId))
+            {
+                var removedData = _combatUsers[connectionId];
+                _combatUsers.Remove(connectionId);
+                Debug.Log($"[CombatArena] Combat verisi silindi - Connection ID: {connectionId}, Oyuncu: {removedData.UserData.DisplayName}");
+            }
+        }
 
         public void SetGameMode(GameModeType gameMode)
         {
@@ -34,7 +119,7 @@ namespace ProjectV3.Shared.Combat
             int teamId;
             int maxTeamSize;
 
-            switch (_currentGameMode)
+            switch ( _currentGameMode )
             {
                 case GameModeType.TeamDeathmatch:
                     maxTeamSize = MAX_TEAM_SIZE_TDM;
@@ -83,11 +168,11 @@ namespace ProjectV3.Shared.Combat
             player.Initialize(player.UserData, player.CharacterController, player.NetworkIdentity, teamId);
             _teamCounter++;
 
-            string modeInfo = _currentGameMode == GameModeType.TeamDeathmatch ? 
+            string modeInfo = _currentGameMode == GameModeType.TeamDeathmatch ?
                 $"(Takım {teamId})" : "(FFA)";
-            
+
             Debug.Log($"[CombatArena] {player.UserData.DisplayName} Team {teamId}'ye eklendi {modeInfo}. " +
-                     $"Takım büyüklüğü: {_teams[teamId].Count}/{maxTeamSize}");
+                      $"Takım büyüklüğü: {_teams[teamId].Count}/{maxTeamSize}");
         }
 
         public void UnregisterPlayer(CombatUserVo player)
@@ -98,7 +183,7 @@ namespace ProjectV3.Shared.Combat
                 {
                     _teamCounter--;
                     Debug.Log($"[CombatArena] {player.UserData.DisplayName} takımdan çıkarıldı. " +
-                            $"Kalan oyuncu sayısı: {_teamCounter}");
+                              $"Kalan oyuncu sayısı: {_teamCounter}");
                     return;
                 }
             }
@@ -113,7 +198,7 @@ namespace ProjectV3.Shared.Combat
         {
             if (_currentGameMode == GameModeType.FreeForAll)
                 return false; // FFA'da takım arkadaşı yok
-                
+
             return player1.TeamId == player2.TeamId;
         }
 
