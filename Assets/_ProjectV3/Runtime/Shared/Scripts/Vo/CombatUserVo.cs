@@ -9,6 +9,12 @@ namespace ProjectV3.Shared.Vo
     [Serializable]
     public class CombatUserVo
     {
+        // Event'ler
+        public event Action OnHealthChanged;
+        public event Action OnShieldChanged;
+        public event Action OnDeath;
+        public event Action<CharacterType> OnCharacterChanged;
+
         #region Character Stats
         [Header("Temel Stats")]
         public float MaxHealth { get; private set; } = 100f;
@@ -92,6 +98,11 @@ namespace ProjectV3.Shared.Vo
 
         private float ProcessShieldDamage(float damage)
         {
+            if (CharacterController.GetCurrentCharacterType() != CharacterType.Tank)
+            {
+                return damage;
+            }
+
             float remainingDamage = 0;
             if (damage > ShieldAmount)
             {
@@ -104,6 +115,7 @@ namespace ProjectV3.Shared.Vo
                 ShieldAmount -= damage;
                 Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in kalkanı {damage} hasar aldı. Kalan kalkan: {ShieldAmount}");
             }
+            OnShieldChanged?.Invoke();
             return remainingDamage;
         }
 
@@ -112,13 +124,21 @@ namespace ProjectV3.Shared.Vo
             float previousHealth = CurrentHealth;
             CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
             Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in canı {previousHealth}'den {CurrentHealth}'e düştü");
+            OnHealthChanged?.Invoke();
         }
 
         public void AddShield(float amount)
         {
+            if (CharacterController.GetCurrentCharacterType() != CharacterType.Tank)
+            {
+                Debug.Log($"[CombatUserVo] {UserData.DisplayName} Tank değil, kalkan eklenemez!");
+                return;
+            }
+
             float previousShield = ShieldAmount;
             ShieldAmount = Mathf.Min(ShieldAmount + amount, 100f);
             Debug.Log($"[CombatUserVo] {UserData.DisplayName} kalkan kazandı: {previousShield} -> {ShieldAmount}");
+            OnShieldChanged?.Invoke();
         }
 
         public void Heal(float amount)
@@ -132,6 +152,7 @@ namespace ProjectV3.Shared.Vo
             float previousHealth = CurrentHealth;
             CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
             Debug.Log($"[CombatUserVo] {UserData.DisplayName} iyileştirildi: {previousHealth} -> {CurrentHealth}");
+            OnHealthChanged?.Invoke();
         }
 
         private void Die(CombatUserVo killer)
@@ -141,6 +162,8 @@ namespace ProjectV3.Shared.Vo
             
             Debug.Log($"[CombatUserVo] {UserData.DisplayName} öldü! Öldüren: {killer.UserData.DisplayName}");
             Debug.Log($"[CombatUserVo] İstatistikler - Ölümler: {Deaths}, Öldürmeler: {Kills}, Asistler: {Assists}");
+
+            OnDeath?.Invoke();
 
             // TODO: Ölüm animasyonunu oynat
             // TODO: Yeniden doğma sistemini başlat
@@ -215,5 +238,18 @@ namespace ProjectV3.Shared.Vo
             return Deaths > 0 ? (Kills + (Assists * 0.5f)) / Deaths : Kills + (Assists * 0.5f);
         }
         #endregion
+
+        // Karakter değiştiğinde çağrılacak metod
+        public void OnCharacterTypeChanged(CharacterType newType)
+        {
+            if (newType != CharacterType.Tank)
+            {
+                ShieldAmount = 0;
+                OnShieldChanged?.Invoke();
+            }
+            
+            OnCharacterChanged?.Invoke(newType);
+            Debug.Log($"[CombatUserVo] {UserData.DisplayName} karakteri değişti: {newType}");
+        }
     }
 } 
