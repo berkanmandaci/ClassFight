@@ -50,6 +50,15 @@ namespace ProjectV3.Shared.Combat
         // Tüm oyuncuların combat verilerini tutan dictionary
         private readonly SyncDictionary<int, CombatUserVo> _combatUsers = new SyncDictionary<int, CombatUserVo>();
 
+        [SyncVar(hook = nameof(OnMatchStateChanged))]
+        private bool _isMatchStarted = false;
+        public bool IsMatchStarted => _isMatchStarted;
+
+        private readonly SyncDictionary<int, bool> _readyPlayers = new SyncDictionary<int, bool>();
+        private bool _isCountdownStarted = false;
+
+        [SerializeField] private float _countdownDuration = 3f;
+
         public override void OnStartServer()
         {
             base.OnStartServer();
@@ -213,5 +222,85 @@ namespace ProjectV3.Shared.Combat
         {
             return _teamCounter;
         }
+
+        [Server]
+        public void RegisterPlayerReady(int connectionId)
+        {
+            if (!_readyPlayers.ContainsKey(connectionId))
+            {
+                _readyPlayers[connectionId] = true;
+                Debug.Log($"[CombatArena] Oyuncu hazır - Connection ID: {connectionId}");
+                CheckAllPlayersReady();
+            }
+        }
+
+        [Server]
+        private void CheckAllPlayersReady()
+        {
+            if (_isCountdownStarted || _isMatchStarted) return;
+
+            int totalPlayers = _combatUsers.Count;
+            int readyPlayers = _readyPlayers.Count;
+
+            Debug.Log($"[CombatArena] Hazır oyuncu kontrolü - Toplam: {totalPlayers}, Hazır: {readyPlayers}");
+
+            if (totalPlayers > 0 && totalPlayers == readyPlayers)
+            {
+                _isCountdownStarted = true;
+                StartMatchCountdown();
+            }
+        }
+
+        [Server]
+        private async void StartMatchCountdown()
+        {
+            Debug.Log("[CombatArena] Maç geri sayımı başlıyor...");
+            RpcStartCountdown(_countdownDuration);
+
+            float remainingTime = _countdownDuration;
+            while (remainingTime > 0)
+            {
+                await System.Threading.Tasks.Task.Delay(1000); // 1 saniye bekle
+                remainingTime--;
+                RpcUpdateCountdown(remainingTime);
+            }
+
+            if (!_isMatchStarted)
+            {
+                _isMatchStarted = true;
+                RpcStartMatch();
+                Debug.Log("[CombatArena] Maç başladı!");
+            }
+        }
+
+        [ClientRpc]
+        private void RpcStartCountdown(float duration)
+        {
+            Debug.Log($"[CombatArena] Geri sayım başladı: {duration} saniye");
+            OnMatchCountdownStarted?.Invoke(duration);
+        }
+
+        [ClientRpc]
+        private void RpcUpdateCountdown(float remainingTime)
+        {
+            Debug.Log($"[CombatArena] Geri sayım: {remainingTime} saniye");
+            OnCountdownUpdated?.Invoke(remainingTime);
+        }
+
+        [ClientRpc]
+        private void RpcStartMatch()
+        {
+            Debug.Log("[CombatArena] Maç başladı!");
+            OnMatchStarted?.Invoke();
+        }
+
+        private void OnMatchStateChanged(bool oldValue, bool newValue)
+        {
+            Debug.Log($"[CombatArena] Maç durumu değişti: {oldValue} -> {newValue}");
+        }
+
+        public event System.Action<float> OnMatchCountdownStarted;
+        public event System.Action<float> OnCountdownUpdated;
+        public event System.Action OnMatchStarted;
     }
 }

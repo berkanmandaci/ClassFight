@@ -55,6 +55,8 @@ namespace ProjectV3.Shared.Combat
 
         [SerializeField] private CombatUserVo _combatData;
 
+        private bool _canControl = false;
+
         #endregion
 
 
@@ -74,17 +76,36 @@ namespace ProjectV3.Shared.Combat
             SubscribeToInputEvents();
             SetupCamera();
             ActivateCharacter(_currentCharacterType);
+
+            // Maç başlama olaylarına abone ol
+            CombatArenaModel.Instance.OnMatchStarted += OnMatchStarted;
+            CombatArenaModel.Instance.OnMatchCountdownStarted += OnMatchCountdownStarted;
+            CombatArenaModel.Instance.OnCountdownUpdated += OnCountdownUpdated;
+            
+            // Hazır olduğunu server'a bildir
+            if (isClient)
+            {
+                CmdRegisterReady();
+            }
         }
 
         private void OnDisable()
         {
             if (!isLocalPlayer) return;
             UnsubscribeFromInputEvents();
+
+            // Maç başlama olaylarından çık
+            if (CombatArenaModel.Instance != null)
+            {
+                CombatArenaModel.Instance.OnMatchStarted -= OnMatchStarted;
+                CombatArenaModel.Instance.OnMatchCountdownStarted -= OnMatchCountdownStarted;
+                CombatArenaModel.Instance.OnCountdownUpdated -= OnCountdownUpdated;
+            }
         }
 
         private void Update()
         {
-            if (!isLocalPlayer || !_isInitialized) return;
+            if (!isLocalPlayer || !_isInitialized || !_canControl) return;
 
             HandleRotation();
 
@@ -223,7 +244,7 @@ namespace ProjectV3.Shared.Combat
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer) return;
+            if (!isLocalPlayer || !_canControl) return;
 
             _moveInput = context.ReadValue<Vector2>();
             _moveDirection = new Vector3(_moveInput.x, 0, _moveInput.y).normalized;
@@ -231,13 +252,13 @@ namespace ProjectV3.Shared.Combat
 
         public void OnAim(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer) return;
+            if (!isLocalPlayer || !_canControl) return;
             _aimInput = context.ReadValue<Vector2>();
         }
 
         protected virtual void OnAttack(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !context.performed) return;
+            if (!isLocalPlayer || !context.performed || !_canControl) return;
 
             try
             {
@@ -252,7 +273,7 @@ namespace ProjectV3.Shared.Combat
 
         public void OnDash(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !context.performed || _isDashing) return;
+            if (!isLocalPlayer || !context.performed || _isDashing || !_canControl) return;
 
             try
             {
@@ -268,7 +289,7 @@ namespace ProjectV3.Shared.Combat
 
         public void OnDodge(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !context.performed || _isDodging) return;
+            if (!isLocalPlayer || !context.performed || _isDodging || !_canControl) return;
 
             try
             {
@@ -284,6 +305,18 @@ namespace ProjectV3.Shared.Combat
                 Debug.LogError($"[{gameObject.name}] Dodge hatası: {e.Message}");
                 _isDodging = false;
             }
+        }
+
+        private void OnPreviousCharacter(InputAction.CallbackContext context)
+        {
+            if (!isLocalPlayer || !context.performed || !_canControl) return;
+            ChangeCharacter(-1);
+        }
+
+        private void OnNextCharacter(InputAction.CallbackContext context)
+        {
+            if (!isLocalPlayer || !context.performed || !_canControl) return;
+            ChangeCharacter(1);
         }
 
         #endregion
@@ -308,6 +341,12 @@ namespace ProjectV3.Shared.Combat
         {
             _isDodging = true;
             RpcDodge(dodgeDirection);
+        }
+
+        [Command]
+        private void CmdRegisterReady()
+        {
+            CombatArenaModel.Instance.RegisterPlayerReady(connectionToClient.connectionId);
         }
 
         #endregion
@@ -387,18 +426,6 @@ namespace ProjectV3.Shared.Combat
         #endregion
 
         #region Character Management
-
-        private void OnPreviousCharacter(InputAction.CallbackContext context)
-        {
-            if (!isLocalPlayer || !context.performed) return;
-            ChangeCharacter(-1);
-        }
-
-        private void OnNextCharacter(InputAction.CallbackContext context)
-        {
-            if (!isLocalPlayer || !context.performed) return;
-            ChangeCharacter(1);
-        }
 
         private void ChangeCharacter(int direction)
         {
@@ -595,6 +622,22 @@ namespace ProjectV3.Shared.Combat
             _combatData = combatData;
             _playerHud.Init(_combatData);
             Debug.Log($"[{gameObject.name}] Combat verileri ayarlandı: {_combatData.UserData.DisplayName}");
+        }
+
+        private void OnMatchCountdownStarted(float duration)
+        {
+            Debug.Log($"[{gameObject.name}] Geri sayım başladı: {duration} saniye");
+        }
+
+        private void OnCountdownUpdated(float remainingTime)
+        {
+            Debug.Log($"[{gameObject.name}] Geri sayım: {remainingTime} saniye");
+        }
+
+        private void OnMatchStarted()
+        {
+            _canControl = true;
+            Debug.Log($"[{gameObject.name}] Karakter kontrolü aktif edildi!");
         }
     }
 }
