@@ -165,7 +165,7 @@ namespace ProjectV3.Shared.Combat
 
             // Oyuncuyu takıma ekle
             _teams[teamId].Add(player);
-            player.Initialize(player.UserData, player.CharacterController, player.NetworkIdentity, teamId);
+            player.Initialize(player.UserData, teamId);
             _teamCounter++;
 
             string modeInfo = _currentGameMode == GameModeType.TeamDeathmatch ?

@@ -53,7 +53,7 @@ namespace ProjectV3.Shared.Combat
         private ICharacterController _warriorController;
         private ICharacterController _tankController;
 
-        private CombatUserVo _combatData;
+        [SerializeField] private CombatUserVo _combatData;
 
         #endregion
 
@@ -94,10 +94,10 @@ namespace ProjectV3.Shared.Combat
             }
 
             // Combat verilerini güncelle
-            if (_combatData != null)
-            {
-                _combatData.UpdatePlayTime(Time.deltaTime);
-            }
+            // if (_combatData != null)
+            // {
+            //     _combatData.UpdatePlayTime(Time.deltaTime);
+            // }
         }
 
         #endregion

@@ -12,17 +12,32 @@ namespace ProjectV3.Shared.Combat
         [SerializeField] private float _damage = 20f;
         [SerializeField] private float _criticalMultiplier = 1.5f;
         [SerializeField] private float _criticalChance = 0.2f;
+        [SerializeField] private float _maxLifetime = 5f;
+        [SerializeField] private float _destroyDelay = 0.1f;
 
+        [SyncVar]
         private CombatUserVo _owner;
+        
+        [SyncVar]
         private bool _hasHit;
+        
         private Rigidbody _rigidbody;
+        private float _spawnTime;
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
-            Debug.Log($"[Arrow] Ok oluşturuldu - Position: {transform.position}");
+            SetupRigidbody();
+        }
 
-            // Ok için fizik ayarları
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            _spawnTime = Time.time;
+        }
+
+        private void SetupRigidbody()
+        {
             if (_rigidbody != null)
             {
                 _rigidbody.useGravity = true;
@@ -40,25 +55,22 @@ namespace ProjectV3.Shared.Combat
         public void Initialize(CombatUserVo owner)
         {
             _owner = owner;
-            Debug.Log($"[Arrow] Ok başlatıldı - Sahibi: {_owner?.UserData?.DisplayName ?? "Bilinmeyen"}, NetworkIdentity: {GetComponent<NetworkIdentity>()?.netId ?? 0}");
+            Debug.Log($"[Arrow] Ok başlatıldı - Sahibi: {_owner.UserData.DisplayName}, NetworkId: {netId}");
+        }
+
+        private void Update()
+        {
+            if (isServer && Time.time - _spawnTime > _maxLifetime)
+            {
+                NetworkServer.Destroy(gameObject);
+            }
         }
 
         [ServerCallback]
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log($"[Arrow] Çarpışma tespit edildi - Hedef: {other.name}");
-
-            if (_hasHit)
-            {
-                Debug.Log("[Arrow] Ok zaten bir hedefe çarpmış, işlem iptal ediliyor.");
+            if (_hasHit || !isServer)
                 return;
-            }
-
-            if (!isServer)
-            {
-                Debug.Log("[Arrow] Bu ok server'da değil, işlem iptal ediliyor.");
-                return;
-            }
 
             if (_owner == null)
             {
@@ -66,32 +78,13 @@ namespace ProjectV3.Shared.Combat
                 return;
             }
 
-            var targetIdentity = other.GetComponent<NetworkIdentity>();
-            if (targetIdentity == null)
-            {
-                Debug.Log($"[Arrow] Hedefte NetworkIdentity yok: {other.name}");
-                return;
-            }
-
-            var targetController = targetIdentity.GetComponent<BaseCharacterController>();
+            var targetController = other.GetComponent<BaseCharacterController>();
             if (targetController == null)
-            {
-                Debug.Log($"[Arrow] Hedefte BaseCharacterController yok: {other.name}");
                 return;
-            }
 
             var targetCombatData = targetController.GetCombatData();
-            if (targetCombatData == null)
-            {
-                Debug.Log($"[Arrow] Hedefte CombatUserVo yok: {other.name}");
+            if (targetCombatData == null || targetCombatData == _owner)
                 return;
-            }
-
-            if (targetCombatData == _owner)
-            {
-                Debug.Log("[Arrow] Ok sahibine çarptı, hasar verilmiyor.");
-                return;
-            }
 
             // Takım arkadaşına hasar verme
             if (CombatArenaModel.Instance.AreTeammates(_owner, targetCombatData))
@@ -103,39 +96,28 @@ namespace ProjectV3.Shared.Combat
             _hasHit = true;
 
             // Kritik vuruş hesapla
-            float finalDamage = _damage;
             bool isCritical = Random.value < _criticalChance;
-            if (isCritical)
-            {
-                finalDamage *= _criticalMultiplier;
-                Debug.Log($"[Arrow] KRİTİK VURUŞ! Hasar: {finalDamage}");
-            }
+            float finalDamage = isCritical ? _damage * _criticalMultiplier : _damage;
 
             // Hasarı uygula
-            Debug.Log($"[Arrow] Hasar uygulanıyor - Hedef: {targetCombatData.UserData.DisplayName}, Hasar: {finalDamage}");
             targetCombatData.TakeDamage(finalDamage, _owner);
+            Debug.Log($"[Arrow] Hedefe vuruldu: {targetCombatData.UserData.DisplayName}, Hasar: {finalDamage}, Kritik: {isCritical}");
 
-            // Ok'u durdur
-            if (_rigidbody != null)
-            {
-                _rigidbody.linearVelocity = Vector3.zero;
-                _rigidbody.isKinematic = true;
-                Debug.Log("[Arrow] Ok durduruldu");
-            }
-
-            // Vuruş efektini oynat
+            // Ok'u durdur ve efektleri oynat
+            StopArrow();
             RpcOnHit(isCritical, transform.position);
 
-            // Ok'u yok et (gecikmeli)
-            StartCoroutine(DestroyAfterDelay());
+            // Ok'u yok et
+            Destroy(gameObject, _destroyDelay);
         }
 
-        private System.Collections.IEnumerator DestroyAfterDelay()
+        private void StopArrow()
         {
-            yield return new WaitForSeconds(0.1f); // Efektlerin oynatılması için kısa bir gecikme
-            if (isServer)
+            if (_rigidbody != null)
             {
-                NetworkServer.Destroy(gameObject);
+                _rigidbody.velocity = Vector3.zero;
+                _rigidbody.isKinematic = true;
+                Debug.Log("[Arrow] Ok durduruldu");
             }
         }
 

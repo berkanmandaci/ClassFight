@@ -7,67 +7,136 @@ using UnityEngine;
 namespace ProjectV3.Shared.Vo
 {
     [Serializable]
-    public class CombatUserVo
+    public class CombatUserVo : NetworkBehaviour
     {
         #region Character Stats
         [Header("Temel Stats")]
-        public float MaxHealth { get; private set; } = 100f;
-        public float MaxShield { get; private set; } = 100f;
-        public float CurrentHealth { get; private set; }
-        public float ShieldAmount { get; private set; }
-        public bool IsDead => CurrentHealth <= 0;
+        [SyncVar(hook = nameof(OnMaxHealthChanged))]
+        private float _maxHealth = 100f;
+        public float MaxHealth => _maxHealth;
+
+        [SyncVar(hook = nameof(OnMaxShieldChanged))]
+        private float _maxShield = 100f;
+        public float MaxShield => _maxShield;
+
+        [SyncVar(hook = nameof(OnCurrentHealthChanged))]
+        private float _currentHealth;
+        public float CurrentHealth => _currentHealth;
+
+        [SyncVar(hook = nameof(OnShieldAmountChanged))]
+        private float _shieldAmount;
+        public float ShieldAmount => _shieldAmount;
+
+        [SyncVar]
+        private bool _isDead;
+        public bool IsDead => _isDead;
         
         [Header("Combat Stats")]
-        public int TotalDamageDealt { get; private set; }
-        public int TotalDamageTaken { get; private set; }
-        public int Kills { get; private set; }
-        public int Deaths { get; private set; }
-        public int Assists { get; private set; }
+        [SyncVar(hook = nameof(OnTotalDamageDealtChanged))]
+        private int _totalDamageDealt;
+        public int TotalDamageDealt => _totalDamageDealt;
+
+        [SyncVar(hook = nameof(OnTotalDamageTakenChanged))]
+        private int _totalDamageTaken;
+        public int TotalDamageTaken => _totalDamageTaken;
+
+        [SyncVar(hook = nameof(OnKillsChanged))]
+        private int _kills;
+        public int Kills => _kills;
+
+        [SyncVar(hook = nameof(OnDeathsChanged))]
+        private int _deaths;
+        public int Deaths => _deaths;
+
+        [SyncVar(hook = nameof(OnAssistsChanged))]
+        private int _assists;
+        public int Assists => _assists;
         
         [Header("Team Info")]
-        public int TeamId { get; private set; }
+        [SyncVar(hook = nameof(OnTeamIdChanged))]
+        private int _teamId;
+        public int TeamId => _teamId;
         public bool IsAlly(CombatUserVo other) => TeamId == other.TeamId;
         
         [Header("Class Specific Stats")]
-        public float ArcherTotalDamage { get; private set; }
-        public float WarriorTotalDamage { get; private set; }
-        public float TankTotalDamage { get; private set; }
-        public float ArcherPlayTime { get; private set; }
-        public float WarriorPlayTime { get; private set; }
-        public float TankPlayTime { get; private set; }
+        [SyncVar]
+        private float _archerTotalDamage;
+        public float ArcherTotalDamage => _archerTotalDamage;
+
+        [SyncVar]
+        private float _warriorTotalDamage;
+        public float WarriorTotalDamage => _warriorTotalDamage;
+
+        [SyncVar]
+        private float _tankTotalDamage;
+        public float TankTotalDamage => _tankTotalDamage;
+
+        [SyncVar]
+        private float _archerPlayTime;
+        public float ArcherPlayTime => _archerPlayTime;
+
+        [SyncVar]
+        private float _warriorPlayTime;
+        public float WarriorPlayTime => _warriorPlayTime;
+
+        [SyncVar]
+        private float _tankPlayTime;
+        public float TankPlayTime => _tankPlayTime;
         #endregion
 
         #region References
-        public UserVo UserData { get; private set; }
-        public BaseCharacterController CharacterController { get; private set; }
-        public NetworkIdentity NetworkIdentity { get; private set; }
-        public bool IsLocalPlayer => NetworkIdentity != null && NetworkIdentity.isLocalPlayer;
+        [SyncVar(hook = nameof(OnUserDataChanged))]
+        private UserVo _userData;
+        public UserVo UserData => _userData;
+        [SerializeField] private BaseCharacterController _characterController;
+        public BaseCharacterController CharacterController => _characterController;
+
         #endregion
 
         #region Initialization
-        public void Initialize(UserVo userData, BaseCharacterController controller, NetworkIdentity identity, int teamId)
+        [Server]
+        public void Initialize(UserVo userData, int teamId)
         {
-            UserData = userData;
-            CharacterController = controller;
-            NetworkIdentity = identity;
-            TeamId = teamId;
-            CurrentHealth = MaxHealth;
+            _userData = userData;
+            _teamId = teamId;
+            _currentHealth = _maxHealth;
+            _isDead = false;
             
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} için combat verileri başlatıldı. Team ID: {TeamId}, Can: {CurrentHealth}/{MaxHealth}");
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} için combat verileri başlatıldı. Team ID: {_teamId}, Can: {_currentHealth}/{_maxHealth}");
+            RpcInitializeClient(userData);
+        }
+
+        [ClientRpc]
+        private void RpcInitializeClient(UserVo userData)
+        {
+            if (!isServer) // Sadece client tarafında çalışsın
+            {
+                _userData = userData;
+                Debug.Log($"[CombatUserVo] Client: {_userData.DisplayName} için combat verileri senkronize edildi.");
+            }
+        }
+
+        private void OnUserDataChanged(UserVo oldValue, UserVo newValue)
+        {
+            // if (newValue != null)
+            // {
+                Debug.Log($"[CombatUserVo] UserData güncellendi: {newValue.DisplayName}");
+            // }
         }
         #endregion
 
         #region Combat Methods
+        [Server]
         public void TakeDamage(float damage, CombatUserVo attacker)
         {
-            if (IsDead)
+            if (_isDead)
             {
-                Debug.Log($"[CombatUserVo] {UserData.DisplayName} zaten ölü!");
+                Debug.Log($"[CombatUserVo] {_userData.DisplayName} zaten ölü!");
                 return;
             }
 
             float finalDamage = damage;
-            if (ShieldAmount > 0)
+            if (_shieldAmount > 0)
             {
                 float remainingDamage = ProcessShieldDamage(damage);
                 if (remainingDamage > 0)
@@ -80,124 +149,134 @@ namespace ProjectV3.Shared.Vo
                 ProcessHealthDamage(damage);
             }
 
-            TotalDamageTaken += Mathf.RoundToInt(finalDamage);
-            attacker.AddDamageDealt(finalDamage);
+            _totalDamageTaken += Mathf.RoundToInt(finalDamage);
+            attacker.RpcAddDamageDealt(finalDamage);
 
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} {finalDamage} hasar aldı. Kalan can: {CurrentHealth}, Kalkan: {ShieldAmount}");
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} {finalDamage} hasar aldı. Kalan can: {_currentHealth}, Kalkan: {_shieldAmount}");
 
-            if (IsDead)
+            if (_isDead)
             {
                 Die(attacker);
             }
         }
 
+        [Server]
         private float ProcessShieldDamage(float damage)
         {
             float remainingDamage = 0;
-            if (damage > ShieldAmount)
+            if (damage > _shieldAmount)
             {
-                remainingDamage = damage - ShieldAmount;
-                ShieldAmount = 0;
-                Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in kalkanı kırıldı!");
+                remainingDamage = damage - _shieldAmount;
+                _shieldAmount = 0;
+                Debug.Log($"[CombatUserVo] {_userData.DisplayName}'in kalkanı kırıldı!");
             }
             else
             {
-                ShieldAmount -= damage;
-                Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in kalkanı {damage} hasar aldı. Kalan kalkan: {ShieldAmount}");
+                _shieldAmount -= damage;
+                Debug.Log($"[CombatUserVo] {_userData.DisplayName}'in kalkanı {damage} hasar aldı. Kalan kalkan: {_shieldAmount}");
             }
-            OnShieldChanged?.Invoke();
             return remainingDamage;
         }
 
+        [Server]
         private void ProcessHealthDamage(float damage)
         {
-            float previousHealth = CurrentHealth;
-            CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-            OnHealthChanged?.Invoke();
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName}'in canı {previousHealth}'den {CurrentHealth}'e düştü");
+            float previousHealth = _currentHealth;
+            _currentHealth = Mathf.Max(0, _currentHealth - damage);
+            _isDead = _currentHealth <= 0;
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName}'in canı {previousHealth}'den {_currentHealth}'e düştü");
         }
 
+        [Server]
         public void AddShield(float amount)
         {
-            float previousShield = ShieldAmount;
-            ShieldAmount = Mathf.Min(ShieldAmount + amount, 100f);
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} kalkan kazandı: {previousShield} -> {ShieldAmount}");
+            float previousShield = _shieldAmount;
+            _shieldAmount = Mathf.Min(_shieldAmount + amount, _maxShield);
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} kalkan kazandı: {previousShield} -> {_shieldAmount}");
         }
 
+        [Server]
         public void Heal(float amount)
         {
-            if (IsDead)
+            if (_isDead)
             {
-                Debug.Log($"[CombatUserVo] {UserData.DisplayName} ölü olduğu için iyileştirilemez!");
+                Debug.Log($"[CombatUserVo] {_userData.DisplayName} ölü olduğu için iyileştirilemez!");
                 return;
             }
 
-            float previousHealth = CurrentHealth;
-            CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
-            OnHealthChanged?.Invoke();
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} iyileştirildi: {previousHealth} -> {CurrentHealth}");
+            float previousHealth = _currentHealth;
+            _currentHealth = Mathf.Min(_currentHealth + amount, _maxHealth);
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} iyileştirildi: {previousHealth} -> {_currentHealth}");
         }
 
+        [Server]
         private void Die(CombatUserVo killer)
         {
-            Deaths++;
-            killer.AddKill();
+            _deaths++;
+            killer.RpcAddKill();
             
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} öldü! Öldüren: {killer.UserData.DisplayName}");
-            Debug.Log($"[CombatUserVo] İstatistikler - Ölümler: {Deaths}, Öldürmeler: {Kills}, Asistler: {Assists}");
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} öldü! Öldüren: {killer.UserData.DisplayName}");
+            Debug.Log($"[CombatUserVo] İstatistikler - Ölümler: {_deaths}, Öldürmeler: {_kills}, Asistler: {_assists}");
 
+            RpcOnDeath();
+        }
+
+        [ClientRpc]
+        private void RpcOnDeath()
+        {
             OnDeath?.Invoke();
-            // TODO: Ölüm animasyonunu oynat
-            // TODO: Yeniden doğma sistemini başlat
         }
 
-        public void AddKill()
+        [ClientRpc]
+        private void RpcAddKill()
         {
-            Kills++;
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} bir kill aldı! Toplam kill: {Kills}");
+            _kills++;
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} bir kill aldı! Toplam kill: {_kills}");
         }
 
-        public void AddAssist()
+        [ClientRpc]
+        private void RpcAddAssist()
         {
-            Assists++;
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} bir asist aldı! Toplam asist: {Assists}");
+            _assists++;
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} bir asist aldı! Toplam asist: {_assists}");
         }
 
-        private void AddDamageDealt(float damage)
+        [ClientRpc]
+        private void RpcAddDamageDealt(float damage)
         {
-            TotalDamageDealt += Mathf.RoundToInt(damage);
+            _totalDamageDealt += Mathf.RoundToInt(damage);
             
-            // Aktif karaktere göre hasar istatistiğini güncelle
-            switch (CharacterController.GetCurrentCharacterType())
+            switch (_characterController.GetCurrentCharacterType())
             {
                 case CharacterType.Archer:
-                    ArcherTotalDamage += damage;
+                    _archerTotalDamage += damage;
                     break;
                 case CharacterType.Warrior:
-                    WarriorTotalDamage += damage;
+                    _warriorTotalDamage += damage;
                     break;
                 case CharacterType.Tank:
-                    TankTotalDamage += damage;
+                    _tankTotalDamage += damage;
                     break;
             }
 
-            Debug.Log($"[CombatUserVo] {UserData.DisplayName} toplam {TotalDamageDealt} hasar verdi");
+            Debug.Log($"[CombatUserVo] {_userData.DisplayName} toplam {_totalDamageDealt} hasar verdi");
         }
         #endregion
 
         #region Time Tracking
+        [Server]
         public void UpdatePlayTime(float deltaTime)
         {
-            switch (CharacterController.GetCurrentCharacterType())
+            switch (_characterController.GetCurrentCharacterType())
             {
                 case CharacterType.Archer:
-                    ArcherPlayTime += deltaTime;
+                    _archerPlayTime += deltaTime;
                     break;
                 case CharacterType.Warrior:
-                    WarriorPlayTime += deltaTime;
+                    _warriorPlayTime += deltaTime;
                     break;
                 case CharacterType.Tank:
-                    TankPlayTime += deltaTime;
+                    _tankPlayTime += deltaTime;
                     break;
             }
         }
@@ -206,20 +285,77 @@ namespace ProjectV3.Shared.Vo
         #region Stats
         public float GetTotalPlayTime()
         {
-            return ArcherPlayTime + WarriorPlayTime + TankPlayTime;
+            return _archerPlayTime + _warriorPlayTime + _tankPlayTime;
         }
 
         public float GetAverageDamagePerMinute()
         {
             float totalMinutes = GetTotalPlayTime() / 60f;
-            return totalMinutes > 0 ? TotalDamageDealt / totalMinutes : 0;
+            return totalMinutes > 0 ? _totalDamageDealt / totalMinutes : 0;
         }
 
         public float GetKDARatio()
         {
-            return Deaths > 0 ? (Kills + (Assists * 0.5f)) / Deaths : Kills + (Assists * 0.5f);
+            return _deaths > 0 ? (_kills + (_assists * 0.5f)) / _deaths : _kills + (_assists * 0.5f);
         }
         #endregion
+
+        #region SyncVar Hooks
+        private void OnMaxHealthChanged(float oldValue, float newValue)
+        {
+            Debug.Log($"[CombatUserVo] MaxHealth değişti: {oldValue} -> {newValue}");
+            OnHealthChanged?.Invoke();
+        }
+
+        private void OnMaxShieldChanged(float oldValue, float newValue)
+        {
+            Debug.Log($"[CombatUserVo] MaxShield değişti: {oldValue} -> {newValue}");
+            OnShieldChanged?.Invoke();
+        }
+
+        private void OnCurrentHealthChanged(float oldValue, float newValue)
+        {
+            Debug.Log($"[CombatUserVo] CurrentHealth değişti: {oldValue} -> {newValue}");
+            OnHealthChanged?.Invoke();
+        }
+
+        private void OnShieldAmountChanged(float oldValue, float newValue)
+        {
+            Debug.Log($"[CombatUserVo] ShieldAmount değişti: {oldValue} -> {newValue}");
+            OnShieldChanged?.Invoke();
+        }
+
+        private void OnTotalDamageDealtChanged(int oldValue, int newValue)
+        {
+            Debug.Log($"[CombatUserVo] TotalDamageDealt değişti: {oldValue} -> {newValue}");
+        }
+
+        private void OnTotalDamageTakenChanged(int oldValue, int newValue)
+        {
+            Debug.Log($"[CombatUserVo] TotalDamageTaken değişti: {oldValue} -> {newValue}");
+        }
+
+        private void OnKillsChanged(int oldValue, int newValue)
+        {
+            Debug.Log($"[CombatUserVo] Kills değişti: {oldValue} -> {newValue}");
+        }
+
+        private void OnDeathsChanged(int oldValue, int newValue)
+        {
+            Debug.Log($"[CombatUserVo] Deaths değişti: {oldValue} -> {newValue}");
+        }
+
+        private void OnAssistsChanged(int oldValue, int newValue)
+        {
+            Debug.Log($"[CombatUserVo] Assists değişti: {oldValue} -> {newValue}");
+        }
+
+        private void OnTeamIdChanged(int oldValue, int newValue)
+        {
+            Debug.Log($"[CombatUserVo] TeamId değişti: {oldValue} -> {newValue}");
+        }
+        #endregion
+
         public event Action OnHealthChanged;
         public event Action OnShieldChanged;
         public event Action OnDeath;

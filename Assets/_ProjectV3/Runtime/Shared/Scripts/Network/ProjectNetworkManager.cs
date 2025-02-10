@@ -186,9 +186,9 @@ namespace ProjectV3.Shared.Network
 
                 // Oyun modunu belirle ve ayarla
                 GameModeType gameMode = GameModeType.FreeForAll; // Varsayılan mod
-                
-                if (matchData.Self != null && 
-                    matchData.Self.NumericProperties != null && 
+
+                if (matchData.Self != null &&
+                    matchData.Self.NumericProperties != null &&
                     matchData.Self.NumericProperties.TryGetValue("gameMode", out double gameModeValue))
                 {
                     gameMode = (GameModeType)((int)gameModeValue);
@@ -200,98 +200,107 @@ namespace ProjectV3.Shared.Network
             }
         }
 
+        private Vector3 GetNextSpawnPosition()
+        {
+            if (spawnPoints == null || spawnPoints.Length == 0)
+                return Vector3.zero;
+
+            Vector3 position = spawnPoints[nextSpawnPointIndex];
+            nextSpawnPointIndex = (nextSpawnPointIndex + 1) % spawnPoints.Length;
+            return position;
+        }
+
+        private (string userId, string username) GetUserDataFromMatch(int connectionId)
+        {
+            if (_pendingMatches.TryGetValue(connectionId, out var matchData))
+            {
+                var matchUser = matchData.Users.FirstOrDefault(u => u.Presence.SessionId == connectionId.ToString());
+                if (matchUser != null)
+                {
+                    return (matchUser.Presence.UserId, matchUser.Presence.Username);
+                }
+            }
+            return ($"local_{connectionId}", $"Player_{connectionId}");
+        }
+
+        private GameObject CreatePlayerInstance(Vector3 spawnPosition)
+        {
+            if (playerPrefab == null)
+            {
+                Debug.LogError("[Server] Player Prefab atanmamış!");
+                return null;
+            }
+
+            var player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+
+            if (player == null)
+            {
+                Debug.LogError("[Server] Player prefab oluşturulamadı!");
+                return null;
+            }
+
+            var characterController = player.GetComponent<BaseCharacterController>();
+            var networkIdentity = player.GetComponent<NetworkIdentity>();
+
+            if (characterController == null || networkIdentity == null)
+            {
+                Debug.LogError("[Server] Player prefab'ında gerekli bileşenler eksik!");
+                Destroy(player);
+                return null;
+            }
+
+            return player;
+        }
+
         public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
             try
             {
-                // Önce oyun modunun ayarlanmış olduğundan emin ol
+                // Oyun modunu kontrol et ve gerekirse varsayılan modu ayarla
                 if (CombatArenaModel.Instance.GetCurrentGameMode() == GameModeType.None)
                 {
                     Debug.LogWarning("[Server] Oyun modu ayarlanmamış, varsayılan mod (FreeForAll) kullanılıyor.");
                     CombatArenaModel.Instance.SetGameMode(GameModeType.FreeForAll);
                 }
 
-                if (playerPrefab == null)
-                {
-                    Debug.LogError("[Server] Player Prefab is not assigned!");
-                    return;
-                }
+                // Spawn pozisyonunu al ve oyuncuyu oluştur
+                Vector3 spawnPos = GetNextSpawnPosition();
+                GameObject player = CreatePlayerInstance(spawnPos);
 
-                // Spawn pozisyonunu belirle
-                Vector3 spawnPos = Vector3.zero;
-                if (spawnPoints != null && spawnPoints.Length > 0)
-                {
-                    spawnPos = spawnPoints[nextSpawnPointIndex];
-                    nextSpawnPointIndex = (nextSpawnPointIndex + 1) % spawnPoints.Length;
-                }
+                if (player == null) return;
 
-                // Oyuncuyu spawn et
-                GameObject player = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
-                if (player == null)
-                {
-                    Debug.LogError("[Server] Failed to instantiate player prefab!");
-                    return;
-                }
-
-                // Combat bileşenlerini al
+                // Gerekli bileşenleri al
                 var characterController = player.GetComponent<BaseCharacterController>();
-                var networkIdentity = player.GetComponent<NetworkIdentity>();
 
-                if (characterController == null || networkIdentity == null)
-                {
-                    Debug.LogError("[Server] Required components missing on player prefab!");
-                    Destroy(player);
-                    return;
-                }
+                // Kullanıcı verilerini al
+                var (userId, username) = GetUserDataFromMatch(conn.connectionId);
 
-                // Nakama match verilerini al
-                IMatchmakerMatched matchData = null;
-                string userId = null;
-                string username = null;
+                // Combat verilerini oluştur
+                var userData = new UserVo(id: userId, username: username);
+                var combatData = characterController.GetCombatData();
 
-                if (_pendingMatches.TryGetValue(conn.connectionId, out matchData))
-                {
-                    var matchUser = matchData.Users.FirstOrDefault(u => u.Presence.SessionId == conn.connectionId.ToString());
-                    if (matchUser != null)
-                    {
-                        userId = matchUser.Presence.UserId;
-                        username = matchUser.Presence.Username;
-                        Debug.Log($"[Server] Found Nakama user data for connection {conn.connectionId}");
-                    }
-                }
-
-                // UserVo ve CombatUserVo oluştur
-                var userData = new UserVo(
-                    id: userId ?? $"local_{conn.connectionId}",
-                    username: username ?? $"Player_{conn.connectionId}"
-                );
-                var combatData = new CombatUserVo();
-                
-                // Connection ID'yi takım ID'si olarak kullan
-                int teamId = conn.connectionId;
-                combatData.Initialize(userData, characterController, networkIdentity, teamId);
+                // Combat verilerini başlat
+                combatData.Initialize(userData,  conn.connectionId);
 
                 // Combat verilerini kaydet
                 _combatUsers[conn.connectionId] = combatData;
-
-                // Combat verilerini CombatArenaModel'e kaydet
                 CombatArenaModel.Instance.RegisterCombatData(conn.connectionId, combatData);
 
-                // Combat verilerini karaktere ata
-                characterController.Init(combatData); 
+                // Karakter kontrolcüsünü başlat
+                characterController.Init(combatData);
 
-                // Oyuncuyu takıma kaydet
+                // Oyuncuyu arena sistemine kaydet
                 CombatArenaModel.Instance.RegisterPlayer(combatData, conn.connectionId);
 
                 // Oyuncuyu ağa ekle
                 NetworkServer.AddPlayerForConnection(conn, player);
                 spawnedPlayers[conn.connectionId] = player;
 
-                Debug.Log($"[Server] Player spawned - Connection ID: {conn.connectionId}, Position: {spawnPos}, User: {userData.DisplayName}");
+                Debug.Log($"[Server] Oyuncu spawn edildi - Bağlantı ID: {conn.connectionId}, Konum: {spawnPos}, Kullanıcı: {userData.DisplayName}");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[Server] Spawn error: {e.Message}");
+                Debug.LogError($"[Server] Spawn hatası: {e.Message}\n{e.StackTrace}");
             }
         }
 
