@@ -213,10 +213,21 @@ namespace ProjectV3.Shared.Vo
         private void Die(CombatUserVo killer)
         {
             _deaths++;
+            _isDead = true;
             killer.RpcAddKill();
             
             Debug.Log($"[CombatUserVo] {_userData.DisplayName} öldü! Öldüren: {killer.UserData.DisplayName}");
             Debug.Log($"[CombatUserVo] İstatistikler - Ölümler: {_deaths}, Öldürmeler: {_kills}, Asistler: {_assists}");
+
+            // Combat Arena'ya ölüm bilgisini gönder
+            if (CombatArenaModel.Instance != null)
+            {
+                CombatArenaModel.Instance.OnPlayerDeath(this);
+            }
+            else
+            {
+                Debug.LogError("[CombatUserVo] CombatArenaModel bulunamadı!");
+            }
 
             RpcOnDeath();
         }
@@ -224,6 +235,8 @@ namespace ProjectV3.Shared.Vo
         [ClientRpc]
         private void RpcOnDeath()
         {
+            Debug.Log($"[CombatUserVo] Client: {_userData.DisplayName} öldü!");
+            _isDead = true;
             OnDeath?.Invoke();
         }
 
@@ -360,5 +373,41 @@ namespace ProjectV3.Shared.Vo
         public event Action OnShieldChanged;
         public event Action OnDeath;
         public event Action<CharacterType> OnCharacterChanged;
+
+        [Server]
+        public void Respawn(Vector3 position)
+        {
+            // Can ve kalkanı yenile
+            _currentHealth = _maxHealth;
+            _shieldAmount = 0;
+            _isDead = false;
+
+            // Pozisyonu ayarla
+            if (_characterController != null && _characterController.gameObject != null)
+            {
+                _characterController.gameObject.transform.position = position;
+                Debug.Log($"[CombatUserVo] {_userData.DisplayName} yeniden doğdu - Can: {_currentHealth}/{_maxHealth}, Pozisyon: {position}");
+            }
+            else
+            {
+                Debug.LogError($"[CombatUserVo] {_userData.DisplayName} için CharacterController bulunamadı!");
+            }
+
+            RpcOnRespawn(position);
+        }
+
+        [ClientRpc]
+        private void RpcOnRespawn(Vector3 position)
+        {
+            Debug.Log($"[CombatUserVo] Client: {_userData.DisplayName} yeniden doğdu");
+            _isDead = false;
+            _currentHealth = _maxHealth;
+            _shieldAmount = 0;
+
+            if (_characterController != null && _characterController.gameObject != null)
+            {
+                _characterController.gameObject.transform.position = position;
+            }
+        }
     }
 } 

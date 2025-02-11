@@ -101,6 +101,12 @@ namespace ProjectV3.Shared.Combat
                 CombatArenaModel.Instance.OnMatchCountdownStarted -= OnMatchCountdownStarted;
                 CombatArenaModel.Instance.OnCountdownUpdated -= OnCountdownUpdated;
             }
+
+            // Ölüm olayından çık
+            if (_combatData != null)
+            {
+                _combatData.OnDeath -= OnPlayerDeath;
+            }
         }
 
         private void Update()
@@ -244,7 +250,7 @@ namespace ProjectV3.Shared.Combat
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !_canControl) return;
+            if (!isLocalPlayer || !_canControl || _combatData.IsDead) return;
 
             _moveInput = context.ReadValue<Vector2>();
             _moveDirection = new Vector3(_moveInput.x, 0, _moveInput.y).normalized;
@@ -252,13 +258,13 @@ namespace ProjectV3.Shared.Combat
 
         public void OnAim(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !_canControl) return;
+            if (!isLocalPlayer || !_canControl || _combatData.IsDead) return;
             _aimInput = context.ReadValue<Vector2>();
         }
 
         protected virtual void OnAttack(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !context.performed || !_canControl) return;
+            if (!isLocalPlayer || !context.performed || !_canControl || _combatData.IsDead) return;
 
             try
             {
@@ -273,7 +279,7 @@ namespace ProjectV3.Shared.Combat
 
         public void OnDash(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !context.performed || _isDashing || !_canControl) return;
+            if (!isLocalPlayer || !context.performed || _isDashing || !_canControl || _combatData.IsDead) return;
 
             try
             {
@@ -289,7 +295,7 @@ namespace ProjectV3.Shared.Combat
 
         public void OnDodge(InputAction.CallbackContext context)
         {
-            if (!isLocalPlayer || !context.performed || _isDodging || !_canControl) return;
+            if (!isLocalPlayer || !context.performed || _isDodging || !_canControl || _combatData.IsDead) return;
 
             try
             {
@@ -622,6 +628,25 @@ namespace ProjectV3.Shared.Combat
             _combatData = combatData;
             _playerHud.Init(_combatData);
             Debug.Log($"[{gameObject.name}] Combat verileri ayarlandı: {_combatData.UserData.DisplayName}");
+
+            // Ölüm olayına abone ol
+            _combatData.OnDeath += OnPlayerDeath;
+        }
+
+        private void OnPlayerDeath()
+        {
+            if (!isLocalPlayer) return;
+            
+            _canControl = false;
+            Debug.Log($"[{gameObject.name}] Oyuncu öldü, kontroller devre dışı bırakıldı!");
+
+            // Aktif karakteri devre dışı bırak
+            if (_activeCharacter != null)
+            {
+                _activeCharacter.OnAttack();
+                _activeCharacter.OnMove(Vector2.zero);
+                _activeCharacter.OnAim(Vector2.zero);
+            }
         }
 
         private void OnMatchCountdownStarted(float duration)
