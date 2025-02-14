@@ -3,6 +3,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Models;
+using ProjectV3.Shared.Core;
 
 namespace ProjectV3.Client
 {

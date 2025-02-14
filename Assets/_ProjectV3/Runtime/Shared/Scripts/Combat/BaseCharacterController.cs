@@ -67,10 +67,12 @@ namespace ProjectV3.Shared.Combat
             InitializeComponents();
         }
 
-        public override void OnStartLocalPlayer()
+        public async override void OnStartLocalPlayer()
         {
             if (!InitializeLocalPlayer())
                 return;
+
+            await UniTask.WaitUntil(() => CombatArenaModel.Instance.ArenaInited);
 
             SetupInputActions();
             SubscribeToInputEvents();
@@ -81,7 +83,7 @@ namespace ProjectV3.Shared.Combat
             CombatArenaModel.Instance.OnMatchStarted += OnMatchStarted;
             CombatArenaModel.Instance.OnMatchCountdownStarted += OnMatchCountdownStarted;
             CombatArenaModel.Instance.OnCountdownUpdated += OnCountdownUpdated;
-            
+
             // Hazır olduğunu server'a bildir
             if (isClient)
             {
@@ -636,7 +638,7 @@ namespace ProjectV3.Shared.Combat
         private void OnPlayerDeath()
         {
             if (!isLocalPlayer) return;
-            
+
             _canControl = false;
             Debug.Log($"[{gameObject.name}] Oyuncu öldü, kontroller devre dışı bırakıldı!");
 

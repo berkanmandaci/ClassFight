@@ -115,7 +115,7 @@ namespace ProjectV3.Shared.Combat
         {
             if (_rigidbody != null)
             {
-                _rigidbody.velocity = Vector3.zero;
+                _rigidbody.linearVelocity = Vector3.zero;
                 _rigidbody.isKinematic = true;
                 Debug.Log("[Arrow] Ok durduruldu");
             }

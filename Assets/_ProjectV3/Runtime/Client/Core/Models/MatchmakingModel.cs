@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Nakama;
 using _Project.Runtime.Core.Extensions.Signal;
+using ProjectV3.Shared.Core;
 using ProjectV3.Shared.Extensions;
 using ProjectV3.Shared.Game;
 

@@ -3,6 +3,7 @@ using _Project.Runtime.Project.Game.Scripts.Vo;
 using Nakama;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Controllers;
+using ProjectV3.Shared.Core;
 namespace ProjectV3.Client
 {
     public class MatchMakingNotificationController : BaseNotificationController<MatchMakingNotificationController>

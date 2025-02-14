@@ -8,7 +8,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
-namespace ProjectV3.Client.Core
+namespace ProjectV3.Shared.Core
 {
     public class BundleModel : SingletonBehaviour<BundleModel>
     {

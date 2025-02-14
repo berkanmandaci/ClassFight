@@ -7,6 +7,7 @@ using _Project.Runtime.Core.Extensions.Signal;
 using Cysharp.Threading.Tasks;
 using Nakama;
 using Newtonsoft.Json;
+using ProjectV3.Shared.Core;
 using ProjectV3.Shared.Extensions;
 using UnityEngine;
 namespace ProjectV3.Client

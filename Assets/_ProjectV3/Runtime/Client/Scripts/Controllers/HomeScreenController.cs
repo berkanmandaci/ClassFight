@@ -2,6 +2,7 @@ using System;
 using _Project.Core.Scripts.Enums;
 using Cysharp.Threading.Tasks;
 using ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core;
+using ProjectV3.Shared.Core;
 using ProjectV3.Shared.Game;
 
 namespace ProjectV3.Client

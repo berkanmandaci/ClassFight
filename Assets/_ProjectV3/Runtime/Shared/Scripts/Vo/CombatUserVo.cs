@@ -408,6 +408,10 @@ namespace ProjectV3.Shared.Vo
             {
                 _characterController.gameObject.transform.position = position;
             }
+
+            // Event'leri tetikle
+            OnHealthChanged?.Invoke();
+            OnShieldChanged?.Invoke();
         }
     }
 } 

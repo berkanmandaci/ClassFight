@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ProjectV3.Shared.Vo;
 using ProjectV3.Shared.Game;
@@ -6,11 +7,15 @@ using UnityEngine;
 using Mirror;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using ProjectV3.Shared.Core;
 
 namespace ProjectV3.Shared.Combat
 {
     public class CombatArenaModel : NetworkBehaviour
     {
+        [SerializeField] private Transform _arenaParentTransform;
+
         private static CombatArenaModel _instance;
         public static CombatArenaModel Instance
         {
@@ -28,20 +33,28 @@ namespace ProjectV3.Shared.Combat
             }
         }
 
-        private void Awake()
+        private async void Awake()
         {
-            if (_instance != null && _instance != this)
+            try
             {
-                Debug.LogWarning("[CombatArena] Sahnede birden fazla CombatArenaModel var! Fazla olan yok ediliyor.");
-                Destroy(gameObject);
-                return;
+                if (_instance != null && _instance != this)
+                {
+                    Debug.LogWarning("[CombatArena] Sahnede birden fazla CombatArenaModel var! Fazla olan yok ediliyor.");
+                    Destroy(gameObject);
+                    return;
+                }
+                _instance = this;
+                Debug.Log("[CombatArena] Singleton başlatıldı");
+
+                await InitArena();
             }
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-            Debug.Log("[CombatArena] Singleton başlatıldı");
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError(e);
+            }
         }
 
-        [SerializeField] private CinemachineCamera _camera;
+        private CinemachineCamera _camera;
 
         private Dictionary<int, List<CombatUserVo>> _teams = new Dictionary<int, List<CombatUserVo>>();
         private const int MAX_TEAM_SIZE_TDM = 2; // TeamDeathmatch için takım başına 2 oyuncu
@@ -126,8 +139,25 @@ namespace ProjectV3.Shared.Combat
 
         public override void OnStartClient()
         {
-            base.OnStartClient();
-            Debug.Log("[CombatArena] Client başlatıldı");
+            try
+            {
+                base.OnStartClient();
+                Debug.Log("[CombatArena] Client başlatıldı");
+            }
+            catch (Exception e)
+            {
+                LogModel.Instance.Error(e);
+                throw; // TODO handle exception
+            }
+        }
+        public bool ArenaInited;
+        
+        private async UniTask InitArena()
+        {
+            var go = await BundleModel.Instance.InstantiatePrefab("CombatArena", _arenaParentTransform);
+            var controller = go.GetComponent<CombatArenaController>();
+            _camera = controller.GetCamera();
+            ArenaInited = true;
         }
 
         public CinemachineCamera GetCamera() => _camera;
@@ -320,7 +350,7 @@ namespace ProjectV3.Shared.Combat
                 _currentRound = 0; // İlk round için sıfırla
                 RpcStartMatch();
                 Debug.Log("[CombatArena] Maç başladı!");
-                
+
                 // İlk roundu başlat
                 await StartNextRound();
             }
@@ -462,7 +492,7 @@ namespace ProjectV3.Shared.Combat
                     Debug.Log("[CombatArena] Tüm oyuncular öldü, round berabere!");
                     await EndRound();
                 }
-                else 
+                else
                 {
                     Debug.Log("[CombatArena] Round devam ediyor - Hayatta kalan oyuncu sayısı > 1");
                 }
@@ -477,7 +507,7 @@ namespace ProjectV3.Shared.Combat
         private async Task EndRound()
         {
             if (!_isRoundActive) return;
-            
+
             _isRoundActive = false;
             Debug.Log($"[CombatArena] Round {_currentRound} sona eriyor...");
 
@@ -497,7 +527,7 @@ namespace ProjectV3.Shared.Combat
             {
                 if (!_playerTotalScores.ContainsKey(stat.Key))
                     _playerTotalScores[stat.Key] = 0;
-                
+
                 _playerTotalScores[stat.Key] += stat.Value.roundScore;
             }
 
@@ -511,7 +541,7 @@ namespace ProjectV3.Shared.Combat
                 .ToArray();
 
             RpcEndRound(roundStatsArray, scoresArray);
-            
+
             // Yeni round'u başlat
             if (_currentRound < _maxRounds)
             {
@@ -528,11 +558,19 @@ namespace ProjectV3.Shared.Combat
         [Server]
         private void EndMatch()
         {
-            var winner = _playerTotalScores.OrderByDescending(x => x.Value).First();
-            var second = _playerTotalScores.OrderByDescending(x => x.Value).Skip(1).First();
-            var third = _playerTotalScores.OrderByDescending(x => x.Value).Skip(2).First();
+            if (!_playerTotalScores.Any())
+            {
+                Debug.LogWarning("[CombatArena] Maç sonu için skor bulunamadı!");
+                return;
+            }
 
-            RpcEndMatch(winner.Key, second.Key, third.Key);
+            var sortedScores = _playerTotalScores.OrderByDescending(x => x.Value).ToList();
+
+            int winnerId = sortedScores[0].Key;
+            int secondId = sortedScores.Count > 1 ? sortedScores[1].Key : -1;
+            int thirdId = sortedScores.Count > 2 ? sortedScores[2].Key : -1;
+
+            RpcEndMatch(winnerId, secondId, thirdId);
             Debug.Log("[CombatArena] Maç sona erdi!");
         }
 

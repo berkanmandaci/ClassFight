@@ -1,5 +1,6 @@
 ﻿using Nakama;
 using Newtonsoft.Json;
+using ProjectV3.Shared.Core;
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core.Controllers
 {
     public abstract class BaseNotificationController<T> where T : BaseNotificationController<T>, new()

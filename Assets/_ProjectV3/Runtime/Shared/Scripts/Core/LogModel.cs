@@ -1,7 +1,7 @@
 ﻿using System;
 using ProjectV3.Shared.Extensions;
 using UnityEngine;
-namespace ProjectV3.Client
+namespace ProjectV3.Shared.Core
 {
     public class LogModel : Singleton<LogModel>
     {
