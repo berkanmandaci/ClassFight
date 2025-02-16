@@ -220,10 +220,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1691093481}
-  - component: {fileID: 1691093483}
-  - component: {fileID: 1691093484}
   - component: {fileID: 1691093485}
+  - component: {fileID: 1691093484}
   - component: {fileID: 1691093486}
+  - component: {fileID: 1691093487}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -246,30 +246,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1691093483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1691093480}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  port: 7777
-  NoDelay: 1
-  SendTimeout: 5000
-  ReceiveTimeout: 30000
-  serverMaxMessageSize: 16384
-  serverMaxReceivesPerTick: 10000
-  serverSendQueueLimitPerConnection: 10000
-  serverReceiveQueueLimitPerConnection: 10000
-  clientMaxMessageSize: 16384
-  clientMaxReceivesPerTick: 1000
-  clientSendQueueLimit: 10000
-  clientReceiveQueueLimit: 10000
 --- !u!114 &1691093484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,8 +280,8 @@ MonoBehaviour:
   offlineScene: Assets/_ProjectV3/Runtime/Server/Scenes/Server.unity
   onlineScene: Assets/_ProjectV3/Runtime/Shared/Scenes/Game.unity
   offlineSceneLoadDelay: 0
-  transport: {fileID: 1691093483}
-  networkAddress: localhost
+  transport: {fileID: 1691093487}
+  networkAddress: 0.0.0.0
   maxConnections: 100
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
@@ -330,11 +306,6 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  maxMessageSize: 16384
-  messageQueueSize: 10000
-  noDelay: 1
-  sendTimeout: 5000
-  receiveTimeout: 5000
   logManager: {fileID: 1691093486}
 --- !u!114 &1691093486
 MonoBehaviour:
@@ -349,6 +320,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isServer: 0
+--- !u!114 &1691093487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691093480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 7777
+  DualMode: 1
+  NoDelay: 1
+  Interval: 10
+  Timeout: 30000
+  RecvBufferSize: 7361536
+  SendBufferSize: 7361536
+  FastResend: 2
+  ReceiveWindowSize: 4096
+  SendWindowSize: 4096
+  MaxRetransmit: 40
+  MaximizeSocketBuffers: 1
+  ReliableMaxMessageSize: 297433
+  UnreliableMaxMessageSize: 1194
+  debugLog: 0
+  statisticsGUI: 0
+  statisticsLog: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

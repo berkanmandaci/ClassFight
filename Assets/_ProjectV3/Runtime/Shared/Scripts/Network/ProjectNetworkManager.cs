@@ -15,13 +15,7 @@ namespace ProjectV3.Shared.Network
         public new static ProjectNetworkManager singleton { get; private set; }
         public bool isShuttingDown { get; private set; }
 
-        [Header("Network Settings")]
-        [SerializeField] private int maxMessageSize = 16384; // 16 KB
-        [SerializeField] private int messageQueueSize = 10000;
-        [SerializeField] private int noDelay = 1; // Nagle algoritmasını devre dışı bırak
-        [SerializeField] private int sendTimeout = 5000; // 5 saniye
-        [SerializeField] private int receiveTimeout = 5000; // 5 saniye
-
+    
         // [Header("Spawn Settings")]
         private readonly Vector3[] spawnPoints =
         {
@@ -54,50 +48,50 @@ namespace ProjectV3.Shared.Network
             singleton = this;
             DontDestroyOnLoad(gameObject);
 
-            ConfigureTransport();
+            // ConfigureTransport();
 
             base.Awake();
         }
 
         private void ConfigureTransport()
         {
-            var transport = GetComponent<Transport>();
-            if (transport == null)
-            {
-                Debug.LogError("[NetworkManager] Transport component bulunamadı!");
-                return;
-            }
-
-            // Transport ayarlarını yap
-            var transportType = transport.GetType().Name;
-            Debug.Log($"[NetworkManager] Transport type: {transportType}");
+            // var transport = GetComponent<Transport>();
+            // if (transport == null)
+            // {
+            //     Debug.LogError("[NetworkManager] Transport component bulunamadı!");
+            //     return;
+            // }
+            //
+            // // Transport ayarlarını yap
+            // var transportType = transport.GetType().Name;
+            // Debug.Log($"[NetworkManager] Transport type: {transportType}");
 
             // Transport özelliklerini ayarla
-            var properties = transport.GetType().GetProperties();
-            foreach (var property in properties)
-            {
-                switch ( property.Name )
-                {
-                    case "MaxMessageSize":
-                        property.SetValue(transport, maxMessageSize);
-                        break;
-                    case "NoDelay":
-                        property.SetValue(transport, noDelay);
-                        break;
-                    case "SendTimeout":
-                        property.SetValue(transport, sendTimeout);
-                        break;
-                    case "ReceiveTimeout":
-                        property.SetValue(transport, receiveTimeout);
-                        break;
-                }
-            }
-
-            Debug.Log($"[NetworkManager] Transport ayarları yapılandırıldı:");
-            Debug.Log($"- Max Message Size: {maxMessageSize}");
-            Debug.Log($"- No Delay: {noDelay}");
-            Debug.Log($"- Send Timeout: {sendTimeout}ms");
-            Debug.Log($"- Receive Timeout: {receiveTimeout}ms");
+            // var properties = transport.GetType().GetProperties();
+            // foreach (var property in properties)
+            // {
+            //     switch ( property.Name )
+            //     {
+            //         case "MaxMessageSize":
+            //             property.SetValue(transport, maxMessageSize);
+            //             break;
+            //         case "NoDelay":
+            //             property.SetValue(transport, noDelay);
+            //             break;
+            //         case "SendTimeout":
+            //             property.SetValue(transport, sendTimeout);
+            //             break;
+            //         case "ReceiveTimeout":
+            //             property.SetValue(transport, receiveTimeout);
+            //             break;
+            //     }
+            // }
+            //
+            // Debug.Log($"[NetworkManager] Transport ayarları yapılandırıldı:");
+            // Debug.Log($"- Max Message Size: {maxMessageSize}");
+            // Debug.Log($"- No Delay: {noDelay}");
+            // Debug.Log($"- Send Timeout: {sendTimeout}ms");
+            // Debug.Log($"- Receive Timeout: {receiveTimeout}ms");
         }
 
         public override void OnStartServer()

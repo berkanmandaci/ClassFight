@@ -35,8 +35,8 @@ namespace ProjectV3.Client
 
         public void Init()
         {
-            // Client = new Nakama.Client("http", "13.61.21.22", 7350, "defaultkey");
-            Client = new Nakama.Client("http", "127.0.0.1", 7350, "defaultkey");
+            Client = new Nakama.Client("http", "52.59.221.136", 7350, "defaultkey");
+            // Client = new Nakama.Client("http", "127.0.0.1", 7350, "defaultkey");
             // Signals.Get<SocketConnected>().AddListener(GetNotifications);
         }
 

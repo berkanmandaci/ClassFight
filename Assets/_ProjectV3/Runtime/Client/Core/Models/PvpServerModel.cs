@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Mirror;
 using Nakama;
 using ProjectV3.Shared.Core;
 using ProjectV3.Shared.Extensions;
 using ProjectV3.Shared.Network;
+using UnityEngine;
 
 namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
 {
@@ -19,6 +21,7 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
         private IMatchmakerMatched currentMatch;
         private readonly object connectionLock = new object();
         private string lastProcessedMatchId;
+        private const string SERVER_INFO_RPC = "get_match_server";
 
         public async UniTask OnMatchFound(IMatchmakerMatched match = null)
         {
@@ -48,22 +51,12 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                     LogModel.Instance.Log($"Match ID: {match.MatchId}");
                 }
 
-                var serverInfo = new ServerInfo
-                {
-                    host = "localhost", // TODO: Gerçek sunucu bilgilerini al
-                    port = 7777
-                };
+                // Nakama'dan server bilgisini al
+                var serverInfo = await GetServerInfo(currentMatch);
 
                 LogModel.Instance.Log($"Sunucu bilgileri alındı:");
                 LogModel.Instance.Log($"Host: {serverInfo.host}");
                 LogModel.Instance.Log($"Port: {serverInfo.port}");
-
-                // Match verilerini NetworkManager'a kaydet
-                if (currentMatch != null && NetworkClient.connection != null)
-                {
-                    networkManager.RegisterMatchData(NetworkClient.connection.connectionId, currentMatch);
-                    LogModel.Instance.Log($"Match verileri NetworkManager'a kaydedildi");
-                }
 
                 await ConnectToGameServer(serverInfo);
             }
@@ -101,48 +94,34 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 // Event listener'ları ekle
                 SubscribeToNetworkEvents();
 
-                try
+                LogModel.Instance.Log("Mirror bağlantısı başlatılıyor...");
+                networkManager.StartClient();
+
+                // Bağlantıyı bekle
+                var connected = await WaitForConnection(connectionTimeout);
+                
+                if (!connected)
                 {
-                    LogModel.Instance.Log("Mirror bağlantısı başlatılıyor...");
-                    networkManager.StartClient();
-
-                    // Bağlantıyı bekle
-                    var timeoutTask = UniTask.Delay(TimeSpan.FromSeconds(connectionTimeout));
-                    var connectionTask = UniTask.WaitUntil(() => NetworkClient.isConnected);
-
-                    var result = await UniTask.WhenAny(connectionTask, timeoutTask);
-
-                    if (result == 1)
-                    {
-                        throw new Exception($"Bağlantı zaman aşımına uğradı ({connectionTimeout} saniye)");
-                    }
-
-                    if (!NetworkClient.isConnected)
-                    {
-                        throw new Exception("Sunucuya bağlanılamadı");
-                    }
-
-                    // Bağlantı başarılı, biraz bekle
-                    await UniTask.Delay(TimeSpan.FromSeconds(1));
-
-                    // Match bilgisini gönder
-                    if (currentMatch != null)
-                    {
-                        NetworkClient.Send(new MatchInfoMessage { matchId = currentMatch.MatchId });
-                    }
-
-                    LogModel.Instance.Log("=== Mirror sunucu bağlantısı başarılı ===");
+                    throw new Exception("Sunucuya bağlanılamadı");
                 }
-                catch (Exception e)
+
+                // Bağlantı başarılı, biraz bekle
+                await UniTask.Delay(TimeSpan.FromSeconds(1));
+
+                // Match bilgisini gönder
+                if (currentMatch != null)
                 {
-                    UnsubscribeFromNetworkEvents();
-                    await CleanupPreviousConnection();
-                    throw new Exception($"Mirror bağlantı hatası: {e.Message}");
+                    NetworkClient.Send(new MatchInfoMessage { matchId = currentMatch.MatchId });
+                    LogModel.Instance.Log($"Match bilgisi gönderildi: {currentMatch.MatchId}");
                 }
+
+                LogModel.Instance.Log("=== Mirror sunucu bağlantısı başarılı ===");
             }
-            finally
+            catch (Exception e)
             {
-                // Event'leri temizlemeyi finally bloğundan kaldırdık çünkü artık daha kontrollü yönetiyoruz
+                UnsubscribeFromNetworkEvents();
+                await CleanupPreviousConnection();
+                throw new Exception($"Mirror bağlantı hatası: {e.Message}");
             }
         }
 
@@ -233,6 +212,48 @@ namespace ProjectV3.Client._ProjectV3.Runtime.Client.Scripts.Core
                 isReconnecting = false;
                 currentMatch = null;
             }
+        }
+
+        public async UniTask<ServerInfo> GetServerInfo(IMatchmakerMatched match)
+        {
+            try 
+            {
+                LogModel.Instance.Log($"=== Server bilgisi alınıyor ===");
+                LogModel.Instance.Log($"Match ID: {match.MatchId}");
+
+                var payload = new Dictionary<string, string> 
+                { 
+                    ["match_id"] = match.MatchId 
+                };
+
+                var rpcResponse = await Socket.RpcAsync(SERVER_INFO_RPC, 
+                    JsonUtility.ToJson(payload));
+                    
+                var serverInfo = JsonUtility.FromJson<ServerInfo>(rpcResponse.Payload);
+                LogModel.Instance.Log($"Server bilgisi alındı: {serverInfo.host}:{serverInfo.port}");
+                
+                return serverInfo;
+            }
+            catch (Exception e)
+            {
+                LogModel.Instance.Error($"Server bilgisi alınamadı: {e.Message}");
+                throw;
+            }
+        }
+
+        private async UniTask<bool> WaitForConnection(float timeout = 10f)
+        {
+            var timeoutTask = UniTask.Delay(TimeSpan.FromSeconds(timeout));
+            var connectionTask = UniTask.WaitUntil(() => NetworkClient.isConnected);
+
+            var result = await UniTask.WhenAny(connectionTask, timeoutTask);
+
+            if (result == 1)
+            {
+                throw new Exception($"Bağlantı zaman aşımına uğradı ({timeout} saniye)");
+            }
+
+            return NetworkClient.isConnected;
         }
     }
 

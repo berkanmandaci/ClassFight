@@ -22,6 +22,8 @@ namespace ProjectV3.Client
         private IMatchmakerTicket currentTicket;
         private const int MATCHMAKING_TIMEOUT = 60; // 60 saniye
         private IMatchmakerMatched currentMatch;
+        private const int MAX_RETRY_ATTEMPTS = 3;
+        private bool isRetrying = false;
 
 
         public void OnMatchmakerMatched(IMatchmakerMatched matched)
@@ -36,11 +38,11 @@ namespace ProjectV3.Client
             Signals.Get<MatchFoundSignal>().Dispatch(matched);
         }
 
-        public async UniTask<IMatchmakerTicket> JoinMatchmaking(MatchmakingData data)
+        public async UniTask<IMatchmakerTicket> JoinMatchmaking(MatchmakingData data, int retryAttempt = 0)
         {
             try
             {
-                if (isMatchmaking)
+                if (isMatchmaking && !isRetrying)
                 {
                     LogModel.Instance.Warning("Zaten matchmaking'e katılmış durumdasınız!");
                     return currentTicket;
@@ -52,16 +54,16 @@ namespace ProjectV3.Client
                 }
 
                 isMatchmaking = true;
-                LogModel.Instance.Log($"=== Matchmaking başlatılıyor ===");
+                isRetrying = retryAttempt > 0;
+
+                LogModel.Instance.Log($"=== Matchmaking başlatılıyor {(isRetrying ? $"(Deneme {retryAttempt}/{MAX_RETRY_ATTEMPTS})" : "")} ===");
                 LogModel.Instance.Log($"Game Mode: {data.GameMode}");
                 LogModel.Instance.Log($"Region: {data.Region}");
 
-                // Matchmaking kriterlerini ayarla
-                var query = "*"; // Tüm oyuncularla eşleş
+                var query = "*";
                 var minCount = 2;
                 var maxCount = 2;
                 
-                // Matchmaking özelliklerini ayarla
                 var stringProperties = new Dictionary<string, string>
                 {
                     { "region", data.Region }
@@ -72,7 +74,6 @@ namespace ProjectV3.Client
                     { "gameMode", (double)data.GameMode }
                 };
 
-                // Matchmaking'e katıl
                 currentTicket = await Socket.AddMatchmakerAsync(
                     query,
                     minCount,
@@ -82,11 +83,20 @@ namespace ProjectV3.Client
                 );
 
                 LogModel.Instance.Log($"Matchmaking ticket alındı: {currentTicket.Ticket}");
+                isRetrying = false;
                 return currentTicket;
             }
             catch (Exception e)
             {
                 LogModel.Instance.Error($"Matchmaking hatası: {e.Message}");
+                
+                if (retryAttempt < MAX_RETRY_ATTEMPTS)
+                {
+                    LogModel.Instance.Log($"Yeniden deneniyor ({retryAttempt + 1}/{MAX_RETRY_ATTEMPTS})...");
+                    await UniTask.Delay(TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))); // Exponential backoff
+                    return await JoinMatchmaking(data, retryAttempt + 1);
+                }
+                
                 await CancelMatchmaking();
                 throw;
             }
@@ -97,7 +107,7 @@ namespace ProjectV3.Client
             LogModel.Instance.Log($"JoinMatch: {matchId}");
         }
 
-        public async UniTask<IMatchmakerMatched> WaitForMatch(IMatchmakerTicket ticket)
+        public async UniTask<IMatchmakerMatched> WaitForMatch(IMatchmakerTicket ticket, float timeout = 60f)
         {
             try
             {
@@ -106,17 +116,16 @@ namespace ProjectV3.Client
                     throw new Exception("Geçersiz matchmaking ticket!");
                 }
 
-                LogModel.Instance.Log("Eşleşme bekleniyor...");
+                LogModel.Instance.Log($"Eşleşme bekleniyor (Timeout: {timeout} saniye)...");
 
-                // Match bulunana kadar bekle
-                var timeoutTask = UniTask.Delay(TimeSpan.FromSeconds(MATCHMAKING_TIMEOUT));
+                var timeoutTask = UniTask.Delay(TimeSpan.FromSeconds(timeout));
                 var matchTask = UniTask.WaitUntil(() => currentMatch != null);
 
                 var result = await UniTask.WhenAny(matchTask, timeoutTask);
 
                 if (result == 1)
                 {
-                    throw new Exception($"Matchmaking zaman aşımına uğradı ({MATCHMAKING_TIMEOUT} saniye)");
+                    throw new Exception($"Matchmaking zaman aşımına uğradı ({timeout} saniye)");
                 }
 
                 if (currentMatch == null)
@@ -129,7 +138,6 @@ namespace ProjectV3.Client
             catch (Exception e)
             {
                 LogModel.Instance.Error($"Eşleşme hatası: {e.Message}");
-                await CancelMatchmaking();
                 throw;
             }
             finally
